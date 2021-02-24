@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <RootNamespace>FamilyTreeBackend.API</RootNamespace>
+    <RootNamespace>FamilyTreeBackend.Presentation.API</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ThirdPartyServices\ThirdPartyServices.csproj" />
+    <ProjectReference Include="..\InternalServices\InternalServices.csproj" />
   </ItemGroup>
 
 

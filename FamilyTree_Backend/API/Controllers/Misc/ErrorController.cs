@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
 
-namespace API.Controllers.Misc
+namespace FamilyTreeBackend.Presentation.API.Controllers.Misc
 {
     [ApiExplorerSettings(IgnoreApi = true)]
     public class ErrorController : ControllerBase
