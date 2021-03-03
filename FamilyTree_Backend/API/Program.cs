@@ -3,7 +3,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
 
-namespace FamilyTreeBackend.API
+namespace FamilyTreeBackend.Presentation.API
 {
     public class Program
     {

@@ -4,7 +4,7 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace FamilyTreeBackend.ThirdPartyServices.Swagger.OperationFilters
+namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices.Swagger.OperationFilters
 {
     public class AuthorizationHeader_Param_OperationFilter : IOperationFilter
     {

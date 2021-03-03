@@ -6,9 +6,9 @@ using Microsoft.OpenApi.Models;
 using Serilog;
 using System;
 using System.Text;
-using FamilyTreeBackend.ThirdPartyServices.Swagger.OperationFilters;
+using FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices.Swagger.OperationFilters;
 
-namespace FamilyTreeBackend.ThirdPartyServices
+namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices
 {
     public static class RegisterThirdPartyServices
     {
@@ -45,6 +45,8 @@ namespace FamilyTreeBackend.ThirdPartyServices
                 c.OperationFilter<AuthorizationHeader_Param_OperationFilter>();
                 c.OperationFilter<DefaultForMostRequests_OperationFilter>();
             });
+
+            services.AddSwaggerGenNewtonsoftSupport();
             #endregion
 
             #region JWT authentication configuration

@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using FamilyTreeBackend.ThirdPartyServices;
+using FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices;
+using FamilyTreeBackend.Infrastructure.Service.InternalServices;
+using FamilyTreeBackend.Persistence;
 
-namespace FamilyTreeBackend.API
+namespace FamilyTreeBackend.Presentation.API
 {
     public class App
     {
@@ -29,8 +31,12 @@ namespace FamilyTreeBackend.API
             );
             #endregion
 
+            #region Persistence Layer
+            services.RegisterServices_Persistence(Configuration);
+            #endregion
+
             #region Service Layer
-                // Nothing yet...
+            services.RegisterServices_Internal(Configuration);
             #endregion
 
             #region Register services from Third party

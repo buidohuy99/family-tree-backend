@@ -1,7 +1,7 @@
 ﻿using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace FamilyTreeBackend.ThirdPartyServices.Swagger.OperationFilters
+namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices.Swagger.OperationFilters
 {
     public class DefaultForMostRequests_OperationFilter : IOperationFilter
     {
