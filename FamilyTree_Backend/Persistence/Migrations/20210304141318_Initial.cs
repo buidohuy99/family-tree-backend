@@ -9,7 +9,7 @@ namespace FamilyTreeBackend.Persistence.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.EnsureSchema(
-                name: "family-tree-db");
+                name: "freedbtech_MyDatabase");
 
             migrationBuilder.CreateTable(
                 name: "AspNetRoles",
@@ -52,10 +52,10 @@ namespace FamilyTreeBackend.Persistence.Migrations
 
             migrationBuilder.CreateTable(
                 name: "FamilyTree",
-                schema: "family-tree-db",
+                schema: "freedbtech_MyDatabase",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "varchar(767)", nullable: false, defaultValueSql: "(UUID())"),
+                    Id = table.Column<string>(type: "varchar(767)", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: true),
                     Description = table.Column<string>(type: "text", nullable: true),
                     DateCreated = table.Column<DateTime>(type: "datetime", nullable: false),
@@ -174,10 +174,10 @@ namespace FamilyTreeBackend.Persistence.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Person",
-                schema: "family-tree-db",
+                schema: "freedbtech_MyDatabase",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "varchar(767)", nullable: false, defaultValueSql: "(UUID())"),
+                    Id = table.Column<string>(type: "varchar(767)", nullable: false),
                     FirstName = table.Column<string>(type: "text", nullable: true),
                     LastName = table.Column<string>(type: "text", nullable: true),
                     DateOfBirth = table.Column<DateTime>(type: "datetime", nullable: true),
@@ -196,7 +196,7 @@ namespace FamilyTreeBackend.Persistence.Migrations
                     table.ForeignKey(
                         name: "Constraints_PeopleOfTree",
                         column: x => x.FamilyTreeId,
-                        principalSchema: "family-tree-db",
+                        principalSchema: "freedbtech_MyDatabase",
                         principalTable: "FamilyTree",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -204,10 +204,10 @@ namespace FamilyTreeBackend.Persistence.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Family",
-                schema: "family-tree-db",
+                schema: "freedbtech_MyDatabase",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "varchar(767)", nullable: false, defaultValueSql: "(UUID())"),
+                    Id = table.Column<string>(type: "varchar(767)", nullable: false),
                     Parent1Id = table.Column<string>(type: "varchar(767)", nullable: true),
                     Parent2Id = table.Column<string>(type: "varchar(767)", nullable: true),
                     FamilyTreeId = table.Column<string>(type: "varchar(767)", nullable: true),
@@ -220,21 +220,21 @@ namespace FamilyTreeBackend.Persistence.Migrations
                     table.ForeignKey(
                         name: "Constraints_FamiliesOfTree",
                         column: x => x.FamilyTreeId,
-                        principalSchema: "family-tree-db",
+                        principalSchema: "freedbtech_MyDatabase",
                         principalTable: "FamilyTree",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Parent1_OfFamily",
                         column: x => x.Parent1Id,
-                        principalSchema: "family-tree-db",
+                        principalSchema: "freedbtech_MyDatabase",
                         principalTable: "Person",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Parent2_OfFamily",
                         column: x => x.Parent2Id,
-                        principalSchema: "family-tree-db",
+                        principalSchema: "freedbtech_MyDatabase",
                         principalTable: "Person",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -242,10 +242,10 @@ namespace FamilyTreeBackend.Persistence.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Relationship",
-                schema: "family-tree-db",
+                schema: "freedbtech_MyDatabase",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "varchar(767)", nullable: false, defaultValueSql: "(UUID())"),
+                    Id = table.Column<string>(type: "varchar(767)", nullable: false),
                     RelationshipType = table.Column<int>(type: "int", nullable: false),
                     DateCreated = table.Column<DateTime>(type: "datetime", nullable: false),
                     LastModified = table.Column<DateTime>(type: "datetime", nullable: false)
@@ -256,7 +256,7 @@ namespace FamilyTreeBackend.Persistence.Migrations
                     table.ForeignKey(
                         name: "FK_Relationship_OfFamily",
                         column: x => x.Id,
-                        principalSchema: "family-tree-db",
+                        principalSchema: "freedbtech_MyDatabase",
                         principalTable: "Family",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -264,10 +264,10 @@ namespace FamilyTreeBackend.Persistence.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Marriage",
-                schema: "family-tree-db",
+                schema: "freedbtech_MyDatabase",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "varchar(767)", nullable: false, defaultValueSql: "(UUID())"),
+                    Id = table.Column<string>(type: "varchar(767)", nullable: false),
                     DateOfMarriage = table.Column<DateTime>(type: "datetime", nullable: false),
                     EndOfMarriage = table.Column<DateTime>(type: "datetime", nullable: true)
                 },
@@ -277,7 +277,7 @@ namespace FamilyTreeBackend.Persistence.Migrations
                     table.ForeignKey(
                         name: "FK_Marriage_Relationship_Id",
                         column: x => x.Id,
-                        principalSchema: "family-tree-db",
+                        principalSchema: "freedbtech_MyDatabase",
                         principalTable: "Relationship",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -322,40 +322,40 @@ namespace FamilyTreeBackend.Persistence.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "IX_Family_FamilyTreeId",
-                schema: "family-tree-db",
+                schema: "freedbtech_MyDatabase",
                 table: "Family",
                 column: "FamilyTreeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Family_Parent1Id",
-                schema: "family-tree-db",
+                schema: "freedbtech_MyDatabase",
                 table: "Family",
                 column: "Parent1Id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Family_Parent2Id",
-                schema: "family-tree-db",
+                schema: "freedbtech_MyDatabase",
                 table: "Family",
                 column: "Parent2Id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Person_ChildOf",
-                schema: "family-tree-db",
+                schema: "freedbtech_MyDatabase",
                 table: "Person",
                 column: "ChildOf");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Person_FamilyTreeId",
-                schema: "family-tree-db",
+                schema: "freedbtech_MyDatabase",
                 table: "Person",
                 column: "FamilyTreeId");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Child_OfFamily",
-                schema: "family-tree-db",
+                schema: "freedbtech_MyDatabase",
                 table: "Person",
                 column: "ChildOf",
-                principalSchema: "family-tree-db",
+                principalSchema: "freedbtech_MyDatabase",
                 principalTable: "Family",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Restrict);
@@ -365,22 +365,22 @@ namespace FamilyTreeBackend.Persistence.Migrations
         {
             migrationBuilder.DropForeignKey(
                 name: "Constraints_FamiliesOfTree",
-                schema: "family-tree-db",
+                schema: "freedbtech_MyDatabase",
                 table: "Family");
 
             migrationBuilder.DropForeignKey(
                 name: "Constraints_PeopleOfTree",
-                schema: "family-tree-db",
+                schema: "freedbtech_MyDatabase",
                 table: "Person");
 
             migrationBuilder.DropForeignKey(
                 name: "FK_Parent1_OfFamily",
-                schema: "family-tree-db",
+                schema: "freedbtech_MyDatabase",
                 table: "Family");
 
             migrationBuilder.DropForeignKey(
                 name: "FK_Parent2_OfFamily",
-                schema: "family-tree-db",
+                schema: "freedbtech_MyDatabase",
                 table: "Family");
 
             migrationBuilder.DropTable(
@@ -400,7 +400,7 @@ namespace FamilyTreeBackend.Persistence.Migrations
 
             migrationBuilder.DropTable(
                 name: "Marriage",
-                schema: "family-tree-db");
+                schema: "freedbtech_MyDatabase");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
@@ -410,19 +410,19 @@ namespace FamilyTreeBackend.Persistence.Migrations
 
             migrationBuilder.DropTable(
                 name: "Relationship",
-                schema: "family-tree-db");
+                schema: "freedbtech_MyDatabase");
 
             migrationBuilder.DropTable(
                 name: "FamilyTree",
-                schema: "family-tree-db");
+                schema: "freedbtech_MyDatabase");
 
             migrationBuilder.DropTable(
                 name: "Person",
-                schema: "family-tree-db");
+                schema: "freedbtech_MyDatabase");
 
             migrationBuilder.DropTable(
                 name: "Family",
-                schema: "family-tree-db");
+                schema: "freedbtech_MyDatabase");
         }
     }
 }

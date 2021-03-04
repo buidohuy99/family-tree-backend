@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FamilyTreeBackend.Persistence.Migrations
 {
     [DbContext(typeof(FamilyTreeDbContext))]
-    [Migration("20210303084504_Initial")]
+    [Migration("20210304141318_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -87,8 +87,7 @@ namespace FamilyTreeBackend.Persistence.Migrations
             modelBuilder.Entity("FamilyTreeBackend.Core.Domain.Entities.Family", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("varchar(767)")
-                        .HasDefaultValueSql("(UUID())");
+                        .HasColumnType("varchar(767)");
 
                     b.Property<DateTime>("DateCreated")
                         .ValueGeneratedOnAdd()
@@ -119,14 +118,13 @@ namespace FamilyTreeBackend.Persistence.Migrations
 
                     b.HasIndex("Parent2Id");
 
-                    b.ToTable("Family", "family-tree-db");
+                    b.ToTable("Family", "freedbtech_MyDatabase");
                 });
 
             modelBuilder.Entity("FamilyTreeBackend.Core.Domain.Entities.FamilyTree", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("varchar(767)")
-                        .HasDefaultValueSql("(UUID())");
+                        .HasColumnType("varchar(767)");
 
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime");
@@ -142,14 +140,13 @@ namespace FamilyTreeBackend.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("FamilyTree", "family-tree-db");
+                    b.ToTable("FamilyTree", "freedbtech_MyDatabase");
                 });
 
             modelBuilder.Entity("FamilyTreeBackend.Core.Domain.Entities.Person", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("varchar(767)")
-                        .HasDefaultValueSql("(UUID())");
+                        .HasColumnType("varchar(767)");
 
                     b.Property<string>("ChildOf")
                         .HasColumnType("varchar(767)");
@@ -190,14 +187,13 @@ namespace FamilyTreeBackend.Persistence.Migrations
 
                     b.HasIndex("FamilyTreeId");
 
-                    b.ToTable("Person", "family-tree-db");
+                    b.ToTable("Person", "freedbtech_MyDatabase");
                 });
 
             modelBuilder.Entity("FamilyTreeBackend.Core.Domain.Entities.Relationship", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("varchar(767)")
-                        .HasDefaultValueSql("(UUID())");
+                        .HasColumnType("varchar(767)");
 
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime");
@@ -210,7 +206,7 @@ namespace FamilyTreeBackend.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Relationship", "family-tree-db");
+                    b.ToTable("Relationship", "freedbtech_MyDatabase");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -364,7 +360,7 @@ namespace FamilyTreeBackend.Persistence.Migrations
                     b.Property<DateTime?>("EndOfMarriage")
                         .HasColumnType("datetime");
 
-                    b.ToTable("Marriage", "family-tree-db");
+                    b.ToTable("Marriage", "freedbtech_MyDatabase");
                 });
 
             modelBuilder.Entity("FamilyTreeBackend.Core.Domain.Entities.Family", b =>

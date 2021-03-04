@@ -19,7 +19,7 @@ namespace FamilyTreeBackend.Persistence.DbContext
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseMySQL("server=localhost;port=3306;user=root;password=123456;database=family-tree-db;");
+            optionsBuilder.UseMySQL("server=freedb.tech;port=3306;user=freedbtech_johnnyshi;password=freedb_1999;database=freedbtech_MyDatabase;");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -27,10 +27,10 @@ namespace FamilyTreeBackend.Persistence.DbContext
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<Family>((entity) => {
-                entity.ToTable("Family", "family-tree-db");
+                entity.ToTable("Family", "freedbtech_MyDatabase");
 
                 entity.HasKey(e => e.Id);
-                entity.Property(e => e.Id).HasDefaultValueSql("(UUID())");
+                entity.Property(e => e.Id);
 
                 entity.Property(e => e.DateCreated)
                     .HasColumnName("createdAt")
@@ -54,10 +54,10 @@ namespace FamilyTreeBackend.Persistence.DbContext
             });
 
             modelBuilder.Entity<Person>((entity) => {
-                entity.ToTable("Person", "family-tree-db");
+                entity.ToTable("Person", "freedbtech_MyDatabase");
 
                 entity.HasKey(e => e.Id);
-                entity.Property(e => e.Id).HasDefaultValueSql("(UUID())");
+                entity.Property(e => e.Id);
 
                 entity.HasOne(e => e.ChildOfFamily)
                     .WithMany(f => f.Children)
@@ -66,10 +66,10 @@ namespace FamilyTreeBackend.Persistence.DbContext
             });
 
             modelBuilder.Entity<Relationship>((entity) => {
-                entity.ToTable("Relationship", "family-tree-db");
+                entity.ToTable("Relationship", "freedbtech_MyDatabase");
 
                 entity.HasKey(e => e.Id);
-                entity.Property(e => e.Id).HasDefaultValueSql("(UUID())");
+                entity.Property(e => e.Id);
 
                 entity.HasOne(e => e.Family)
                     .WithOne(f => f.Relationship)
@@ -79,14 +79,14 @@ namespace FamilyTreeBackend.Persistence.DbContext
 
             modelBuilder.Entity<Marriage>((entity) =>
             {
-                entity.ToTable("Marriage", "family-tree-db");
+                entity.ToTable("Marriage", "freedbtech_MyDatabase");
             });
 
             modelBuilder.Entity<FamilyTree>((entity) => {
-                entity.ToTable("FamilyTree", "family-tree-db");
+                entity.ToTable("FamilyTree", "freedbtech_MyDatabase");
 
                 entity.HasKey(e => e.Id);
-                entity.Property(e => e.Id).HasDefaultValueSql("(UUID())");
+                entity.Property(e => e.Id);
 
                 entity.HasMany(e => e.People)
                     .WithOne()
