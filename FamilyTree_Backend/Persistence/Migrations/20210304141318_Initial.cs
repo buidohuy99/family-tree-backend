@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Migrations;
 using MySql.EntityFrameworkCore.Metadata;
 
-namespace FamilyTreeBackend.Persistence.Migrations
+namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
 {
     public partial class Initial : Migration
     {

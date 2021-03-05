@@ -3,24 +3,19 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace FamilyTreeBackend.Persistence.DbContext
+namespace FamilyTreeBackend.Infrastructure.Persistence.DbContext
 {
     public partial class FamilyTreeDbContext : IdentityDbContext<ApplicationUser>
     {
+        public FamilyTreeDbContext(DbContextOptions<FamilyTreeDbContext> options) : base(options)
+        {
+
+        }
+
         public virtual DbSet<Family> Families { get; set; }
         public virtual DbSet<FamilyTree> FamilyTrees { get; set; }
         public virtual DbSet<Person> People { get; set; }
         public virtual DbSet<Relationship> Relationships { get; set; }
-
-        public FamilyTreeDbContext(DbContextOptions<FamilyTreeDbContext> options)
-            : base(options)
-        {
-        }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseMySQL("server=freedb.tech;port=3306;user=freedbtech_johnnyshi;password=freedb_1999;database=freedbtech_MyDatabase;");
-        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

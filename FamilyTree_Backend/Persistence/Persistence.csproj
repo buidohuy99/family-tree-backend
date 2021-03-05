@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-    <RootNamespace>FamilyTreeBackend.Persistence</RootNamespace>
+    <RootNamespace>FamilyTreeBackend.Infrastructure.Persistence</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

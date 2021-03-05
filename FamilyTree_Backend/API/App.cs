@@ -5,8 +5,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices;
 using FamilyTreeBackend.Infrastructure.Service.InternalServices;
-using FamilyTreeBackend.Persistence;
-
 namespace FamilyTreeBackend.Presentation.API
 {
     public class App
@@ -29,10 +27,6 @@ namespace FamilyTreeBackend.Presentation.API
             services.AddControllers().AddNewtonsoftJson(
                 options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
             );
-            #endregion
-
-            #region Persistence Layer
-            services.RegisterServices_Persistence(Configuration);
             #endregion
 
             #region Service Layer

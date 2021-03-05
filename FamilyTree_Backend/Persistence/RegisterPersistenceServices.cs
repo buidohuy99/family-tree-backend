@@ -1,5 +1,5 @@
 ﻿using FamilyTreeBackend.Core.Domain.Entities;
-using FamilyTreeBackend.Persistence.DbContext;
+using FamilyTreeBackend.Infrastructure.Persistence.DbContext;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -8,7 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace FamilyTreeBackend.Persistence
+namespace FamilyTreeBackend.Infrastructure.Persistence
 {
     public static class RegisterPersistenceServices
     {
