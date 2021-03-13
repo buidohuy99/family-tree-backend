@@ -22,37 +22,35 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.DbContext
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<Family>((entity) => {
-                entity.ToTable("Family", "freedbtech_MyDatabase");
+                entity.ToTable("Family");
 
                 entity.HasKey(e => e.Id);
-                entity.Property(e => e.Id);
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();;
 
                 entity.Property(e => e.DateCreated)
                     .HasColumnName("createdAt")
                     .HasDefaultValueSql("CURRENT_TIMESTAMP")
                     .ValueGeneratedOnAdd();
 
-                entity.Property(e => e.LastModified)
-                    .HasColumnName("updatedAt")
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
-                    .ValueGeneratedOnAddOrUpdate();
+                //entity.Property(e => e.LastModified)
+                //    .HasColumnName("updatedAt")
+                //    .HasDefaultValueSql("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+                //    .ValueGeneratedOnAddOrUpdate();
 
                 entity.HasOne(e => e.Parent1)
                     .WithMany()
-                    .HasForeignKey(e => e.Parent1Id)
-                    .HasConstraintName("FK_Parent1_OfFamily");
+                    .HasForeignKey(e => e.Parent1Id);
 
                 entity.HasOne(e => e.Parent2)
                     .WithMany()
-                    .HasForeignKey(e => e.Parent2Id)
-                    .HasConstraintName("FK_Parent2_OfFamily");
+                    .HasForeignKey(e => e.Parent2Id);
             });
 
             modelBuilder.Entity<Person>((entity) => {
-                entity.ToTable("Person", "freedbtech_MyDatabase");
+                entity.ToTable("Person");
 
                 entity.HasKey(e => e.Id);
-                entity.Property(e => e.Id);
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();;
 
                 entity.HasOne(e => e.ChildOfFamily)
                     .WithMany(f => f.Children)
@@ -61,7 +59,7 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.DbContext
             });
 
             modelBuilder.Entity<Relationship>((entity) => {
-                entity.ToTable("Relationship", "freedbtech_MyDatabase");
+                entity.ToTable("Relationship");
 
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Id);
@@ -74,14 +72,14 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.DbContext
 
             modelBuilder.Entity<Marriage>((entity) =>
             {
-                entity.ToTable("Marriage", "freedbtech_MyDatabase");
+                entity.ToTable("Marriage");
             });
 
             modelBuilder.Entity<FamilyTree>((entity) => {
-                entity.ToTable("FamilyTree", "freedbtech_MyDatabase");
+                entity.ToTable("FamilyTree");
 
                 entity.HasKey(e => e.Id);
-                entity.Property(e => e.Id);
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();;
 
                 entity.HasMany(e => e.People)
                     .WithOne()
@@ -93,28 +91,28 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.DbContext
             });
 
             // Set asp net table to be compatible with mysql 8
-            modelBuilder.Entity<ApplicationUser>(entity => entity.Property(m => m.Id).HasMaxLength(85));
-            modelBuilder.Entity<ApplicationUser>(entity => entity.Property(m => m.NormalizedEmail).HasMaxLength(85));
-            modelBuilder.Entity<ApplicationUser>(entity => entity.Property(m => m.NormalizedUserName).HasMaxLength(85));
+            //modelBuilder.Entity<ApplicationUser>(entity => entity.Property(m => m.Id).HasMaxLength(85));
+            //modelBuilder.Entity<ApplicationUser>(entity => entity.Property(m => m.NormalizedEmail).HasMaxLength(85));
+            //modelBuilder.Entity<ApplicationUser>(entity => entity.Property(m => m.NormalizedUserName).HasMaxLength(85));
 
-            modelBuilder.Entity<IdentityRole>(entity => entity.Property(m => m.Id).HasMaxLength(85));
-            modelBuilder.Entity<IdentityRole>(entity => entity.Property(m => m.NormalizedName).HasMaxLength(85));
+            //modelBuilder.Entity<IdentityRole>(entity => entity.Property(m => m.Id).HasMaxLength(85));
+            //modelBuilder.Entity<IdentityRole>(entity => entity.Property(m => m.NormalizedName).HasMaxLength(85));
 
-            modelBuilder.Entity<IdentityUserLogin<string>>(entity => entity.Property(m => m.LoginProvider).HasMaxLength(85));
-            modelBuilder.Entity<IdentityUserLogin<string>>(entity => entity.Property(m => m.ProviderKey).HasMaxLength(85));
-            modelBuilder.Entity<IdentityUserLogin<string>>(entity => entity.Property(m => m.UserId).HasMaxLength(85));
-            modelBuilder.Entity<IdentityUserRole<string>>(entity => entity.Property(m => m.UserId).HasMaxLength(85));
+            //modelBuilder.Entity<IdentityUserLogin<string>>(entity => entity.Property(m => m.LoginProvider).HasMaxLength(85));
+            //modelBuilder.Entity<IdentityUserLogin<string>>(entity => entity.Property(m => m.ProviderKey).HasMaxLength(85));
+            //modelBuilder.Entity<IdentityUserLogin<string>>(entity => entity.Property(m => m.UserId).HasMaxLength(85));
+            //modelBuilder.Entity<IdentityUserRole<string>>(entity => entity.Property(m => m.UserId).HasMaxLength(85));
 
-            modelBuilder.Entity<IdentityUserRole<string>>(entity => entity.Property(m => m.RoleId).HasMaxLength(85));
+            //modelBuilder.Entity<IdentityUserRole<string>>(entity => entity.Property(m => m.RoleId).HasMaxLength(85));
 
-            modelBuilder.Entity<IdentityUserToken<string>>(entity => entity.Property(m => m.UserId).HasMaxLength(85));
-            modelBuilder.Entity<IdentityUserToken<string>>(entity => entity.Property(m => m.LoginProvider).HasMaxLength(85));
-            modelBuilder.Entity<IdentityUserToken<string>>(entity => entity.Property(m => m.Name).HasMaxLength(85));
+            //modelBuilder.Entity<IdentityUserToken<string>>(entity => entity.Property(m => m.UserId).HasMaxLength(85));
+            //modelBuilder.Entity<IdentityUserToken<string>>(entity => entity.Property(m => m.LoginProvider).HasMaxLength(85));
+            //modelBuilder.Entity<IdentityUserToken<string>>(entity => entity.Property(m => m.Name).HasMaxLength(85));
 
-            modelBuilder.Entity<IdentityUserClaim<string>>(entity => entity.Property(m => m.Id).HasMaxLength(85));
-            modelBuilder.Entity<IdentityUserClaim<string>>(entity => entity.Property(m => m.UserId).HasMaxLength(85));
-            modelBuilder.Entity<IdentityRoleClaim<string>>(entity => entity.Property(m => m.Id).HasMaxLength(85));
-            modelBuilder.Entity<IdentityRoleClaim<string>>(entity => entity.Property(m => m.RoleId).HasMaxLength(85));
+            //modelBuilder.Entity<IdentityUserClaim<string>>(entity => entity.Property(m => m.Id).HasMaxLength(85));
+            //modelBuilder.Entity<IdentityUserClaim<string>>(entity => entity.Property(m => m.UserId).HasMaxLength(85));
+            //modelBuilder.Entity<IdentityRoleClaim<string>>(entity => entity.Property(m => m.Id).HasMaxLength(85));
+            //modelBuilder.Entity<IdentityRoleClaim<string>>(entity => entity.Property(m => m.RoleId).HasMaxLength(85));
         }
     }
 }
