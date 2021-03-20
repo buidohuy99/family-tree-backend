@@ -9,7 +9,7 @@ namespace FamilyTreeBackend.Core.Domain.Entities
         public string Name { get; set; }
         public string Description { get; set; }
 
-        public IEnumerable<Person> People { get; set; }
-        public IEnumerable<Family> Families { get; set; }
+        public ICollection<Person> People { get; set; }
+        public ICollection<Family> Families { get; set; }
     }
 }

@@ -5,6 +5,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices;
 using FamilyTreeBackend.Infrastructure.Service.InternalServices;
+using FamilyTreeBackend.Infrastructure.Persistence.DbContext;
+
 namespace FamilyTreeBackend.Presentation.API
 {
     public class App
@@ -52,8 +54,10 @@ namespace FamilyTreeBackend.Presentation.API
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, FamilyTreeDbContext dbContext)
         {
+            dbContext.SeedData();
+
             app.UseExceptionHandler("/error");
 
             app.UseCors();
@@ -68,6 +72,8 @@ namespace FamilyTreeBackend.Presentation.API
             {
                 endpoints.MapControllers();
             });
+
+           
 
             #region middleware Swagger
             // Enable middleware to serve generated Swagger as a JSON endpoint.

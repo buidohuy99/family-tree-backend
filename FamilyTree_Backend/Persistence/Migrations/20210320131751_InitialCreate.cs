@@ -179,10 +179,10 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                     DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: true),
                     DateOfDeath = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Gender = table.Column<int>(type: "int", nullable: false),
-                    ChildOf = table.Column<long>(type: "bigint", nullable: false),
+                    ChildOf = table.Column<long>(type: "bigint", nullable: true),
                     Note = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserId = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FamilyTreeId = table.Column<long>(type: "bigint", nullable: true),
+                    FamilyTreeId = table.Column<long>(type: "bigint", nullable: false),
                     DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
                     LastModified = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
@@ -194,7 +194,7 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                         column: x => x.FamilyTreeId,
                         principalTable: "FamilyTree",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -205,7 +205,7 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Parent1Id = table.Column<long>(type: "bigint", nullable: true),
                     Parent2Id = table.Column<long>(type: "bigint", nullable: true),
-                    FamilyTreeId = table.Column<long>(type: "bigint", nullable: true),
+                    FamilyTreeId = table.Column<long>(type: "bigint", nullable: false),
                     createdAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
                     LastModified = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
@@ -217,7 +217,7 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                         column: x => x.FamilyTreeId,
                         principalTable: "FamilyTree",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Family_Person_Parent1Id",
                         column: x => x.Parent1Id,
@@ -341,7 +341,7 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                 column: "ChildOf",
                 principalTable: "Family",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.Restrict);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

@@ -23,6 +23,7 @@ namespace FamilyTreeBackend.Infrastructure.Persistence
                 services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<FamilyTreeDbContext>()
                 .AddDefaultTokenProviders();
+
             // add authentication jwt
         }
     }

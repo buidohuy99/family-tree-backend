@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(FamilyTreeDbContext))]
-    [Migration("20210313020208_InitialCreate")]
+    [Migration("20210320131751_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -99,7 +99,7 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                         .HasColumnName("createdAt")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-                    b.Property<long?>("FamilyTreeId")
+                    b.Property<long>("FamilyTreeId")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("LastModified")
@@ -153,7 +153,7 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                         .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<long>("ChildOf")
+                    b.Property<long?>("ChildOf")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("DateCreated")
@@ -165,7 +165,7 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                     b.Property<DateTime?>("DateOfDeath")
                         .HasColumnType("datetime2");
 
-                    b.Property<long?>("FamilyTreeId")
+                    b.Property<long>("FamilyTreeId")
                         .HasColumnType("bigint");
 
                     b.Property<string>("FirstName")
@@ -363,7 +363,9 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                     b.HasOne("FamilyTreeBackend.Core.Domain.Entities.FamilyTree", null)
                         .WithMany("Families")
                         .HasForeignKey("FamilyTreeId")
-                        .HasConstraintName("Constraints_FamiliesOfTree");
+                        .HasConstraintName("Constraints_FamiliesOfTree")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("FamilyTreeBackend.Core.Domain.Entities.Person", "Parent1")
                         .WithMany()
@@ -384,13 +386,14 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                         .WithMany("Children")
                         .HasForeignKey("ChildOf")
                         .HasConstraintName("FK_Child_OfFamily")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("FamilyTreeBackend.Core.Domain.Entities.FamilyTree", null)
                         .WithMany("People")
                         .HasForeignKey("FamilyTreeId")
-                        .HasConstraintName("Constraints_PeopleOfTree");
+                        .HasConstraintName("Constraints_PeopleOfTree")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("ChildOfFamily");
                 });
