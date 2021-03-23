@@ -7,7 +7,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Persistence\Persistence.csproj" />
-    <ProjectReference Include="..\ThirdPartyServices\ThirdPartyServices.csproj" />
   </ItemGroup>
 
 </Project>
