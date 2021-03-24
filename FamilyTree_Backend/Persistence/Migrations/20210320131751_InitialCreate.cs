@@ -1,24 +1,20 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
-using MySql.EntityFrameworkCore.Metadata;
 
-namespace FamilyTreeBackend.Persistence.Migrations
+namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
 {
-    public partial class Initial : Migration
+    public partial class InitialCreate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.EnsureSchema(
-                name: "family-tree-db");
-
             migrationBuilder.CreateTable(
                 name: "AspNetRoles",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "varchar(85)", maxLength: 85, nullable: false),
-                    Name = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true),
-                    NormalizedName = table.Column<string>(type: "varchar(85)", maxLength: 85, nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "text", nullable: true)
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -29,20 +25,20 @@ namespace FamilyTreeBackend.Persistence.Migrations
                 name: "AspNetUsers",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "varchar(85)", maxLength: 85, nullable: false),
-                    UserName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true),
-                    NormalizedUserName = table.Column<string>(type: "varchar(85)", maxLength: 85, nullable: true),
-                    Email = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true),
-                    NormalizedEmail = table.Column<string>(type: "varchar(85)", maxLength: 85, nullable: true),
-                    EmailConfirmed = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    PasswordHash = table.Column<string>(type: "text", nullable: true),
-                    SecurityStamp = table.Column<string>(type: "text", nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "text", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "text", nullable: true),
-                    PhoneNumberConfirmed = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    TwoFactorEnabled = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(type: "timestamp", nullable: true),
-                    LockoutEnabled = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
                     AccessFailedCount = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -52,14 +48,14 @@ namespace FamilyTreeBackend.Persistence.Migrations
 
             migrationBuilder.CreateTable(
                 name: "FamilyTree",
-                schema: "family-tree-db",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "varchar(767)", nullable: false, defaultValueSql: "(UUID())"),
-                    Name = table.Column<string>(type: "text", nullable: true),
-                    Description = table.Column<string>(type: "text", nullable: true),
-                    DateCreated = table.Column<DateTime>(type: "datetime", nullable: false),
-                    LastModified = table.Column<DateTime>(type: "datetime", nullable: false)
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LastModified = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -70,11 +66,11 @@ namespace FamilyTreeBackend.Persistence.Migrations
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", maxLength: 85, nullable: false)
-                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
-                    RoleId = table.Column<string>(type: "varchar(85)", maxLength: 85, nullable: false),
-                    ClaimType = table.Column<string>(type: "text", nullable: true),
-                    ClaimValue = table.Column<string>(type: "text", nullable: true)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -91,11 +87,11 @@ namespace FamilyTreeBackend.Persistence.Migrations
                 name: "AspNetUserClaims",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", maxLength: 85, nullable: false)
-                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
-                    UserId = table.Column<string>(type: "varchar(85)", maxLength: 85, nullable: false),
-                    ClaimType = table.Column<string>(type: "text", nullable: true),
-                    ClaimValue = table.Column<string>(type: "text", nullable: true)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -112,10 +108,10 @@ namespace FamilyTreeBackend.Persistence.Migrations
                 name: "AspNetUserLogins",
                 columns: table => new
                 {
-                    LoginProvider = table.Column<string>(type: "varchar(85)", maxLength: 85, nullable: false),
-                    ProviderKey = table.Column<string>(type: "varchar(85)", maxLength: 85, nullable: false),
-                    ProviderDisplayName = table.Column<string>(type: "text", nullable: true),
-                    UserId = table.Column<string>(type: "varchar(85)", maxLength: 85, nullable: false)
+                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ProviderKey = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ProviderDisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -132,8 +128,8 @@ namespace FamilyTreeBackend.Persistence.Migrations
                 name: "AspNetUserRoles",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(type: "varchar(85)", maxLength: 85, nullable: false),
-                    RoleId = table.Column<string>(type: "varchar(85)", maxLength: 85, nullable: false)
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -156,10 +152,10 @@ namespace FamilyTreeBackend.Persistence.Migrations
                 name: "AspNetUserTokens",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(type: "varchar(85)", maxLength: 85, nullable: false),
-                    LoginProvider = table.Column<string>(type: "varchar(85)", maxLength: 85, nullable: false),
-                    Name = table.Column<string>(type: "varchar(85)", maxLength: 85, nullable: false),
-                    Value = table.Column<string>(type: "text", nullable: true)
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -174,21 +170,21 @@ namespace FamilyTreeBackend.Persistence.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Person",
-                schema: "family-tree-db",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "varchar(767)", nullable: false, defaultValueSql: "(UUID())"),
-                    FirstName = table.Column<string>(type: "text", nullable: true),
-                    LastName = table.Column<string>(type: "text", nullable: true),
-                    DateOfBirth = table.Column<DateTime>(type: "datetime", nullable: true),
-                    DateOfDeath = table.Column<DateTime>(type: "datetime", nullable: true),
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DateOfDeath = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Gender = table.Column<int>(type: "int", nullable: false),
-                    ChildOf = table.Column<string>(type: "varchar(767)", nullable: true),
-                    Note = table.Column<string>(type: "text", nullable: true),
-                    UserId = table.Column<string>(type: "text", nullable: true),
-                    FamilyTreeId = table.Column<string>(type: "varchar(767)", nullable: true),
-                    DateCreated = table.Column<DateTime>(type: "datetime", nullable: false),
-                    LastModified = table.Column<DateTime>(type: "datetime", nullable: false)
+                    ChildOf = table.Column<long>(type: "bigint", nullable: true),
+                    Note = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FamilyTreeId = table.Column<long>(type: "bigint", nullable: false),
+                    DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LastModified = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -196,23 +192,22 @@ namespace FamilyTreeBackend.Persistence.Migrations
                     table.ForeignKey(
                         name: "Constraints_PeopleOfTree",
                         column: x => x.FamilyTreeId,
-                        principalSchema: "family-tree-db",
                         principalTable: "FamilyTree",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Family",
-                schema: "family-tree-db",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "varchar(767)", nullable: false, defaultValueSql: "(UUID())"),
-                    Parent1Id = table.Column<string>(type: "varchar(767)", nullable: true),
-                    Parent2Id = table.Column<string>(type: "varchar(767)", nullable: true),
-                    FamilyTreeId = table.Column<string>(type: "varchar(767)", nullable: true),
-                    createdAt = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    updatedAt = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Parent1Id = table.Column<long>(type: "bigint", nullable: true),
+                    Parent2Id = table.Column<long>(type: "bigint", nullable: true),
+                    FamilyTreeId = table.Column<long>(type: "bigint", nullable: false),
+                    createdAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    LastModified = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -220,21 +215,18 @@ namespace FamilyTreeBackend.Persistence.Migrations
                     table.ForeignKey(
                         name: "Constraints_FamiliesOfTree",
                         column: x => x.FamilyTreeId,
-                        principalSchema: "family-tree-db",
                         principalTable: "FamilyTree",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Parent1_OfFamily",
+                        name: "FK_Family_Person_Parent1Id",
                         column: x => x.Parent1Id,
-                        principalSchema: "family-tree-db",
                         principalTable: "Person",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Parent2_OfFamily",
+                        name: "FK_Family_Person_Parent2Id",
                         column: x => x.Parent2Id,
-                        principalSchema: "family-tree-db",
                         principalTable: "Person",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -242,13 +234,12 @@ namespace FamilyTreeBackend.Persistence.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Relationship",
-                schema: "family-tree-db",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "varchar(767)", nullable: false, defaultValueSql: "(UUID())"),
+                    Id = table.Column<long>(type: "bigint", nullable: false),
                     RelationshipType = table.Column<int>(type: "int", nullable: false),
-                    DateCreated = table.Column<DateTime>(type: "datetime", nullable: false),
-                    LastModified = table.Column<DateTime>(type: "datetime", nullable: false)
+                    DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LastModified = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -256,7 +247,6 @@ namespace FamilyTreeBackend.Persistence.Migrations
                     table.ForeignKey(
                         name: "FK_Relationship_OfFamily",
                         column: x => x.Id,
-                        principalSchema: "family-tree-db",
                         principalTable: "Family",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -264,12 +254,11 @@ namespace FamilyTreeBackend.Persistence.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Marriage",
-                schema: "family-tree-db",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "varchar(767)", nullable: false, defaultValueSql: "(UUID())"),
-                    DateOfMarriage = table.Column<DateTime>(type: "datetime", nullable: false),
-                    EndOfMarriage = table.Column<DateTime>(type: "datetime", nullable: true)
+                    Id = table.Column<long>(type: "bigint", nullable: false),
+                    DateOfMarriage = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndOfMarriage = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -277,10 +266,9 @@ namespace FamilyTreeBackend.Persistence.Migrations
                     table.ForeignKey(
                         name: "FK_Marriage_Relationship_Id",
                         column: x => x.Id,
-                        principalSchema: "family-tree-db",
                         principalTable: "Relationship",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
@@ -292,7 +280,8 @@ namespace FamilyTreeBackend.Persistence.Migrations
                 name: "RoleNameIndex",
                 table: "AspNetRoles",
                 column: "NormalizedName",
-                unique: true);
+                unique: true,
+                filter: "[NormalizedName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetUserClaims_UserId",
@@ -318,44 +307,38 @@ namespace FamilyTreeBackend.Persistence.Migrations
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
-                unique: true);
+                unique: true,
+                filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Family_FamilyTreeId",
-                schema: "family-tree-db",
                 table: "Family",
                 column: "FamilyTreeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Family_Parent1Id",
-                schema: "family-tree-db",
                 table: "Family",
                 column: "Parent1Id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Family_Parent2Id",
-                schema: "family-tree-db",
                 table: "Family",
                 column: "Parent2Id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Person_ChildOf",
-                schema: "family-tree-db",
                 table: "Person",
                 column: "ChildOf");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Person_FamilyTreeId",
-                schema: "family-tree-db",
                 table: "Person",
                 column: "FamilyTreeId");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Child_OfFamily",
-                schema: "family-tree-db",
                 table: "Person",
                 column: "ChildOf",
-                principalSchema: "family-tree-db",
                 principalTable: "Family",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Restrict);
@@ -365,22 +348,18 @@ namespace FamilyTreeBackend.Persistence.Migrations
         {
             migrationBuilder.DropForeignKey(
                 name: "Constraints_FamiliesOfTree",
-                schema: "family-tree-db",
                 table: "Family");
 
             migrationBuilder.DropForeignKey(
                 name: "Constraints_PeopleOfTree",
-                schema: "family-tree-db",
                 table: "Person");
 
             migrationBuilder.DropForeignKey(
-                name: "FK_Parent1_OfFamily",
-                schema: "family-tree-db",
+                name: "FK_Family_Person_Parent1Id",
                 table: "Family");
 
             migrationBuilder.DropForeignKey(
-                name: "FK_Parent2_OfFamily",
-                schema: "family-tree-db",
+                name: "FK_Family_Person_Parent2Id",
                 table: "Family");
 
             migrationBuilder.DropTable(
@@ -399,8 +378,7 @@ namespace FamilyTreeBackend.Persistence.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Marriage",
-                schema: "family-tree-db");
+                name: "Marriage");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
@@ -409,20 +387,16 @@ namespace FamilyTreeBackend.Persistence.Migrations
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                name: "Relationship",
-                schema: "family-tree-db");
+                name: "Relationship");
 
             migrationBuilder.DropTable(
-                name: "FamilyTree",
-                schema: "family-tree-db");
+                name: "FamilyTree");
 
             migrationBuilder.DropTable(
-                name: "Person",
-                schema: "family-tree-db");
+                name: "Person");
 
             migrationBuilder.DropTable(
-                name: "Family",
-                schema: "family-tree-db");
+                name: "Family");
         }
     }
 }

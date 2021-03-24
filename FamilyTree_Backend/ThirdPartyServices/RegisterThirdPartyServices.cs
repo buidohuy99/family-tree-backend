@@ -7,6 +7,7 @@ using Serilog;
 using System;
 using System.Text;
 using FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices.Swagger.OperationFilters;
+using FamilyTreeBackend.Core.Application.Helpers.ConfigModels;
 
 namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices
 {
@@ -50,6 +51,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices
             #endregion
 
             #region JWT authentication configuration
+            services.Configure<JWT>(Configuration.GetSection("JWT"));
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
