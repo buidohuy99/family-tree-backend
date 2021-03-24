@@ -1,4 +1,5 @@
-﻿using FamilyTreeBackend.Core.Domain.Entities;
+﻿using FamilyTreeBackend.Core.Application.Helpers.ConfigModels;
+using FamilyTreeBackend.Core.Domain.Entities;
 using FamilyTreeBackend.Infrastructure.Persistence.Context;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -14,17 +15,17 @@ namespace FamilyTreeBackend.Infrastructure.Persistence
     {
         public static void RegisterServices_Persistence(this IServiceCollection services, IConfiguration Configuration)
         {
-            
-
-                services.AddDbContext<FamilyTreeDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("FamilyTreeDbContext")));
-                // add unit of work
-                // add identity
-                services.AddIdentity<ApplicationUser, IdentityRole>()
-                .AddEntityFrameworkStores<FamilyTreeDbContext>()
-                .AddDefaultTokenProviders();
-
-            // add authentication jwt
+            // add db context
+            services.AddDbContext<FamilyTreeDbContext>(options =>
+            options.UseSqlServer(Configuration.GetConnectionString("FamilyTreeDbContext")));
+            // add unit of work
+            // add identity
+            services.AddIdentity<ApplicationUser, IdentityRole>(options => {
+                options.Password.RequireUppercase = false;
+                options.User.RequireUniqueEmail = true;
+            })
+            .AddEntityFrameworkStores<FamilyTreeDbContext>()
+            .AddDefaultTokenProviders();
         }
     }
 }

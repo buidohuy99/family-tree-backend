@@ -9,11 +9,12 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.UnitOfWork
     public class UnitOfWork<TContext> : IUnitOfWork where TContext : DbContext
     {
         private readonly TContext _dbContext;
-        private Dictionary<string, dynamic> repositoriesPrototypes;
+        private Dictionary<string, dynamic> repositoriesPrototypes = new Dictionary<string, dynamic>();
 
         public UnitOfWork(TContext context)
         {
             _dbContext = context;
+            repositoriesPrototypes = new Dictionary<string, dynamic>();
 
         }
         public IGenericRepository<TEntity> Repository<TEntity>() where TEntity : BaseEntity

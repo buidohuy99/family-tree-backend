@@ -5,6 +5,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices;
 using FamilyTreeBackend.Infrastructure.Service.InternalServices;
+using Microsoft.EntityFrameworkCore;
+using Serilog;
+using System;
+using Microsoft.AspNetCore.Identity;
+using FamilyTreeBackend.Core.Domain.Entities;
 using FamilyTreeBackend.Infrastructure.Persistence.Context;
 
 namespace FamilyTreeBackend.Presentation.API
@@ -54,11 +59,26 @@ namespace FamilyTreeBackend.Presentation.API
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, FamilyTreeDbContext dbContext)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, FamilyTreeDbContext dbContext, IServiceProvider serviceProvider)
         {
-            dbContext.SeedData();
-
             app.UseExceptionHandler("/error");
+
+            dbContext.Database.Migrate();
+
+            var logger = Log.Logger;
+            try
+            {
+                var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+                var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+                //Seed Default Users
+                dbContext.SeedDefaultUserAsync(userManager, roleManager).Wait();
+                // Seed data
+                dbContext.SeedData();
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "An error occurred when seeding the DB.");
+            }     
 
             app.UseCors();
 
@@ -72,8 +92,6 @@ namespace FamilyTreeBackend.Presentation.API
             {
                 endpoints.MapControllers();
             });
-
-           
 
             #region middleware Swagger
             // Enable middleware to serve generated Swagger as a JSON endpoint.
