@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace FamilyTreeBackend.Infrastructure.Persistence.DbContext
+namespace FamilyTreeBackend.Infrastructure.Persistence.Context
 {
     public partial class FamilyTreeDbContext : IdentityDbContext<ApplicationUser>
     {

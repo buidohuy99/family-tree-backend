@@ -1,5 +1,5 @@
 ﻿using FamilyTreeBackend.Core.Domain.Entities;
-using FamilyTreeBackend.Infrastructure.Persistence.DbContext;
+using FamilyTreeBackend.Infrastructure.Persistence.Context;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;

@@ -5,7 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices;
 using FamilyTreeBackend.Infrastructure.Service.InternalServices;
-using FamilyTreeBackend.Infrastructure.Persistence.DbContext;
+using FamilyTreeBackend.Infrastructure.Persistence.Context;
 
 namespace FamilyTreeBackend.Presentation.API
 {
