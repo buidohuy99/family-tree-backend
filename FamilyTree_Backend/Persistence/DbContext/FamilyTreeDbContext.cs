@@ -291,7 +291,7 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.DbContext
                     Status = 1
                 };
 
-                await userManager.CreateAsync(defaultUser, "Test@123");
+                await userManager.CreateAsync(defaultUser, "test@123");
 
                 logger.Information("Seeding complete for test user...");
             }

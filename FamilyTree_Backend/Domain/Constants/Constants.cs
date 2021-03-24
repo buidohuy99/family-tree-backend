@@ -21,7 +21,9 @@ namespace FamilyTreeBackend.Core.Domain.Constants
 
     public static class AuthServiceExceptionMessages
     {
-        public const string AuthService_CannotRegisterUser = "Cannot create the user";
+        public const string AuthService_CannotRegisterUser = "Cannot register the user with the above credentials";
+        public const string AuthService_UsernameAlreadyExists = "Cannot register: username already exist";
+        public const string AuthService_EmailAlreadyExists = "Cannot register: email already exist";
         public const string AuthService_CannotFindUser = "Valid user cannot be found from the specified infos";
         public const string AuthService_PasswordProvidedIsInvalid = "Provided password is wrong for the username/email";
     }

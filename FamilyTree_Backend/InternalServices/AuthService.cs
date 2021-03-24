@@ -114,6 +114,20 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
         {
             try
             {
+                var sameUsernameUser = await _userManager.FindByNameAsync(model.UserName);
+
+                if (sameUsernameUser != null)
+                {
+                    throw new AuthServiceException(AuthServiceExceptionMessages.AuthService_UsernameAlreadyExists);
+                }
+
+                var sameEmailUser = await _userManager.FindByEmailAsync(model.Email);
+
+                if (sameEmailUser != null)
+                {
+                    throw new AuthServiceException(AuthServiceExceptionMessages.AuthService_EmailAlreadyExists);
+                }
+
                 var newUser = new ApplicationUser()
                 {
                     UserName = model.UserName,

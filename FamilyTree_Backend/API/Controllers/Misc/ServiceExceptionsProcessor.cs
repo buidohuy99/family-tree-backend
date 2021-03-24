@@ -13,7 +13,9 @@ namespace FamilyTreeBackend.Presentation.API.Controllers.Misc
             {
                 [AuthServiceExceptionMessages.AuthService_CannotRegisterUser] = 500,
                 [AuthServiceExceptionMessages.AuthService_CannotFindUser] = 400,
-                [AuthServiceExceptionMessages.AuthService_PasswordProvidedIsInvalid] = 400
+                [AuthServiceExceptionMessages.AuthService_PasswordProvidedIsInvalid] = 400,
+                [AuthServiceExceptionMessages.AuthService_UsernameAlreadyExists] = 400,
+                [AuthServiceExceptionMessages.AuthService_EmailAlreadyExists] = 400,
             };
         }
 

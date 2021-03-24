@@ -20,7 +20,10 @@ namespace FamilyTreeBackend.Infrastructure.Persistence
             options.UseSqlServer(Configuration.GetConnectionString("FamilyTreeDbContext")));
             // add unit of work
             // add identity
-            services.AddIdentity<ApplicationUser, IdentityRole>()
+            services.AddIdentity<ApplicationUser, IdentityRole>(options => {
+                options.Password.RequireUppercase = false;
+                options.User.RequireUniqueEmail = true;
+            })
             .AddEntityFrameworkStores<FamilyTreeDbContext>()
             .AddDefaultTokenProviders();
         }
