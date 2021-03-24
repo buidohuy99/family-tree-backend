@@ -24,10 +24,10 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.UnitOfWork
 
             if (!repositoriesPrototypes.ContainsKey(repoType))
             {
-                repositoriesPrototypes.Add(repoType, new GenericRepository<TEntity, TContext>(_dbContext));
+                repositoriesPrototypes.Add(repoType, new GenericRepository<TEntity>(_dbContext));
             }
 
-            return repositoriesPrototypes[repoType];
+            return (GenericRepository<TEntity>)repositoriesPrototypes[repoType];
         }
     }
 

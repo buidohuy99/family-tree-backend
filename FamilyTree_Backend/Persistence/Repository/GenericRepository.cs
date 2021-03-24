@@ -9,14 +9,13 @@ using System.Threading.Tasks;
 
 namespace FamilyTreeBackend.Infrastructure.Persistence.Repository
 {
-    public class GenericRepository<TEntity, TContext> : IGenericRepository<TEntity> 
+    public class GenericRepository<TEntity> : IGenericRepository<TEntity> 
         where TEntity : BaseEntity
-        where TContext : DbContext
     {
-        private readonly TContext _context;
+        private readonly DbContext _context;
         private DbSet<TEntity> dbSet;
 
-        public GenericRepository(TContext context)
+        public GenericRepository(DbContext context)
         {
             _context = context;
             dbSet = _context.Set<TEntity>() ?? throw new ArgumentNullException(nameof(context));
