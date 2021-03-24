@@ -8,9 +8,11 @@ using FamilyTreeBackend.Presentation.API.Controllers.Misc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -27,6 +29,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         }
 
         [HttpPost("login")]
+        [SwaggerResponse(200, Type = typeof(AuthResponseModel))]
         public async Task<IActionResult> Login([FromBody] AuthLoginModel model)
         {
             try
@@ -59,6 +62,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         }
 
         [HttpPost("register")]
+        [SwaggerResponse(200, Type = typeof(AuthResponseModel))]
         public async Task<IActionResult> RegisterUser([FromBody] AuthRegisterModel model)
         {
             try
