@@ -6,12 +6,12 @@ using System.Collections.Generic;
 
 namespace FamilyTreeBackend.Infrastructure.Persistence.UnitOfWork
 {
-    public class UnitOfWork<TContext> : IUnitOfWork where TContext : DbContext
+    public class GenericUnitOfWork<TContext> : IUnitOfWork where TContext : DbContext
     {
         private readonly TContext _dbContext;
         private Dictionary<string, dynamic> repositoriesPrototypes = new Dictionary<string, dynamic>();
 
-        public UnitOfWork(TContext context)
+        public GenericUnitOfWork(TContext context)
         {
             _dbContext = context;
             repositoriesPrototypes = new Dictionary<string, dynamic>();
