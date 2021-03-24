@@ -3,11 +3,11 @@ using FamilyTreeBackend.Core.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace FamilyTreeBackend.Infrastructure.Persistence.DbContext
 {
@@ -22,10 +22,17 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.DbContext
         public virtual DbSet<FamilyTree> FamilyTrees { get; set; }
         public virtual DbSet<Person> People { get; set; }
         public virtual DbSet<Relationship> Relationships { get; set; }
+        public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<RefreshToken>((entity) => {
+                entity.ToTable("RefreshToken");
+
+                entity.HasKey(e => e.Token);
+            });
 
             modelBuilder.Entity<Family>((entity) => {
                 entity.ToTable("Family");
@@ -262,6 +269,32 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.DbContext
 
 
             SaveChanges();
+        }
+
+        public async Task SeedDefaultUserAsync(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        {
+            var logger = Log.Logger;
+
+            if (!userManager.Users.Any(u => u.UserName == "test"))
+            {
+                logger.Information("Seeding test user...");
+                //Seed Default User
+                var defaultUser = new ApplicationUser
+                {
+                    UserName = "test",
+                    FirstName = "test",
+                    LastName = "user",
+                    Email = "test@family-tree.com",
+                    EmailConfirmed = true,
+                    PhoneNumber = "0123434552",
+                    PhoneNumberConfirmed = true,
+                    Status = 1
+                };
+
+                await userManager.CreateAsync(defaultUser, "test@123");
+
+                logger.Information("Seeding complete for test user...");
+            }
         }
     }
 }
