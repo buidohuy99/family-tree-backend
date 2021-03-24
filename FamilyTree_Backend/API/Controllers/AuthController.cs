@@ -29,7 +29,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         }
 
         [HttpPost("login")]
-        [SwaggerResponse(200, Type = typeof(AuthResponseModel))]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<AuthResponseModel>))]
         public async Task<IActionResult> Login([FromBody] AuthLoginModel model)
         {
             try
@@ -62,7 +62,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         }
 
         [HttpPost("register")]
-        [SwaggerResponse(200, Type = typeof(AuthResponseModel))]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<AuthResponseModel>))]
         public async Task<IActionResult> RegisterUser([FromBody] AuthRegisterModel model)
         {
             try
