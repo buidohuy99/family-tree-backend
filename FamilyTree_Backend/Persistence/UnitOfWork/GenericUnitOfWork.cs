@@ -3,6 +3,7 @@ using FamilyTreeBackend.Core.Domain.Entities;
 using FamilyTreeBackend.Infrastructure.Persistence.Repository;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace FamilyTreeBackend.Infrastructure.Persistence.UnitOfWork
 {
@@ -28,6 +29,16 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.UnitOfWork
             }
 
             return (GenericRepository<TEntity>)repositoriesPrototypes[repoType];
+        }
+
+        public int SaveChanges()
+        {
+            return _dbContext.SaveChanges();
+        }
+
+        public Task<int> SaveChangesAsync()
+        {
+            return _dbContext.SaveChangesAsync();
         }
     }
 

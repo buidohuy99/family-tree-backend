@@ -11,5 +11,7 @@ namespace FamilyTreeBackend.Core.Application.Interfaces
     public interface IUnitOfWork
     {
         public IGenericRepository<TEntity> Repository<TEntity>() where TEntity : BaseEntity;
+        public int SaveChanges();
+        public Task<int> SaveChangesAsync();
     }
 }

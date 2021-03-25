@@ -45,7 +45,12 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Repository
             return entity;
         }
 
-        public async Task<TEntity> FindAsync(int id)
+        public TEntity Find(long id)
+        {
+            return dbSet.Find(id);
+        }
+
+        public async Task<TEntity> FindAsync(long id)
         {
             return await dbSet.FindAsync(id);
         }
