@@ -8,6 +8,6 @@ namespace FamilyTreeBackend.Core.Application.Interfaces
 {
     public interface IPersonService
     {
-
+        
     }
 }
