@@ -45,6 +45,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices
                 });
                 c.OperationFilter<AuthorizationHeader_Param_OperationFilter>();
                 c.OperationFilter<DefaultForMostRequests_OperationFilter>();
+                c.EnableAnnotations();
             });
 
             services.AddSwaggerGenNewtonsoftSupport();

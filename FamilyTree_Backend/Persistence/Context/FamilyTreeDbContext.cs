@@ -96,12 +96,14 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
                 entity.Property(e => e.Id).ValueGeneratedOnAdd();;
 
                 entity.HasMany(e => e.People)
-                    .WithOne()
-                    .HasConstraintName("Constraints_PeopleOfTree");
+                    .WithOne(e => e.FamilyTree)
+                    .HasForeignKey(e => e.FamilyTreeId)
+                    .HasConstraintName("FK_PersonOfTree");
 
                 entity.HasMany(e => e.Families)
-                    .WithOne()
-                    .HasConstraintName("Constraints_FamiliesOfTree");
+                    .WithOne(e => e.FamilyTree)
+                    .HasForeignKey(e => e.FamilyTreeId)
+                    .HasConstraintName("FK_FamilyOfTree");
             });
 
 
@@ -275,7 +277,7 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
         {
             var logger = Log.Logger;
 
-            if (!userManager.Users.Any(u => u.UserName == "test"))
+            if (!userManager.Users.Any())
             {
                 logger.Information("Seeding test user...");
                 //Seed Default User
