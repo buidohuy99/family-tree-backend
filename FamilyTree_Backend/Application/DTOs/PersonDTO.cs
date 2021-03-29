@@ -11,6 +11,7 @@ namespace FamilyTreeBackend.Core.Application.DTOs
 {
     public class PersonDTO
     {
+        public long Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public DateTime? DateOfBirth { get; set; }
@@ -25,6 +26,7 @@ namespace FamilyTreeBackend.Core.Application.DTOs
         public PersonDTO(Person person)
         {
             if (person == null) return;
+            Id = person.Id;
             FirstName = person.FirstName;
             LastName = person.LastName;
             DateOfBirth = person.DateOfBirth;
