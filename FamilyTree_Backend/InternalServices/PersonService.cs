@@ -1,6 +1,9 @@
 ﻿using FamilyTreeBackend.Core.Application.Interfaces;
+using FamilyTreeBackend.Core.Application.Models.PersonModels;
 using FamilyTreeBackend.Core.Domain.Entities;
+using FamilyTreeBackend.Infrastructure.Service.InternalServices.AutoMapper;
 using FamilyTreeBackend.Infrastructure.Service.InternalServices.CustomException;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +21,21 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             _unitOfWork = unitOfWork;
         }
 
-        
+        public async Task<PersonModel> GetPerson(long id)
+        {
+            Person person =  await _unitOfWork.Repository<Person>().GetDbset()
+                .Include(p => p.ChildOfFamily)
+                .Where(p => p.Id == id)
+                .FirstOrDefaultAsync<Person>();
+
+            var personModel = Mapping.Mapper.Map<Person, PersonModel>(person);
+
+            return personModel;
+        }
+
+        public Task<IEnumerable<PersonModel>> GetPersonChildren(long id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

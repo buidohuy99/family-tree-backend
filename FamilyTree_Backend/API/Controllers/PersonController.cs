@@ -1,4 +1,5 @@
-﻿using FamilyTreeBackend.Core.Domain.Entities;
+﻿using FamilyTreeBackend.Core.Application.Interfaces;
+using FamilyTreeBackend.Core.Domain.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -12,11 +13,13 @@ using System.Threading.Tasks;
 namespace FamilyTreeBackend.Presentation.API.Controllers
 {
     [Area("person-management")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class PersonController : BaseController
     {
-        protected PersonController(UserManager<ApplicationUser> userManager) : base(userManager)
+        private readonly IPersonService _personService;
+        public PersonController(UserManager<ApplicationUser> userManager, IPersonService personService) : base(userManager)
         {
+            _personService = personService;
         }
 
         [HttpGet("test")]
@@ -24,5 +27,12 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         {
             return Ok("OwO");
         }
+
+        [HttpGet("{personId}")]
+        public async Task<IActionResult> FindPerson(long personId)
+        {
+            return Ok(await _personService.GetPerson(personId));
+        }
+
     }
 }
