@@ -1,4 +1,5 @@
-﻿using FamilyTreeBackend.Core.Domain.Enums;
+﻿using FamilyTreeBackend.Core.Domain.Entities;
+using FamilyTreeBackend.Core.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -10,15 +11,37 @@ namespace FamilyTreeBackend.Core.Application.DTOs
 {
     public class PersonDTO
     {
-        [Required]
-        public Gender Gender { get; set; }
-
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public DateTime? DateOfBirth { get; set; }
         public DateTime? DateOfDeath { get; set; }
-        public long? ChildOf { get; set; }
+        public Gender Gender { get; set; }
         public string Note { get; set; }
-        public string UserId { get; set; }
+
+        public FamilyDTO ChildOfFamily { get; set; }
+        public FamilyTreeDTO FamilyTree { get; set; }
+        public UserDTO ConnectedUser { get; set; }
+
+        public PersonDTO(Person person)
+        {
+            if (person == null) return;
+            FirstName = person.FirstName;
+            LastName = person.LastName;
+            DateOfBirth = person.DateOfBirth;
+            DateOfDeath = person.DateOfDeath;
+            Gender = person.Gender;
+            if (person.ChildOfFamily != null)
+            {
+                ChildOfFamily = new FamilyDTO(person.ChildOfFamily);
+            }
+            if(person.FamilyTree != null)
+            {
+                FamilyTree = new FamilyTreeDTO(person.FamilyTree);
+            }  
+            if(person.ConnectedUser != null)
+            {
+                ConnectedUser = new UserDTO(person.ConnectedUser);
+            }
+        }
     }
 }

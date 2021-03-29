@@ -16,6 +16,10 @@ namespace FamilyTreeBackend.Presentation.API.Controllers.Misc
                 [AuthServiceExceptionMessages.AuthService_PasswordProvidedIsInvalid] = 400,
                 [AuthServiceExceptionMessages.AuthService_UsernameAlreadyExists] = 400,
                 [AuthServiceExceptionMessages.AuthService_EmailAlreadyExists] = 400,
+
+                [PersonServiceExceptionMessages.PersonService_CannotFindSpecifiedPersonFromId] = 400,
+                [PersonServiceExceptionMessages.PersonService_CannotFindSpecifiedTreeFromId] = 400,
+                [PersonServiceExceptionMessages.PersonService_CannotFindSpecifiedUserFromId] = 400
             };
         }
 

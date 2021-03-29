@@ -2,6 +2,8 @@
 using FamilyTreeBackend.Core.Domain.Entities;
 using FamilyTreeBackend.Infrastructure.Persistence.Repository;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Storage;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -18,6 +20,7 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.UnitOfWork
             repositoriesPrototypes = new Dictionary<string, dynamic>();
 
         }
+
         public IGenericRepository<TEntity> Repository<TEntity>() where TEntity : BaseEntity
         {
 
@@ -39,6 +42,16 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.UnitOfWork
         public Task<int> SaveChangesAsync()
         {
             return _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<IDbContextTransaction> CreateTransaction()
+        {
+            return await _dbContext.Database.BeginTransactionAsync();
+        }
+
+        public EntityEntry<T> Entry<T>(T obj) where T : BaseEntity
+        {
+            return _dbContext.Entry(obj);
         }
     }
 

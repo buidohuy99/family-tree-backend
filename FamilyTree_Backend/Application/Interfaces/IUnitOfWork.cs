@@ -1,5 +1,7 @@
 ﻿using FamilyTreeBackend.Core.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,5 +15,8 @@ namespace FamilyTreeBackend.Core.Application.Interfaces
         public IGenericRepository<TEntity> Repository<TEntity>() where TEntity : BaseEntity;
         public int SaveChanges();
         public Task<int> SaveChangesAsync();
+
+        public Task<IDbContextTransaction> CreateTransaction();
+        public EntityEntry<T> Entry<T>(T obj) where T : BaseEntity;
     }
 }

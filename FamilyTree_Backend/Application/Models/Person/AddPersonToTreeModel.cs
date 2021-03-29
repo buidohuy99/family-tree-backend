@@ -7,6 +7,7 @@ namespace FamilyTreeBackend.Core.Application.Models.Person
     {
         [Required]
         public long FamilyTreeId { get; set; }
-        public PersonDTO PersonInfo { get; set; }
+        [Required]
+        public PersonInputModel PersonInfo { get; set; }
     }
 }

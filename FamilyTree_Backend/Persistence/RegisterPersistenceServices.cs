@@ -19,7 +19,8 @@ namespace FamilyTreeBackend.Infrastructure.Persistence
         {
             // add db context
             services.AddDbContext<FamilyTreeDbContext>(options =>
-            options.UseSqlServer(Configuration.GetConnectionString("FamilyTreeDbContext")));
+            options.UseSqlServer(
+                Configuration.GetConnectionString("FamilyTreeDbContext")));
             // add unit of work
             services.AddScoped<IUnitOfWork, GenericUnitOfWork<FamilyTreeDbContext>>();
             // add identity

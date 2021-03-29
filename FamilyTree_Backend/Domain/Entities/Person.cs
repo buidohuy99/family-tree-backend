@@ -19,5 +19,6 @@ namespace FamilyTreeBackend.Core.Domain.Entities
         
         public Family ChildOfFamily { get; set; }
         public FamilyTree FamilyTree { get; set; }
+        public ApplicationUser ConnectedUser { get; set; }
     }
 }
