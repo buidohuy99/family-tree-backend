@@ -6,6 +6,7 @@ using FamilyTreeBackend.Core.Domain.Constants;
 using FamilyTreeBackend.Core.Domain.Entities;
 using FamilyTreeBackend.Infrastructure.Service.InternalServices.CustomException;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using System;
@@ -34,14 +35,14 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             await using var transaction = await _unitOfWork.CreateTransaction();
             try
             {
-                var familyTree = _unitOfWork.Repository<FamilyTree>().GetDbset().FirstOrDefault(e => e.Id == input.FamilyTreeId);
+                var familyTree = await _unitOfWork.Repository<FamilyTree>().GetDbset().FirstOrDefaultAsync(e => e.Id == input.FamilyTreeId);
                 if(familyTree == null)
                 {
                     throw new PersonServiceException(PersonServiceExceptionMessages.PersonService_CannotFindSpecifiedTreeFromId);
                 }
                 if(input.PersonInfo.UserId != null)
                 {
-                    var connectedUser = _userManager.FindByIdAsync(input.PersonInfo.UserId);
+                    var connectedUser = await _userManager.FindByIdAsync(input.PersonInfo.UserId);
                     if(connectedUser == null)
                     {
                         throw new PersonServiceException(PersonServiceExceptionMessages.PersonService_CannotFindSpecifiedUserFromId);
@@ -49,7 +50,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                 }
                 if(input.PersonInfo.ChildOf != null)
                 {
-                    var connectedPerson = _unitOfWork.Repository<Person>().GetDbset().FirstOrDefault(e => e.Id == input.PersonInfo.ChildOf);
+                    var connectedPerson = await _unitOfWork.Repository<Person>().GetDbset().FirstOrDefaultAsync(e => e.Id == input.PersonInfo.ChildOf);
                     if(connectedPerson == null)
                     {
                         throw new PersonServiceException(PersonServiceExceptionMessages.PersonService_CannotFindSpecifiedPersonFromId);
@@ -75,8 +76,6 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                 var entry = _unitOfWork.Entry(newPerson);
                 if(entry != null)
                 {
-                    await entry.Reference(e => e.ChildOfFamily).LoadAsync();
-                    await entry.Reference(e => e.FamilyTree).LoadAsync();
                     await entry.Reference(e => e.ConnectedUser).LoadAsync();
                 }
                 await transaction.CommitAsync();

@@ -18,12 +18,10 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.UnitOfWork
         {
             _dbContext = context;
             repositoriesPrototypes = new Dictionary<string, dynamic>();
-
         }
 
         public IGenericRepository<TEntity> Repository<TEntity>() where TEntity : BaseEntity
         {
-
             var repoType = typeof(TEntity).Name;
 
             if (!repositoriesPrototypes.ContainsKey(repoType))
