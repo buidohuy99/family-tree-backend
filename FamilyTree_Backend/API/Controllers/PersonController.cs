@@ -78,40 +78,117 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         [SwaggerOperation(Summary = "Add new parent to an existing person")]
         public async Task<IActionResult> AddNewParent(long personId, [FromBody] PersonInputModel input)
         {
-            return null;
+            try
+            {
+                // Check validity of the request
+                var claimsManager = HttpContext.User;
+                string uid = null;
+                try
+                {
+                    uid = GetUserId(claimsManager);
+                }
+                catch (Exception e)
+                {
+                    return Unauthorized(e.Message);
+                }
+
+                if (uid == null)
+                {
+                    return Unauthorized("Unauthorized individuals cannot access this route");
+                }
+
+                // Carry on with the business logic
+                var model = new AddNewParentToPersonModel()
+                {
+                    PersonId = personId,
+                    ParentInfo = input
+                };
+                PersonDTO result = await _personService.AddNewParent(uid, model);
+
+                return Ok(new HttpResponse<PersonDTO>(result, GenericResponseStrings.PersonController_AddParentToPersonSuccessful));
+            }
+            catch (Exception ex)
+            {
+                string genericMessage = GenericResponseStrings.AnExceptionOccuredInController;
+                if (ex is BaseServiceException exception)
+                {
+                    uint? statusCode = ServiceExceptionsProcessor.GetStatusCode(exception.Message);
+                    if (statusCode != null && statusCode.HasValue)
+                    {
+                        return StatusCode((int)statusCode.Value, new HttpResponse<string>(exception.Message, genericMessage));
+                    }
+                }
+                return StatusCode(500, new HttpResponse<Exception>(ex, GenericResponseStrings.InternalServerError));
+            }
         }
 
         [HttpPost("person/{personId}/parent/{parentId}")]
         [SwaggerOperation(Summary = "Add an existing parent to an existing person")]
-        public async Task<IActionResult> AddExistingParent(long personId, long parentId)
+        public async Task<IActionResult> AddExistingParent(long personId, [SwaggerParameter(Description = "Parent must not be in any family, families must be deleted before node could be used in this function")]long parentId)
         {
-            return null;
+            try
+            {
+                // Check validity of the request
+                var claimsManager = HttpContext.User;
+                string uid = null;
+                try
+                {
+                    uid = GetUserId(claimsManager);
+                }
+                catch (Exception e)
+                {
+                    return Unauthorized(e.Message);
+                }
+
+                if (uid == null)
+                {
+                    return Unauthorized("Unauthorized individuals cannot access this route");
+                }
+
+                // Carry on with the business logic
+                PersonDTO result = await _personService.AddExistingParent(uid, personId, parentId);
+
+                return Ok(new HttpResponse<PersonDTO>(result, GenericResponseStrings.PersonController_AddParentToPersonSuccessful));
+            }
+            catch (Exception ex)
+            {
+                string genericMessage = GenericResponseStrings.AnExceptionOccuredInController;
+                if (ex is BaseServiceException exception)
+                {
+                    uint? statusCode = ServiceExceptionsProcessor.GetStatusCode(exception.Message);
+                    if (statusCode != null && statusCode.HasValue)
+                    {
+                        return StatusCode((int)statusCode.Value, new HttpResponse<string>(exception.Message, genericMessage));
+                    }
+                }
+                return StatusCode(500, new HttpResponse<Exception>(ex, GenericResponseStrings.InternalServerError));
+            }
         }
 
         [HttpPost("person/{personId}/spouse")]
         [SwaggerOperation(Summary = "Add new spouse to an existing person")]
-        public async Task<IActionResult> AddNewSpouse(long personId, [FromBody] PersonInputModel input)
+        public async Task<IActionResult> AddNewSpouse(string userPerformingCreation, long personId, [FromBody] PersonInputModel input)
         {
             return null;
         }
 
         [HttpPost("person/{personId}/spouse/{spouseId}")]
         [SwaggerOperation(Summary = "Add an existing spouse to an existing person")]
-        public async Task<IActionResult> AddExistingSpouse(long personId, long spouseId)
+        public async Task<IActionResult> AddExistingSpouse(string userPerformingCreation, long personId, long spouseId)
         {
             return null;
         }
 
         [HttpPost("person/{personId}/child")]
         [SwaggerOperation(Summary = "Add new child to an existing person")]
-        public async Task<IActionResult> AddNewChild(long personId, [FromBody] PersonInputModel input)
+        public async Task<IActionResult> AddNewChild(string userPerformingCreation, long personId, [FromBody] PersonInputModel input)
         {
             return null;
         }
 
         [HttpPost("person/{personId}/child/{childId}")]
         [SwaggerOperation(Summary = "Add an existing child to an existing person")]
-        public async Task<IActionResult> AddExistingChild(long personId, long childId)
+        public async Task<IActionResult> AddExistingChild(string userPerformingCreation, long personId, long childId)
         {
             return null;
         }

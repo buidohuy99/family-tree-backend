@@ -1,4 +1,5 @@
 ﻿using FamilyTreeBackend.Core.Domain.Entities;
+using FamilyTreeBackend.Core.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,29 +10,32 @@ namespace FamilyTreeBackend.Core.Application.DTOs
 {
     public class FamilyDTO
     {
+        public long Id { get; set; }
         public PersonDTO Parent1 { get; set; }
         public PersonDTO Parent2 { get; set; }
         public RelationshipDTO Relationship { get; set; }
 
-        public FamilyDTO(Person parent1, Person parent2, Relationship relationship)
+        public FamilyDTO(Family family)
         {
-            if (parent1 != null)
+            if (family == null) return;
+            Id = family.Id;
+            if (family.Parent1 != null)
             {
-                Parent1 = new PersonDTO(parent1);
+                Parent1 = new PersonDTO(family.Parent1);
             }
-            if (parent2 != null)
+            if (family.Parent2 != null)
             {
-                Parent2 = new PersonDTO(parent2);
+                Parent2 = new PersonDTO(family.Parent2);
             }
-            if (relationship != null)
+            if (family.Relationship != null)
             {
-                if (relationship is Marriage)
+                if (family.Relationship.RelationshipType == RelationshipType.MARRIED)
                 {
-                    Relationship = new MarriageDTO(relationship as Marriage);
+                    Relationship = new MarriageDTO(family.Relationship as Marriage);
                 }
                 else
                 {
-                    Relationship = new RelationshipDTO(relationship);
+                    Relationship = new RelationshipDTO(family.Relationship);
                 }
             }
         }

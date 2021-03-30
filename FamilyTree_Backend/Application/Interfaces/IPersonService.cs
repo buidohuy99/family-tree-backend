@@ -12,16 +12,16 @@ namespace FamilyTreeBackend.Core.Application.Interfaces
     {
         public Task<PersonDTO> AddNewPerson(string userPerformingCreation, AddPersonToTreeModel input);
 
-        public Task AddNewParent(AddNewParentToPersonModel input);
+        public Task<PersonDTO> AddNewParent(string userPerformingCreation, AddNewParentToPersonModel input);
 
-        public Task AddExistingParent(long personId, long parentId);
+        public Task<PersonDTO> AddExistingParent(string userPerformingCreation, long personId, long parentId);
 
-        public Task AddNewSpouse(AddNewSpouseToPersonModel input);
+        public Task<PersonDTO> AddNewSpouse(string userPerformingCreation, AddNewSpouseToPersonModel input);
 
-        public Task AddExistingSpouse(long personId, long spouseId);
+        public Task<PersonDTO> AddExistingSpouse(string userPerformingCreation, long personId, long spouseId);
 
-        public Task AddNewChild(AddNewChildToPersonModel input);
+        public Task<PersonDTO> AddNewChild(string userPerformingCreation, AddNewChildToPersonModel input);
 
-        public Task AddExistingChild(long personId, long childId);
+        public Task<PersonDTO> AddExistingChild(string userPerformingCreation, long personId, long childId);
     }
 }

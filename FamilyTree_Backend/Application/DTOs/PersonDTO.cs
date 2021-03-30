@@ -34,7 +34,7 @@ namespace FamilyTreeBackend.Core.Application.DTOs
             Gender = person.Gender;
             if (person.ChildOfFamily != null) 
             {
-                ChildOfFamily = new FamilyDTO(person.ChildOfFamily.Parent1, person.ChildOfFamily.Parent2, person.ChildOfFamily.Relationship);
+                ChildOfFamily = new FamilyDTO(person.ChildOfFamily);
             }
             if (person.FamilyTree != null)
             {

@@ -10,11 +10,13 @@ namespace FamilyTreeBackend.Core.Application.DTOs
 {
     public class RelationshipDTO
     {
+        public long Id { get; set; }
         public RelationshipType RelationshipType { get; set; }
 
         public RelationshipDTO(Relationship relationship)
         {
             if (relationship == null) return;
+            Id = relationship.Id;
             RelationshipType = relationship.RelationshipType;
         }
     }
