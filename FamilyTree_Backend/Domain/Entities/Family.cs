@@ -12,8 +12,9 @@ namespace FamilyTreeBackend.Core.Domain.Entities
 
         public Person Parent1 { get; set; }
         public Person Parent2 { get; set; }
-        public ICollection<Person> Children { get; set; }
         public Relationship Relationship { get; set; }
+
         public FamilyTree FamilyTree { get; set; }
+        public ICollection<Person> Children { get; set; }
     }
 }

@@ -39,5 +39,6 @@ namespace FamilyTreeBackend.Core.Domain.Constants
         public const string PersonService_CannotFindSpecifiedTreeFromId = "Tree cannot be found from the provided id";
         public const string PersonService_CannotFindSpecifiedUserFromId = "User cannot be found from the provided id";
         public const string PersonService_CannotFindSpecifiedPersonFromId = "Person cannot be found from the provided id";
+        public const string PersonService_UserAlreadyExistedInTree = "User already existed as a person in the tree";
     }
 }

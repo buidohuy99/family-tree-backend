@@ -47,6 +47,11 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                     {
                         throw new PersonServiceException(PersonServiceExceptionMessages.PersonService_CannotFindSpecifiedUserFromId);
                     }
+                    var existingNodeRelatedToUser = await _unitOfWork.Repository<Person>().GetDbset().AnyAsync(e => e.FamilyTreeId == familyTree.Id && e.UserId == input.PersonInfo.UserId);
+                    if(existingNodeRelatedToUser)
+                    {
+                        throw new PersonServiceException(PersonServiceExceptionMessages.PersonService_UserAlreadyExistedInTree);
+                    }
                 }
                 if(input.PersonInfo.ChildOf != null)
                 {
@@ -76,7 +81,17 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                 var entry = _unitOfWork.Entry(newPerson);
                 if(entry != null)
                 {
+                    await entry.Reference(e => e.FamilyTree).LoadAsync();
+                    await entry.Reference(e => e.ChildOfFamily).LoadAsync();
                     await entry.Reference(e => e.ConnectedUser).LoadAsync();
+
+                    if(newPerson.ChildOfFamily != null)
+                    {
+                        var entryFamily = _unitOfWork.Entry(newPerson.ChildOfFamily);
+                        await entryFamily.Reference(e => e.Parent1).LoadAsync();
+                        await entryFamily.Reference(e => e.Parent2).LoadAsync();
+                        await entryFamily.Reference(e => e.Relationship).LoadAsync();
+                    }
                 }
                 await transaction.CommitAsync();
                 return new PersonDTO(newPerson);

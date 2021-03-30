@@ -19,8 +19,8 @@ namespace FamilyTreeBackend.Core.Application.DTOs
         public Gender Gender { get; set; }
         public string Note { get; set; }
 
-        public long? ChildOfFamily { get; set; }
-        public long FamilyTree { get; set; }
+        public FamilyDTO ChildOfFamily { get; set; }
+        public FamilyTreeDTO FamilyTree { get; set; }
         public UserDTO ConnectedUser { get; set; }
 
         public PersonDTO(Person person)
@@ -32,8 +32,14 @@ namespace FamilyTreeBackend.Core.Application.DTOs
             DateOfBirth = person.DateOfBirth;
             DateOfDeath = person.DateOfDeath;
             Gender = person.Gender;
-            ChildOfFamily = person.ChildOf;
-            FamilyTree = person.FamilyTreeId;  
+            if (person.ChildOfFamily != null) 
+            {
+                ChildOfFamily = new FamilyDTO(person.ChildOfFamily.Parent1, person.ChildOfFamily.Parent2, person.ChildOfFamily.Relationship);
+            }
+            if (person.FamilyTree != null)
+            {
+                FamilyTree = new FamilyTreeDTO(person.FamilyTree);
+            }
             if(person.ConnectedUser != null)
             {
                 ConnectedUser = new UserDTO(person.ConnectedUser);
