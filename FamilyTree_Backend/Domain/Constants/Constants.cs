@@ -45,5 +45,6 @@ namespace FamilyTreeBackend.Core.Domain.Constants
         public const string PersonService_UserAlreadyExistedInTree = "User already existed as a person in the tree";
         public const string PersonService_NoSlotForParentOfPerson = "No more parent slot for specified person";
         public const string PersonService_PersonCannotBeParentTwiceInAFamily = "Cannot set both parents of the family to be the same person";
+        public const string PersonService_ParentCannotBeOneself = "Cannot set parent of the person to be himself";
     }
 }

@@ -25,6 +25,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers.Misc
                 [PersonServiceExceptionMessages.PersonService_NoSlotForParentOfPerson] = 403,
                 [PersonServiceExceptionMessages.PersonService_UserAlreadyExistedInTree] = 403,
                 [PersonServiceExceptionMessages.PersonService_PersonCannotBeParentTwiceInAFamily] = 403,
+                [PersonServiceExceptionMessages.PersonService_ParentCannotBeOneself] = 400,
             };
         }
 
