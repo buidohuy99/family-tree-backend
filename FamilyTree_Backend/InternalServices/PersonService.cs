@@ -1,7 +1,7 @@
-﻿using FamilyTreeBackend.Core.Application.Interfaces;
+﻿using AutoMapper;
+using FamilyTreeBackend.Core.Application.Interfaces;
 using FamilyTreeBackend.Core.Application.Models.PersonModels;
 using FamilyTreeBackend.Core.Domain.Entities;
-using FamilyTreeBackend.Infrastructure.Service.InternalServices.AutoMapper;
 using FamilyTreeBackend.Infrastructure.Service.InternalServices.CustomException;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -16,9 +16,12 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
     {
         private readonly IUnitOfWork _unitOfWork;
 
-        public PersonService(IUnitOfWork unitOfWork)
+        private readonly IMapper _mapper;
+
+        public PersonService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
         public async Task<PersonModel> GetPerson(long id)
@@ -33,7 +36,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                 throw new PersonNotFoundException($"Person not found: {id}");
             }
 
-            var personModel = Mapping.Mapper.Map<Person, PersonModel>(person);
+            var personModel = _mapper.Map<Person, PersonModel>(person);
 
             return personModel;
         }
@@ -49,7 +52,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
             foreach(var person in people)
             {
-                PersonModel personModel = Mapping.Mapper.Map<PersonModel>(person);
+                PersonModel personModel = _mapper.Map<PersonModel>(person);
                 result.Add(personModel);
             }
 
