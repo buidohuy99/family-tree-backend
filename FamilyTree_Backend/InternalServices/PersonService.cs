@@ -28,14 +28,46 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                 .Where(p => p.Id == id)
                 .FirstOrDefaultAsync<Person>();
 
+            if (person == null)
+            {
+                throw new PersonNotFoundException($"Person not found: {id}");
+            }
+
             var personModel = Mapping.Mapper.Map<Person, PersonModel>(person);
 
             return personModel;
         }
 
-        public Task<IEnumerable<PersonModel>> GetPersonChildren(long id)
+        public async Task<IEnumerable<PersonModel>> GetPersonChildren(long id)
         {
-            throw new NotImplementedException();
+            List<PersonModel> result = new List<PersonModel>();
+
+            IEnumerable<Person> people = await _unitOfWork.Repository<Person>().GetDbset()
+                .Where(p => p.ChildOfFamily.Parent1Id == id || p.ChildOfFamily.Parent2Id == id)
+                .Include(p => p.ChildOfFamily)
+                .ToListAsync();
+
+            foreach(var person in people)
+            {
+                PersonModel personModel = Mapping.Mapper.Map<PersonModel>(person);
+                result.Add(personModel);
+            }
+
+            return result;
+        }
+
+        public async Task RemovePerson(long id)
+        {
+            bool anyChildren =  await _unitOfWork.Repository<Person>().GetDbset()
+                .Where(p => p.ChildOfFamily.Parent1Id == id || p.ChildOfFamily.Parent2Id == id)
+                .AnyAsync();
+
+            if (anyChildren)
+            {
+                throw new PersonHasChildrenException($"This person still have children: {id}");
+            }
+            Person deletedPerson = await _unitOfWork.Repository<Person>().DeleteAsync(id);
+            return;
         }
     }
 }

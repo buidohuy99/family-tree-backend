@@ -32,7 +32,7 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Repository
             return entity;
         }
 
-        public async Task<TEntity> DeleteAsync(int id)
+        public async Task<TEntity> DeleteAsync(long id)
         {
             var entity = await dbSet.FindAsync(id);
 

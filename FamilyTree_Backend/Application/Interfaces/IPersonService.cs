@@ -11,5 +11,6 @@ namespace FamilyTreeBackend.Core.Application.Interfaces
     {
         public Task<PersonModel> GetPerson(long id);
         public Task<IEnumerable<PersonModel>> GetPersonChildren(long id);
+        public Task RemovePerson(long id);
     }
 }

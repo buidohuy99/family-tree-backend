@@ -6,10 +6,13 @@ using System.Threading.Tasks;
 
 namespace FamilyTreeBackend.Infrastructure.Service.InternalServices.CustomException
 {
-    class PersonNotFoundException : Exception
+    [Serializable]
+    public class PersonNotFoundException : Exception
     {
         public PersonNotFoundException(string message) : base(message)
         {
         }
+
+        
     }
 }
