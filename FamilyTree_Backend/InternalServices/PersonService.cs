@@ -75,8 +75,6 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                     UserId = newPersonValues.UserId,
                     FamilyTreeId = operatingPerson.FamilyTreeId
                 };
-                newParent = await _unitOfWork.Repository<Person>().AddAsync(newParent);
-                await _unitOfWork.SaveChangesAsync();
 
                 // Lastly, check if the operating person is in any family
                 var connectedFamily = await _unitOfWork.Repository<Family>().GetDbset().FirstOrDefaultAsync(e => e.Id == operatingPerson.ChildOf);
@@ -85,11 +83,11 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                     // check for an empty slot to insert in a parent if a family is found
                     if (connectedFamily.Parent1Id == null)
                     {
-                        connectedFamily.Parent1Id = newParent.Id;
+                        connectedFamily.Parent1 = newParent;
                     }
                     else if (connectedFamily.Parent2Id == null)
                     {
-                        connectedFamily.Parent2Id = newParent.Id;
+                        connectedFamily.Parent2 = newParent;
                     }
                     else
                     {
@@ -106,7 +104,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                     };
                     var newFamily = new Family()
                     {
-                        Parent1Id = newParent.Id,
+                        Parent1 = newParent,
                         FamilyTreeId = operatingPerson.FamilyTreeId,
                         Relationship = newRelationship,
                     };
@@ -114,6 +112,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                     operatingPerson.ChildOfFamily = newFamily;
                     _unitOfWork.Repository<Person>().Update(operatingPerson);
                 }
+                newParent = await _unitOfWork.Repository<Person>().AddAsync(newParent);
                 await _unitOfWork.SaveChangesAsync();
 
                 // Entry and populate fields
@@ -146,14 +145,186 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             }
         }
 
-        public async Task<PersonDTO> AddNewSpouse(string userPerformingCreation, AddNewSpouseToPersonModel input)
+        public async Task<FamilyDTO> AddNewSpouse(string userPerformingCreation, AddNewSpouseToPersonModel input)
         {
-            return null;
+            await using var transaction = await _unitOfWork.CreateTransaction();
+            try
+            {
+                // check person is valid 
+                var operatingPerson = await _unitOfWork.Repository<Person>().GetDbset().FirstOrDefaultAsync(e => e.Id == input.PersonId);
+                if (operatingPerson == null)
+                {
+                    throw new PersonServiceException(PersonServiceExceptionMessages.PersonService_CannotFindSpecifiedPersonFromId);
+                }
+
+                // check if user connected to this new parent node is an existing tree node or not (we dont want the user to exist as a tree node)
+                if (input.SpouseInfo.UserId != null)
+                {
+                    var connectedUser = await _userManager.FindByIdAsync(input.SpouseInfo.UserId);
+                    if (connectedUser == null)
+                    {
+                        throw new PersonServiceException(PersonServiceExceptionMessages.PersonService_CannotFindSpecifiedUserFromId);
+                    }
+                    var existingNodeRelatedToUser = await _unitOfWork.Repository<Person>().GetDbset().AnyAsync(e => e.FamilyTreeId == operatingPerson.FamilyTreeId && e.UserId == connectedUser.Id);
+                    if (existingNodeRelatedToUser)
+                    {
+                        throw new PersonServiceException(PersonServiceExceptionMessages.PersonService_UserAlreadyExistedInTree);
+                    }
+                }
+
+                // Do person creation
+                var newPersonValues = input.SpouseInfo;
+                var newSpouse = new Person()
+                {
+                    FirstName = newPersonValues.FirstName,
+                    LastName = newPersonValues.LastName,
+                    DateOfBirth = newPersonValues.DateOfBirth,
+                    DateOfDeath = newPersonValues.DateOfDeath,
+                    Gender = newPersonValues.Gender,
+                    Note = newPersonValues.Note,
+                    UserId = newPersonValues.UserId,
+                    FamilyTreeId = operatingPerson.FamilyTreeId
+                };
+
+                // if there is no previously existing family, we create a new family
+                var newRelationship = new Relationship()
+                {
+                    RelationshipType = RelationshipType.UNKNOWN,
+                };
+                var newFamily = new Family()
+                {
+                    Parent1Id = operatingPerson.Id,
+                    Parent2 = newSpouse,
+                    FamilyTreeId = operatingPerson.FamilyTreeId,
+                    Relationship = newRelationship,
+                };
+                newFamily = await _unitOfWork.Repository<Family>().AddAsync(newFamily);
+                await _unitOfWork.SaveChangesAsync();
+
+                // Entry and populate fields
+                var entry = _unitOfWork.Entry(newFamily);
+                if (entry != null)
+                {
+                    await entry.Reference(e => e.Parent1).LoadAsync();
+                    await entry.Reference(e => e.Parent2).LoadAsync();
+                    await entry.Reference(e => e.Relationship).LoadAsync();
+                }
+                await transaction.CommitAsync();
+                return new FamilyDTO(newFamily);
+            }
+            catch (Exception ex)
+            {
+                if (transaction != null)
+                {
+                    await transaction.RollbackAsync();
+                }
+                _logger.LogInformation(ex, LoggingMessages.PersonService_ErrorMessage);
+                throw;
+            }
         }
 
         public async Task<PersonDTO> AddNewChild(string userPerformingCreation, AddNewChildToPersonModel input)
         {
-            return null;
+            await using var transaction = await _unitOfWork.CreateTransaction();
+            try
+            {
+                // check person is valid 
+                var operatingPerson = await _unitOfWork.Repository<Person>().GetDbset().FirstOrDefaultAsync(e => e.Id == input.PersonId);
+                if (operatingPerson == null)
+                {
+                    throw new PersonServiceException(PersonServiceExceptionMessages.PersonService_CannotFindSpecifiedPersonFromId);
+                }
+
+                // check if user connected to this new parent node is an existing tree node or not (we dont want the user to exist as a tree node)
+                if (input.ChildInfo.UserId != null)
+                {
+                    var connectedUser = await _userManager.FindByIdAsync(input.ChildInfo.UserId);
+                    if (connectedUser == null)
+                    {
+                        throw new PersonServiceException(PersonServiceExceptionMessages.PersonService_CannotFindSpecifiedUserFromId);
+                    }
+                    var existingNodeRelatedToUser = await _unitOfWork.Repository<Person>().GetDbset().AnyAsync(e => e.FamilyTreeId == operatingPerson.FamilyTreeId && e.UserId == connectedUser.Id);
+                    if (existingNodeRelatedToUser)
+                    {
+                        throw new PersonServiceException(PersonServiceExceptionMessages.PersonService_UserAlreadyExistedInTree);
+                    }
+                }
+
+                // Do person creation
+                var newPersonValues = input.ChildInfo;
+                var newChild = new Person()
+                {
+                    FirstName = newPersonValues.FirstName,
+                    LastName = newPersonValues.LastName,
+                    DateOfBirth = newPersonValues.DateOfBirth,
+                    DateOfDeath = newPersonValues.DateOfDeath,
+                    Gender = newPersonValues.Gender,
+                    Note = newPersonValues.Note,
+                    UserId = newPersonValues.UserId,
+                    FamilyTreeId = operatingPerson.FamilyTreeId
+                };
+
+                // Lastly, check if the operating person is in any family
+                var connectedFamilies = _unitOfWork.Repository<Family>().GetDbset().Where(e => e.Parent1Id == operatingPerson.Id || e.Parent2Id == operatingPerson.Id);
+                if (connectedFamilies.Any())
+                {
+                    // More than one family, you need to use the family-management route
+                    if(connectedFamilies.Count() > 1)
+                    {
+                        throw new PersonServiceException(PersonServiceExceptionMessages.PersonService_MultipleFamiliesFoundOfPerson_DontKnowWhichToAddChild);
+                    }
+                    //else we add child to the single family found
+                    var connectedFamily = connectedFamilies.ToList()[0];
+                    newChild.ChildOfFamily = connectedFamily;
+                }
+                else
+                {
+                    // if there is no previously existing family, we create a new family
+                    var newRelationship = new Relationship()
+                    {
+                        RelationshipType = RelationshipType.UNKNOWN,
+                    };
+                    var newFamily = new Family()
+                    {
+                        Parent1Id = operatingPerson.Id,
+                        FamilyTreeId = operatingPerson.FamilyTreeId,
+                        Relationship = newRelationship,
+                    };
+                    // the new child to the new family
+                    newFamily = await _unitOfWork.Repository<Family>().AddAsync(newFamily);
+                    newChild.ChildOfFamily = newFamily;
+                }
+                newChild = await _unitOfWork.Repository<Person>().AddAsync(newChild);
+                await _unitOfWork.SaveChangesAsync();
+
+                // Entry and populate fields
+                var entry = _unitOfWork.Entry(newChild);
+                if (entry != null)
+                {
+                    await entry.Reference(e => e.FamilyTree).LoadAsync();
+                    await entry.Reference(e => e.ChildOfFamily).LoadAsync();
+                    await entry.Reference(e => e.ConnectedUser).LoadAsync();
+
+                    if (newChild.ChildOfFamily != null)
+                    {
+                        var entryFamily = _unitOfWork.Entry(newChild.ChildOfFamily);
+                        await entryFamily.Reference(e => e.Parent1).LoadAsync();
+                        await entryFamily.Reference(e => e.Parent2).LoadAsync();
+                        await entryFamily.Reference(e => e.Relationship).LoadAsync();
+                    }
+                }
+                await transaction.CommitAsync();
+                return new PersonDTO(newChild);
+            }
+            catch (Exception ex)
+            {
+                if (transaction != null)
+                {
+                    await transaction.RollbackAsync();
+                }
+                _logger.LogInformation(ex, LoggingMessages.PersonService_ErrorMessage);
+                throw;
+            }
         }
 
         public async Task<PersonModel> GetPerson(long id)
