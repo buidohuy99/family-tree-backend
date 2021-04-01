@@ -14,11 +14,9 @@ namespace FamilyTreeBackend.Core.Application.Interfaces
     }
     public interface IGenericRepository<TEntity> : IRepository where TEntity: BaseEntity
     {
-        public DbSet<TEntity> GetDbset();
-        TEntity Find(long id);
-        Task<TEntity> FindAsync(long id);
+        Task<TEntity> FindAsync(int id);
         Task<TEntity> AddAsync(TEntity entity);
-        Task<TEntity> DeleteAsync(long id);
+        Task<TEntity> DeleteAsync(int id);
 
         TEntity Delete(TEntity entity);
         TEntity Update(TEntity entity);

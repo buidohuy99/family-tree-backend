@@ -1,8 +1,6 @@
 ﻿using FamilyTreeBackend.Core.Application.Helpers.ConfigModels;
-using FamilyTreeBackend.Core.Application.Interfaces;
 using FamilyTreeBackend.Core.Domain.Entities;
 using FamilyTreeBackend.Infrastructure.Persistence.Context;
-using FamilyTreeBackend.Infrastructure.Persistence.UnitOfWork;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -21,7 +19,6 @@ namespace FamilyTreeBackend.Infrastructure.Persistence
             services.AddDbContext<FamilyTreeDbContext>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("FamilyTreeDbContext")));
             // add unit of work
-            services.AddScoped<IUnitOfWork, GenericUnitOfWork<FamilyTreeDbContext>>();
             // add identity
             services.AddIdentity<ApplicationUser, IdentityRole>(options => {
                 options.Password.RequireUppercase = false;

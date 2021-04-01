@@ -16,7 +16,6 @@ namespace FamilyTreeBackend.Presentation.API
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseUrls("http://*:3000");
                     webBuilder.ConfigureLogging((logging) => {
                         logging.ClearProviders();
                         logging.AddSerilog();
