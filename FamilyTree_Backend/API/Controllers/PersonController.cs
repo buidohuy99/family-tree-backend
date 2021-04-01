@@ -133,9 +133,51 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
 
         [HttpPost("person/{personId}/child")]
         [SwaggerOperation(Summary = "Add new child to an existing person")]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<PersonDTO>), Description = "Return the info of the new child, along with the family that the child belongs to")]
         public async Task<IActionResult> AddNewChild(long personId, [FromBody] PersonInputModel input)
         {
-            return null;
+            try
+            {
+                // Check validity of the request
+                var claimsManager = HttpContext.User;
+                string uid = null;
+                try
+                {
+                    uid = GetUserId(claimsManager);
+                }
+                catch (Exception e)
+                {
+                    return Unauthorized(e.Message);
+                }
+
+                if (uid == null)
+                {
+                    return Unauthorized("Unauthorized individuals cannot access this route");
+                }
+
+                // Carry on with the business logic
+                var model = new AddNewChildToPersonModel()
+                {
+                    PersonId = personId,
+                    ChildInfo = input
+                };
+                PersonDTO result = await _personService.AddNewChild(uid, model);
+
+                return Ok(new HttpResponse<PersonDTO>(result, GenericResponseStrings.PersonController_AddChildToPersonSuccessful));
+            }
+            catch (Exception ex)
+            {
+                string genericMessage = GenericResponseStrings.AnExceptionOccuredInController;
+                if (ex is BaseServiceException exception)
+                {
+                    uint? statusCode = ServiceExceptionsProcessor.GetStatusCode(exception.Message);
+                    if (statusCode != null && statusCode.HasValue)
+                    {
+                        return StatusCode((int)statusCode.Value, new HttpResponse<string>(exception.Message, genericMessage));
+                    }
+                }
+                return StatusCode(500, new HttpResponse<Exception>(ex, GenericResponseStrings.InternalServerError));
+            }
         }
 
         [HttpGet("person/{personId}")]
