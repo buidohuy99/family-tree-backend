@@ -18,7 +18,7 @@ namespace FamilyTreeBackend.Core.Application.Interfaces
         TEntity Find(long id);
         Task<TEntity> FindAsync(long id);
         Task<TEntity> AddAsync(TEntity entity);
-        Task<TEntity> DeleteAsync(int id);
+        Task<TEntity> DeleteAsync(long id);
 
         TEntity Delete(TEntity entity);
         TEntity Update(TEntity entity);
