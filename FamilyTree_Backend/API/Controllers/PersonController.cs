@@ -35,6 +35,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
 
         [HttpPost("person/{personId}/parent")]
         [SwaggerOperation(Summary = "Add new parent to an existing person")]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<PersonDTO>), Description = "Return the new info of the existing person, along with the family that houses his new parent")]
         public async Task<IActionResult> AddNewParent(long personId, [FromBody] PersonInputModel input)
         {
             try
@@ -83,19 +84,61 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
 
         [HttpPost("person/{personId}/spouse")]
         [SwaggerOperation(Summary = "Add new spouse to an existing person")]
-        public async Task<IActionResult> AddNewSpouse(string userPerformingCreation, long personId, [FromBody] PersonInputModel input)
+        [SwaggerResponse(200, Type = typeof(HttpResponse<FamilyDTO>), Description = "Returns the family created with the new spouse")]
+        public async Task<IActionResult> AddNewSpouse(long personId, [FromBody] PersonInputModel input)
         {
-            return null;
+            try
+            {
+                // Check validity of the request
+                var claimsManager = HttpContext.User;
+                string uid = null;
+                try
+                {
+                    uid = GetUserId(claimsManager);
+                }
+                catch (Exception e)
+                {
+                    return Unauthorized(e.Message);
+                }
+
+                if (uid == null)
+                {
+                    return Unauthorized("Unauthorized individuals cannot access this route");
+                }
+
+                // Carry on with the business logic
+                var model = new AddNewSpouseToPersonModel()
+                {
+                    PersonId = personId,
+                    SpouseInfo = input
+                };
+                FamilyDTO result = await _personService.AddNewSpouse(uid, model);
+
+                return Ok(new HttpResponse<FamilyDTO>(result, GenericResponseStrings.PersonController_AddSpouseToPersonSuccessful));
+            }
+            catch (Exception ex)
+            {
+                string genericMessage = GenericResponseStrings.AnExceptionOccuredInController;
+                if (ex is BaseServiceException exception)
+                {
+                    uint? statusCode = ServiceExceptionsProcessor.GetStatusCode(exception.Message);
+                    if (statusCode != null && statusCode.HasValue)
+                    {
+                        return StatusCode((int)statusCode.Value, new HttpResponse<string>(exception.Message, genericMessage));
+                    }
+                }
+                return StatusCode(500, new HttpResponse<Exception>(ex, GenericResponseStrings.InternalServerError));
+            }
         }
 
         [HttpPost("person/{personId}/child")]
         [SwaggerOperation(Summary = "Add new child to an existing person")]
-        public async Task<IActionResult> AddNewChild(string userPerformingCreation, long personId, [FromBody] PersonInputModel input)
+        public async Task<IActionResult> AddNewChild(long personId, [FromBody] PersonInputModel input)
         {
             return null;
         }
 
-        [HttpGet("{personId}")]
+        [HttpGet("person/{personId}")]
         public async Task<IActionResult> FindPerson(long personId)
         {
             try
@@ -113,7 +156,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             }
         }
 
-        [HttpGet("{personId}/children")]
+        [HttpGet("person/{personId}/children")]
         public async Task<IActionResult> FindChildren(long personId)
         {
             return Ok(await _personService.GetPersonChildren(personId));

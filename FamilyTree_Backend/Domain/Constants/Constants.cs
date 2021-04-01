@@ -14,8 +14,8 @@ namespace FamilyTreeBackend.Core.Domain.Constants
         public const string RegisterSuccessful = "You have successfully registered";
 
         // Person Controller
-        public const string PersonController_AddPersonToTreeSuccessful = "You have successfully add a person to a tree";
-        public const string PersonController_AddParentToPersonSuccessful = "You have successfully added a parent to the person below";
+        public const string PersonController_AddParentToPersonSuccessful = "You have successfully added a parent to the person below, you can also find the family that the new parent belongs to below";
+        public const string PersonController_AddSpouseToPersonSuccessful = "You have successfully added a spouse to the person and produced the below family";
 
         public const string InternalServerError = "Server encountered an exception";
     }
@@ -44,7 +44,5 @@ namespace FamilyTreeBackend.Core.Domain.Constants
         public const string PersonService_CannotFindSpecifiedFamilyFromId = "Family cannot be found from the provided id";
         public const string PersonService_UserAlreadyExistedInTree = "User already existed as a person in the tree";
         public const string PersonService_NoSlotForParentOfPerson = "No more parent slot for specified person";
-        public const string PersonService_PersonCannotBeParentTwiceInAFamily = "Cannot set both parents of the family to be the same person";
-        public const string PersonService_ParentCannotBeOneself = "Cannot set parent of the person to be himself";
     }
 }
