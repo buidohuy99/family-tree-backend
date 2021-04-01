@@ -1,24 +1,23 @@
-﻿using FamilyTreeBackend.Core.Domain.Enums;
+﻿using FamilyTreeBackend.Core.Domain.Entities;
+using FamilyTreeBackend.Core.Domain.Enums;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
-namespace FamilyTreeBackend.Core.Domain.Entities
+namespace FamilyTreeBackend.Core.Application.Models.PersonModels
 {
-    public class Person : BaseEntity
+    public class PersonModel
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public DateTime? DateOfBirth { get; set; }
         public DateTime? DateOfDeath { get; set; }
+        public long Parent1Id { get; set; }
+        public long Parent2Id { get; set; }
         public Gender Gender { get; set; }
-        public long? ChildOf { get; set; }
-        public long FamilyTreeId { get; set; }
         public string Note { get; set; }
         public string UserId { get; set; }
-        
-        public Family ChildOfFamily { get; set; }
-        public FamilyTree FamilyTree { get; set; }
-        public ApplicationUser ConnectedUser { get; set; }
     }
 }

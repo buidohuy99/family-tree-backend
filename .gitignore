@@ -357,3 +357,6 @@ appsettings.Deployment.json
 
 # Ignore SysLogs
 SysLogs
+
+# .env file
+.env
