@@ -1,0 +1,29 @@
+version: '3.4'
+
+services:
+    familytreedb:
+        container_name: "family-tree-db"
+        image: "mcr.microsoft.com/mssql/server"
+        env_file: .env
+        volumes:
+            - type: volume
+              source: familytreedbdata
+              target: /var/opt/mssql
+        environment:
+            - ACCEPT_EULA=Y
+            - MSSQL_SA_PASSWORD=${MSSQL_PASSWORD}
+    familytreeapi:
+        container_name: "family-tree-api"
+        image: "familytreeapi:all-purpose"
+        ports:
+            - "3000:3000"
+        build:
+            context: .
+            dockerfile: API/Dockerfile
+        environment:
+            - ASPNETCORE_ENVIRONMENT=Deployment
+        depends_on:
+            - familytreedb
+volumes:
+    familytreedbdata:
+        name: "familytreedbdata"

@@ -41,14 +41,12 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
                 entity.Property(e => e.Id).ValueGeneratedOnAdd();
 
                 entity.Property(e => e.DateCreated)
-                    .HasColumnName("createdAt")
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                    .HasDefaultValueSql("GETUTCDATE()")
                     .ValueGeneratedOnAdd();
 
-                //entity.Property(e => e.LastModified)
-                //    .HasColumnName("updatedAt")
-                //    .HasDefaultValueSql("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
-                //    .ValueGeneratedOnAddOrUpdate();
+                entity.Property(e => e.LastModified)
+                    .HasDefaultValueSql("GETUTCDATE()")
+                   .ValueGeneratedOnAddOrUpdate();
 
                 entity.HasOne(e => e.Parent1)
                     .WithMany()
@@ -65,11 +63,25 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Id).ValueGeneratedOnAdd();
 
+                entity.Property(e => e.DateCreated)
+                    .HasDefaultValueSql("GETUTCDATE()")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.LastModified)
+                    .HasDefaultValueSql("GETUTCDATE()")
+                   .ValueGeneratedOnAddOrUpdate();
+
                 entity.HasOne(e => e.ChildOfFamily)
                     .WithMany(f => f.Children)
                     .HasForeignKey(e => e.ChildOf)
                     .HasConstraintName("FK_Child_OfFamily")
                     .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.ConnectedUser)
+                    .WithMany()
+                    .HasForeignKey(e => e.UserId)
+                    .HasConstraintName("FK_ConnectedWith_User")
+                    .OnDelete(DeleteBehavior.SetNull);
             });
 
             modelBuilder.Entity<Relationship>((entity) => {
@@ -77,6 +89,14 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
 
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Id);
+
+                entity.Property(e => e.DateCreated)
+                    .HasDefaultValueSql("GETUTCDATE()")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.LastModified)
+                    .HasDefaultValueSql("GETUTCDATE()")
+                   .ValueGeneratedOnAddOrUpdate();
 
                 entity.HasOne(e => e.Family)
                     .WithOne(f => f.Relationship)
@@ -93,15 +113,25 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
                 entity.ToTable("FamilyTree");
 
                 entity.HasKey(e => e.Id);
-                entity.Property(e => e.Id).ValueGeneratedOnAdd();;
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+
+                entity.Property(e => e.DateCreated)
+                    .HasDefaultValueSql("GETUTCDATE()")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.LastModified)
+                    .HasDefaultValueSql("GETUTCDATE()")
+                   .ValueGeneratedOnAddOrUpdate();
 
                 entity.HasMany(e => e.People)
-                    .WithOne()
-                    .HasConstraintName("Constraints_PeopleOfTree");
+                    .WithOne(e => e.FamilyTree)
+                    .HasForeignKey(e => e.FamilyTreeId)
+                    .HasConstraintName("FK_PersonOfTree");
 
                 entity.HasMany(e => e.Families)
-                    .WithOne()
-                    .HasConstraintName("Constraints_FamiliesOfTree");
+                    .WithOne(e => e.FamilyTree)
+                    .HasForeignKey(e => e.FamilyTreeId)
+                    .HasConstraintName("FK_FamilyOfTree");
             });
 
 
@@ -275,7 +305,7 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
         {
             var logger = Log.Logger;
 
-            if (!userManager.Users.Any(u => u.UserName == "test"))
+            if (!userManager.Users.Any())
             {
                 logger.Information("Seeding test user...");
                 //Seed Default User
