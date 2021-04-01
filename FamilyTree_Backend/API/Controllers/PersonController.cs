@@ -4,8 +4,11 @@ using FamilyTreeBackend.Core.Application.Helpers.Exceptions;
 using FamilyTreeBackend.Core.Application.Interfaces;
 using FamilyTreeBackend.Core.Application.Models.Person;
 using FamilyTreeBackend.Core.Domain.Constants;
-using FamilyTreeBackend.Core.Domain.Entities;
 using FamilyTreeBackend.Presentation.API.Controllers.Misc;
+using FamilyTreeBackend.Core.Application.Models.PersonModels;
+using FamilyTreeBackend.Core.Domain.Entities;
+using FamilyTreeBackend.Infrastructure.Service.InternalServices;
+using FamilyTreeBackend.Infrastructure.Service.InternalServices.CustomException;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -91,5 +94,30 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         {
             return null;
         }
+
+        [HttpGet("{personId}")]
+        public async Task<IActionResult> FindPerson(long personId)
+        {
+            try
+            {
+                PersonModel personModel = await _personService.GetPerson(personId);
+                return Ok(personModel);
+            }
+            catch(PersonNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, new { ex.Message, ex.StackTrace });
+            }
+        }
+
+        [HttpGet("{personId}/children")]
+        public async Task<IActionResult> FindChildren(long personId)
+        {
+            return Ok(await _personService.GetPersonChildren(personId));
+        }
+
     }
 }
