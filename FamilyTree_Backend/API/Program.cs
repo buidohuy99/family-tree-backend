@@ -20,7 +20,6 @@ namespace FamilyTreeBackend.Presentation.API
                     webBuilder.ConfigureLogging((logging) => {
                         logging.ClearProviders();
                         logging.AddSerilog();
-                        logging.AddConsole();
                     });
                     webBuilder.UseStartup<App>();
                 });
