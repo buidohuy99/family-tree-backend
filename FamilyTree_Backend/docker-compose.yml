@@ -4,9 +4,10 @@ services:
   familytreedb:
     container_name: "family-tree-db"
     image: "mcr.microsoft.com/mssql/server"
+    env_file: .env
     environment:
       - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=Admin@123
+      - MSSQL_SA_PASSWORD=${MSSQL_PASSWORD}
   familytreeapi:
     container_name: "family-tree-api"
     image: "familytreeapi:all-purpose"
