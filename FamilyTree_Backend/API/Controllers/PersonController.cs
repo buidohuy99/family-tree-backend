@@ -195,7 +195,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             }
             catch(Exception ex)
             {
-                return StatusCode(500, new { ex.Message, ex.StackTrace });
+                return StatusCode(500, new HttpResponse<Exception>(ex, GenericResponseStrings.InternalServerError));
             }
         }
 
@@ -212,7 +212,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             try
             {
                 await _personService.RemovePerson(personId);
-                return Ok();
+                return Ok(GenericResponseStrings.PersonController_RemovePersonSuccessful);
             }
             catch (DeletePersonException ex)
             {
@@ -232,7 +232,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             {
                 PersonModel personModel = await _personService.UpdatePersonInfo(personId, updatedPersonModel);
 
-                var response = new HttpResponse<PersonModel>(personModel, "Person updated successfully");
+                var response = new HttpResponse<PersonModel>(personModel, GenericResponseStrings.PersonController_UpdatePersonSuccessful);
 
                 return Ok(response);
             }
@@ -243,7 +243,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { ex.Message, ex.StackTrace });
+                return StatusCode(500, new HttpResponse<Exception>(ex, GenericResponseStrings.InternalServerError));
             }
         }
         
