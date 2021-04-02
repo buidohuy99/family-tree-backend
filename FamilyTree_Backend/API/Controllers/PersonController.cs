@@ -5,7 +5,7 @@ using FamilyTreeBackend.Core.Application.Interfaces;
 using FamilyTreeBackend.Core.Application.Models.Person;
 using FamilyTreeBackend.Core.Domain.Constants;
 using FamilyTreeBackend.Presentation.API.Controllers.Misc;
-using FamilyTreeBackend.Core.Application.Models.PersonModels;
+using FamilyTreeBackend.Core.Application.Models;
 using FamilyTreeBackend.Core.Domain.Entities;
 using FamilyTreeBackend.Infrastructure.Service.InternalServices;
 using FamilyTreeBackend.Infrastructure.Service.InternalServices.CustomException;
@@ -190,9 +190,8 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             }
             catch(PersonNotFoundException ex)
             {
-                string genericMessage = GenericResponseStrings.AnExceptionOccuredInController;
                 uint? statusCode = ServiceExceptionsProcessor.GetStatusCode(ex.Message);
-                return StatusCode((int)statusCode.Value, new HttpResponse<string>(ex.Message, genericMessage));
+                return StatusCode((int)statusCode.Value, new HttpResponse<long>(personId, ex.Message));
             }
             catch(Exception ex)
             {
@@ -203,8 +202,30 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         [HttpGet("person/{personId}/children")]
         public async Task<IActionResult> FindChildren(long personId)
         {
-            return Ok(await _personService.GetPersonChildren(personId));
+            IEnumerable<PersonModel> result = await _personService.GetPersonChildren(personId);
+            return Ok(new HttpResponse<IEnumerable<PersonModel>>(result, $"List of children belonging to person: {personId}"));
         }
+
+        [HttpDelete("person/{personId}")]
+        public async Task<IActionResult> RemovePerson(long personId)
+        {
+            try
+            {
+                await _personService.RemovePerson(personId);
+                return Ok();
+            }
+            catch (DeletePersonException ex)
+            {
+                uint? statusCode = ServiceExceptionsProcessor.GetStatusCode(ex.Message);
+                return StatusCode((int)statusCode.Value, new HttpResponse<long>(personId, ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new HttpResponse<Exception>(ex, GenericResponseStrings.InternalServerError));
+            }
+        }
+
+
 
     }
 }
