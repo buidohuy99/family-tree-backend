@@ -1,6 +1,6 @@
 ﻿using FamilyTreeBackend.Core.Application.DTOs;
 using FamilyTreeBackend.Core.Application.Models.Person;
-﻿using FamilyTreeBackend.Core.Application.Models.PersonModels;
+﻿using FamilyTreeBackend.Core.Application.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;

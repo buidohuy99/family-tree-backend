@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FamilyTreeBackend.Core.Application.Models.PersonModels
+namespace FamilyTreeBackend.Core.Application.Models
 {
     public class PersonModel
     {
