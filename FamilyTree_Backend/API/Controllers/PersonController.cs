@@ -23,7 +23,7 @@ using System.Threading.Tasks;
 namespace FamilyTreeBackend.Presentation.API.Controllers
 {
     [Area("person-management")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class PersonController : BaseController
     {
         private readonly IPersonService _personService;

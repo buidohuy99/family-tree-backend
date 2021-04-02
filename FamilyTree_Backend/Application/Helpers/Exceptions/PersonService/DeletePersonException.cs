@@ -5,10 +5,10 @@ using System.Runtime.Serialization;
 namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 {
     [Serializable]
-    public class PersonHasChildrenException : PersonServiceException
+    public class DeletePersonException : PersonServiceException
     {
         
-        public PersonHasChildrenException(string message) : base(message)
+        public DeletePersonException(string message) : base(message)
         {
         }
 

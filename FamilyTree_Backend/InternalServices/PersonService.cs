@@ -336,7 +336,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
             if (person == null)
             {
-                throw new PersonNotFoundException($"Person not found: {id}");
+                throw new PersonNotFoundException(PersonServiceExceptionMessages.PersonService_PersonNotFound);
             }
 
             var personModel = _mapper.Map<Person, PersonModel>(person);
@@ -370,7 +370,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
             if (anyChildren)
             {
-                throw new PersonHasChildrenException($"This person still have children: {id}");
+                throw new DeletePersonException(PersonServiceExceptionMessages.PersonService_CannotDeletePerson);
             }
             Person deletedPerson = await _unitOfWork.Repository<Person>().DeleteAsync(id);
             return;
