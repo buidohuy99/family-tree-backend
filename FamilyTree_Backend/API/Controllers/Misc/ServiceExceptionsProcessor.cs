@@ -25,6 +25,8 @@ namespace FamilyTreeBackend.Presentation.API.Controllers.Misc
                 [PersonServiceExceptionMessages.PersonService_NoSlotForParentOfPerson] = 403,
                 [PersonServiceExceptionMessages.PersonService_UserAlreadyExistedInTree] = 403,
                 [PersonServiceExceptionMessages.PersonService_MultipleFamiliesFoundOfPerson_DontKnowWhichToAddChild] = 300,
+                [PersonServiceExceptionMessages.PersonService_PersonNotFound] = 404,
+                [PersonServiceExceptionMessages.PersonService_CannotDeletePerson] = 400,
             };
         }
 

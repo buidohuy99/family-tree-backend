@@ -46,5 +46,7 @@ namespace FamilyTreeBackend.Core.Domain.Constants
         public const string PersonService_UserAlreadyExistedInTree = "User already existed as a person in the tree";
         public const string PersonService_NoSlotForParentOfPerson = "No more parent slot for specified person";
         public const string PersonService_MultipleFamiliesFoundOfPerson_DontKnowWhichToAddChild = "Found multiple instances of the person's families, please use another route to specify which family to add child to";
+        public const string PersonService_PersonNotFound = "Cannot find person with provided Id";
+        public const string PersonService_CannotDeletePerson = "Cannot delete person, please remove all the person's descendant relationships before deleting them";
     }
 }

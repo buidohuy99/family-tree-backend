@@ -23,7 +23,7 @@ using System.Threading.Tasks;
 namespace FamilyTreeBackend.Presentation.API.Controllers
 {
     [Area("person-management")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class PersonController : BaseController
     {
         private readonly IPersonService _personService;
@@ -190,7 +190,9 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             }
             catch(PersonNotFoundException ex)
             {
-                return NotFound(ex.Message);
+                string genericMessage = GenericResponseStrings.AnExceptionOccuredInController;
+                uint? statusCode = ServiceExceptionsProcessor.GetStatusCode(ex.Message);
+                return StatusCode((int)statusCode.Value, new HttpResponse<string>(ex.Message, genericMessage));
             }
             catch(Exception ex)
             {
