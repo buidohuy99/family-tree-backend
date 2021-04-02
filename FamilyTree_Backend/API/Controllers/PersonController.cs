@@ -190,7 +190,9 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             }
             catch(PersonNotFoundException ex)
             {
-                return NotFound(ex.Message);
+                string genericMessage = GenericResponseStrings.AnExceptionOccuredInController;
+                uint? statusCode = ServiceExceptionsProcessor.GetStatusCode(ex.Message);
+                return StatusCode((int)statusCode.Value, new HttpResponse<string>(ex.Message, genericMessage));
             }
             catch(Exception ex)
             {
