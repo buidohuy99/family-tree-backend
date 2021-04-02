@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using FamilyTreeBackend.Core.Application.Models.PersonModels;
+using FamilyTreeBackend.Core.Application.Models;
 using FamilyTreeBackend.Core.Domain.Entities;
 
 namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices.MapperProfiles

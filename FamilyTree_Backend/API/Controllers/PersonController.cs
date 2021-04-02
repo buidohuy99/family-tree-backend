@@ -195,7 +195,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             }
             catch(Exception ex)
             {
-                return StatusCode(500, new { ex.Message, ex.StackTrace });
+                return StatusCode(500, new HttpResponse<Exception>(ex, GenericResponseStrings.InternalServerError));
             }
         }
 
@@ -212,7 +212,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             try
             {
                 await _personService.RemovePerson(personId);
-                return Ok();
+                return Ok(GenericResponseStrings.PersonController_RemovePersonSuccessful);
             }
             catch (DeletePersonException ex)
             {
@@ -225,7 +225,28 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             }
         }
 
+        [HttpPut("person/{personId}")]
+        public async Task<IActionResult> UpdatePersonInfo(long personId, [FromBody] PersonInputModel updatedPersonModel)
+        {
+            try
+            {
+                PersonModel personModel = await _personService.UpdatePersonInfo(personId, updatedPersonModel);
 
+                var response = new HttpResponse<PersonModel>(personModel, GenericResponseStrings.PersonController_UpdatePersonSuccessful);
+
+                return Ok(response);
+            }
+            catch (PersonNotFoundException ex)
+            {
+                uint? statusCode = ServiceExceptionsProcessor.GetStatusCode(ex.Message);
+                return StatusCode((int)statusCode.Value, new HttpResponse<long>(personId, ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new HttpResponse<Exception>(ex, GenericResponseStrings.InternalServerError));
+            }
+        }
+        
 
     }
 }
