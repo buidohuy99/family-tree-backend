@@ -35,7 +35,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
 
         [HttpPost("person/{personId}/parent")]
         [SwaggerOperation(Summary = "Add new parent to an existing person")]
-        [SwaggerResponse(200, Type = typeof(HttpResponse<PersonDTO>), Description = "Return the new info of the existing person, along with the family that houses his new parent")]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<AddNewParentToPersonResponseModel>), Description = "Return family with the new parent inside")]
         public async Task<IActionResult> AddNewParent(long personId, [FromBody] PersonInputModel input)
         {
             try
@@ -63,9 +63,9 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
                     PersonId = personId,
                     ParentInfo = input
                 };
-                PersonDTO result = await _personService.AddNewParent(uid, model);
+                var result = await _personService.AddNewParent(uid, model);
 
-                return Ok(new HttpResponse<PersonDTO>(result, GenericResponseStrings.PersonController_AddParentToPersonSuccessful));
+                return Ok(new HttpResponse<AddNewParentToPersonResponseModel>(result, GenericResponseStrings.PersonController_AddParentToPersonSuccessful));
             }
             catch (Exception ex)
             {
@@ -84,7 +84,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
 
         [HttpPost("person/{personId}/spouse")]
         [SwaggerOperation(Summary = "Add new spouse to an existing person")]
-        [SwaggerResponse(200, Type = typeof(HttpResponse<FamilyDTO>), Description = "Returns the family created with the new spouse")]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<PersonDTO>), Description = "Returns the new spouse")]
         public async Task<IActionResult> AddNewSpouse(long personId, [FromBody] PersonInputModel input)
         {
             try
@@ -112,9 +112,9 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
                     PersonId = personId,
                     SpouseInfo = input
                 };
-                FamilyDTO result = await _personService.AddNewSpouse(uid, model);
+                PersonDTO result = await _personService.AddNewSpouse(uid, model);
 
-                return Ok(new HttpResponse<FamilyDTO>(result, GenericResponseStrings.PersonController_AddSpouseToPersonSuccessful));
+                return Ok(new HttpResponse<PersonDTO>(result, GenericResponseStrings.PersonController_AddSpouseToPersonSuccessful));
             }
             catch (Exception ex)
             {
@@ -131,10 +131,10 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             }
         }
 
-        [HttpPost("person/{personId}/child")]
-        [SwaggerOperation(Summary = "Add new child to an existing person")]
-        [SwaggerResponse(200, Type = typeof(HttpResponse<PersonDTO>), Description = "Return the info of the new child, along with the family that the child belongs to")]
-        public async Task<IActionResult> AddNewChild(long personId, [FromBody] PersonInputModel input)
+        [HttpPost("person/child")]
+        [SwaggerOperation(Summary = "Add new child to a family with motherId and fatherId")]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<AddNewChildToFamilyResponseModel>), Description = "Return the info of the new child, along with the new parent created on the spot (if have)")]
+        public async Task<IActionResult> AddNewChild([FromBody] AddNewChildToFamilyModel input)
         {
             try
             {
@@ -155,15 +155,9 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
                     return Unauthorized("Unauthorized individuals cannot access this route");
                 }
 
-                // Carry on with the business logic
-                var model = new AddNewChildToPersonModel()
-                {
-                    PersonId = personId,
-                    ChildInfo = input
-                };
-                PersonDTO result = await _personService.AddNewChild(uid, model);
+                var result = await _personService.AddNewChild(uid, input);
 
-                return Ok(new HttpResponse<PersonDTO>(result, GenericResponseStrings.PersonController_AddChildToPersonSuccessful));
+                return Ok(new HttpResponse<AddNewChildToFamilyResponseModel>(result, GenericResponseStrings.PersonController_AddChildToPersonSuccessful));
             }
             catch (Exception ex)
             {

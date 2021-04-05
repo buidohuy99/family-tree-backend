@@ -17,6 +17,9 @@ namespace FamilyTreeBackend.Core.Application.DTOs
         public DateTime? DateOfBirth { get; set; }
         public DateTime? DateOfDeath { get; set; }
         public Gender Gender { get; set; }
+        public string PhoneNumber { get; set; }
+        public string HomeAddress { get; set; }
+        public string Occupation { get; set; }
         public string Note { get; set; }
 
         public FamilyDTO ChildOfFamily { get; set; }
@@ -32,6 +35,9 @@ namespace FamilyTreeBackend.Core.Application.DTOs
             DateOfBirth = person.DateOfBirth;
             DateOfDeath = person.DateOfDeath;
             Gender = person.Gender;
+            PhoneNumber = person.PhoneNumber;
+            Occupation = person.Occupation;
+            HomeAddress = person.HomeAddress;
             if (person.ChildOfFamily != null) 
             {
                 ChildOfFamily = new FamilyDTO(person.ChildOfFamily);
