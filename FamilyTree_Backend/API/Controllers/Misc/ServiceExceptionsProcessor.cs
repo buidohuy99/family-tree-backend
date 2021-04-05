@@ -21,10 +21,13 @@ namespace FamilyTreeBackend.Presentation.API.Controllers.Misc
                 [PersonServiceExceptionMessages.PersonService_CannotFindSpecifiedParentPersonFromId] = 400,
                 [PersonServiceExceptionMessages.PersonService_CannotFindSpecifiedTreeFromId] = 400,
                 [PersonServiceExceptionMessages.PersonService_CannotFindSpecifiedUserFromId] = 400,
-                [PersonServiceExceptionMessages.PersonService_CannotFindSpecifiedFamilyFromId] = 400,
-                [PersonServiceExceptionMessages.PersonService_NoSlotForParentOfPerson] = 403,
+                [PersonServiceExceptionMessages.PersonService_CannotFindSpecifiedFamily] = 400,
+                [PersonServiceExceptionMessages.PersonService_FamilyAlreadyExist] = 400,
                 [PersonServiceExceptionMessages.PersonService_UserAlreadyExistedInTree] = 403,
-                [PersonServiceExceptionMessages.PersonService_MultipleFamiliesFoundOfPerson_DontKnowWhichToAddChild] = 300,
+                [PersonServiceExceptionMessages.PersonService_FatherGenderIsNotValid] = 400,
+                [PersonServiceExceptionMessages.PersonService_MotherGenderIsNotValid] = 400,
+                [PersonServiceExceptionMessages.PersonService_SpouseGenderNotValid] = 400,
+                [PersonServiceExceptionMessages.PersonService_CannotAddChildToNoFamily] = 400,
             };
         }
 
