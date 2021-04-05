@@ -17,8 +17,7 @@ namespace FamilyTreeBackend.Core.Application.Models
         public long Parent1Id { get; set; }
         public long Parent2Id { get; set; }
         public Gender Gender { get; set; }
-        public IEnumerable<long> Husbands { get; set; }
-        public IEnumerable<long> Wives { get; set; }
+        public IEnumerable<PersonModel> Spouses;
         public string Note { get; set; }
         public string UserId { get; set; }
     }
