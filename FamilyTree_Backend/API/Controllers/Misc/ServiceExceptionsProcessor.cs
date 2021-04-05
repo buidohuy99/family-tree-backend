@@ -28,6 +28,8 @@ namespace FamilyTreeBackend.Presentation.API.Controllers.Misc
                 [PersonServiceExceptionMessages.PersonService_MotherGenderIsNotValid] = 400,
                 [PersonServiceExceptionMessages.PersonService_SpouseGenderNotValid] = 400,
                 [PersonServiceExceptionMessages.PersonService_CannotAddChildToNoFamily] = 400,
+                [PersonServiceExceptionMessages.PersonService_PersonNotFound] = 404,
+                [PersonServiceExceptionMessages.PersonService_CannotDeletePerson] = 400,
             };
         }
 

@@ -4,7 +4,7 @@ using FamilyTreeBackend.Core.Application.Interfaces;
 using FamilyTreeBackend.Core.Application.Models.Person;
 using FamilyTreeBackend.Core.Domain.Constants;
 ﻿using AutoMapper;
-using FamilyTreeBackend.Core.Application.Models.PersonModels;
+using FamilyTreeBackend.Core.Application.Models;
 using FamilyTreeBackend.Core.Domain.Entities;
 using FamilyTreeBackend.Core.Domain.Enums;
 using FamilyTreeBackend.Infrastructure.Service.InternalServices.CustomException;
@@ -400,7 +400,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
             if (person == null)
             {
-                throw new PersonNotFoundException($"Person not found: {id}");
+                throw new PersonNotFoundException(PersonServiceExceptionMessages.PersonService_PersonNotFound);
             }
 
             var personModel = _mapper.Map<Person, PersonModel>(person);
@@ -434,10 +434,26 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
             if (anyChildren)
             {
-                throw new PersonHasChildrenException($"This person still have children: {id}");
+                throw new DeletePersonException(PersonServiceExceptionMessages.PersonService_CannotDeletePerson);
             }
             Person deletedPerson = await _unitOfWork.Repository<Person>().DeleteAsync(id);
             return;
+        }
+
+        public async Task<PersonModel> UpdatePersonInfo(long personId, PersonInputModel updatedPersonModel)
+        {
+            Person person = await _unitOfWork.Repository<Person>().FindAsync(personId);
+
+            if (person == null)
+            {
+                throw new PersonNotFoundException(PersonServiceExceptionMessages.PersonService_PersonNotFound);
+            }
+
+            _mapper.Map(updatedPersonModel, person);
+
+            await _unitOfWork.SaveChangesAsync();
+
+            return _mapper.Map<PersonModel>(person);
         }
     }
 }

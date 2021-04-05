@@ -5,7 +5,7 @@ using FamilyTreeBackend.Core.Application.Interfaces;
 using FamilyTreeBackend.Core.Application.Models.Person;
 using FamilyTreeBackend.Core.Domain.Constants;
 using FamilyTreeBackend.Presentation.API.Controllers.Misc;
-using FamilyTreeBackend.Core.Application.Models.PersonModels;
+using FamilyTreeBackend.Core.Application.Models;
 using FamilyTreeBackend.Core.Domain.Entities;
 using FamilyTreeBackend.Infrastructure.Service.InternalServices;
 using FamilyTreeBackend.Infrastructure.Service.InternalServices.CustomException;
@@ -23,7 +23,7 @@ using System.Threading.Tasks;
 namespace FamilyTreeBackend.Presentation.API.Controllers
 {
     [Area("person-management")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class PersonController : BaseController
     {
         private readonly IPersonService _personService;
@@ -184,19 +184,63 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             }
             catch(PersonNotFoundException ex)
             {
-                return NotFound(ex.Message);
+                uint? statusCode = ServiceExceptionsProcessor.GetStatusCode(ex.Message);
+                return StatusCode((int)statusCode.Value, new HttpResponse<long>(personId, ex.Message));
             }
             catch(Exception ex)
             {
-                return StatusCode(500, new { ex.Message, ex.StackTrace });
+                return StatusCode(500, new HttpResponse<Exception>(ex, GenericResponseStrings.InternalServerError));
             }
         }
 
         [HttpGet("person/{personId}/children")]
         public async Task<IActionResult> FindChildren(long personId)
         {
-            return Ok(await _personService.GetPersonChildren(personId));
+            IEnumerable<PersonModel> result = await _personService.GetPersonChildren(personId);
+            return Ok(new HttpResponse<IEnumerable<PersonModel>>(result, $"List of children belonging to person: {personId}"));
         }
+
+        [HttpDelete("person/{personId}")]
+        public async Task<IActionResult> RemovePerson(long personId)
+        {
+            try
+            {
+                await _personService.RemovePerson(personId);
+                return Ok(GenericResponseStrings.PersonController_RemovePersonSuccessful);
+            }
+            catch (DeletePersonException ex)
+            {
+                uint? statusCode = ServiceExceptionsProcessor.GetStatusCode(ex.Message);
+                return StatusCode((int)statusCode.Value, new HttpResponse<long>(personId, ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new HttpResponse<Exception>(ex, GenericResponseStrings.InternalServerError));
+            }
+        }
+
+        [HttpPut("person/{personId}")]
+        public async Task<IActionResult> UpdatePersonInfo(long personId, [FromBody] PersonInputModel updatedPersonModel)
+        {
+            try
+            {
+                PersonModel personModel = await _personService.UpdatePersonInfo(personId, updatedPersonModel);
+
+                var response = new HttpResponse<PersonModel>(personModel, GenericResponseStrings.PersonController_UpdatePersonSuccessful);
+
+                return Ok(response);
+            }
+            catch (PersonNotFoundException ex)
+            {
+                uint? statusCode = ServiceExceptionsProcessor.GetStatusCode(ex.Message);
+                return StatusCode((int)statusCode.Value, new HttpResponse<long>(personId, ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new HttpResponse<Exception>(ex, GenericResponseStrings.InternalServerError));
+            }
+        }
+        
 
     }
 }

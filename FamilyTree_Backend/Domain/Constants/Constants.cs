@@ -17,7 +17,8 @@ namespace FamilyTreeBackend.Core.Domain.Constants
         public const string PersonController_AddParentToPersonSuccessful = "You have successfully added a parent to the person below, you can also find the family that the new parent belongs to below";
         public const string PersonController_AddSpouseToPersonSuccessful = "You have successfully added a spouse to the person and produced the below family";
         public const string PersonController_AddChildToPersonSuccessful = "You have successfully added a child to the person and the info of that child is below, along with the family he was added in";
-
+        public const string PersonController_UpdatePersonSuccessful = "Person updated successfully";
+        public const string PersonController_RemovePersonSuccessful = "Person removed successfully";
         public const string InternalServerError = "Server encountered an exception";
     }
 
@@ -49,5 +50,7 @@ namespace FamilyTreeBackend.Core.Domain.Constants
         public const string PersonService_MotherGenderIsNotValid = "Mother for the operation is not a female";
         public const string PersonService_SpouseGenderNotValid = "Gender of the spouse is not valid, spouse gender must be the opposite of the person";
         public const string PersonService_CannotAddChildToNoFamily = "You have to specify a mother and/or a father to add the child to";
+        public const string PersonService_PersonNotFound = "Cannot find person with provided Id";
+        public const string PersonService_CannotDeletePerson = "Cannot delete person, please remove all the person's descendant relationships before deleting them";
     }
 }

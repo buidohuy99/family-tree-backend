@@ -16,7 +16,7 @@ services:
         container_name: "family-tree-api"
         image: "familytreeapi:all-purpose"
         ports:
-            - "3000:3000"
+            - "${API_PORT}:3000"
         build:
             context: .
             dockerfile: API/Dockerfile
