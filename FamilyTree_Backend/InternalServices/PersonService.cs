@@ -332,7 +332,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             Person person =  await _unitOfWork.Repository<Person>().GetDbset()
                 .Include(p => p.ChildOfFamily)
                 .Where(p => p.Id == id)
-                .FirstOrDefaultAsync<Person>();
+                .FirstOrDefaultAsync();
 
             if (person == null)
             {
@@ -341,7 +341,44 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
             var personModel = _mapper.Map<Person, PersonModel>(person);
 
+            var spouses = await FindPersonSpouses(person);
+
+            IEnumerable<PersonModel> models = _mapper.Map<IEnumerable<Person>, IEnumerable<PersonModel>>(spouses);
+
+            personModel.Spouses = models;
             return personModel;
+        }
+
+        public async Task<IEnumerable<Person>> FindPersonSpouses(Person person)
+        {
+            //IQueryable<Family> query = _unitOfWork.Repository<Family>().GetDbset();
+
+            if (person.Gender == Gender.MALE)
+            {
+                IEnumerable<Person> people = await _unitOfWork.Repository<Family>().GetDbset()
+                .Include(f => f.Parent2)
+                .Where(f => f.Parent1Id == person.Id)
+                .Select(f => f.Parent2)
+                .ToListAsync();
+
+                string query = _unitOfWork.Repository<Family>().GetDbset()
+                .Include(f => f.Parent2)
+                .Where(f => f.Parent1Id == person.Id)
+                .Select(f => f.Parent2).ToQueryString();
+
+                return people;
+            }
+            else
+            {
+                IEnumerable<Person> people = await _unitOfWork.Repository<Family>().GetDbset()
+                .Include(f => f.Parent1)
+                .Where(f => f.Parent2Id == person.Id)
+                .Select(f => f.Parent1)
+                .ToListAsync();
+
+                return people;
+            }
+
         }
 
         public async Task<IEnumerable<PersonModel>> GetPersonChildren(long id)

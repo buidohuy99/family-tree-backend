@@ -18,7 +18,7 @@ namespace FamilyTreeBackend.Core.Domain.Constants
         public const string PersonController_AddSpouseToPersonSuccessful = "You have successfully added a spouse to the person and produced the below family";
         public const string PersonController_AddChildToPersonSuccessful = "You have successfully added a child to the person and the info of that child is below, along with the family he was added in";
         public const string PersonController_UpdatePersonSuccessful = "Person updated successfully";
-        public const string PersonController_RemovePersonSuccessful = "Person removed successfully"
+        public const string PersonController_RemovePersonSuccessful = "Person removed successfully";
         public const string InternalServerError = "Server encountered an exception";
     }
 
