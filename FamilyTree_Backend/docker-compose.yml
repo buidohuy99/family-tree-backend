@@ -14,7 +14,7 @@ services:
             - MSSQL_SA_PASSWORD=${MSSQL_PASSWORD}
     familytreeapi:
         container_name: "family-tree-api"
-        image: "familytreeapi:all-purpose"
+        image: "${CONTAINER_REGISTRY}/familytreeapi:latest"
         ports:
             - "${API_PORT}:3000"
         build:
