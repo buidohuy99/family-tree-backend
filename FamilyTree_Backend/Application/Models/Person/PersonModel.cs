@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FamilyTreeBackend.Core.Application.Models.PersonModels
+namespace FamilyTreeBackend.Core.Application.Models
 {
     public class PersonModel
     {
@@ -17,6 +17,7 @@ namespace FamilyTreeBackend.Core.Application.Models.PersonModels
         public long Parent1Id { get; set; }
         public long Parent2Id { get; set; }
         public Gender Gender { get; set; }
+        public IEnumerable<PersonModel> Spouses;
         public string Note { get; set; }
         public string UserId { get; set; }
     }

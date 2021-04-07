@@ -267,7 +267,7 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
                 FirstName = "Phan",
                 LastName = "Luan",
                 DateOfBirth = new DateTime(1954, 10, 20),
-                Gender = Gender.MALE,
+                Gender = Gender.FEMALE,
             };
 
             familyTree.People.Add(person);
