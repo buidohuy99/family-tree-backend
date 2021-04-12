@@ -177,20 +177,22 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         [HttpGet("person/{personId}")]
         public async Task<IActionResult> FindPerson(long personId)
         {
-            try
-            {
-                PersonModel personModel = await _personService.GetPerson(personId);
-                return Ok(personModel);
-            }
-            catch(PersonNotFoundException ex)
-            {
-                uint? statusCode = ServiceExceptionsProcessor.GetStatusCode(ex.Message);
-                return StatusCode((int)statusCode.Value, new HttpResponse<long>(personId, ex.Message));
-            }
-            catch(Exception ex)
-            {
-                return StatusCode(500, new HttpResponse<Exception>(ex, GenericResponseStrings.InternalServerError));
-            }
+            PersonModel personModel = await _personService.GetPerson(personId);
+            return Ok(personModel);
+            //try
+            //{
+            //    PersonModel personModel = await _personService.GetPerson(personId);
+            //    return Ok(personModel);
+            //}
+            //catch(PersonNotFoundException ex)
+            //{
+            //    uint? statusCode = ServiceExceptionsProcessor.GetStatusCode(ex.Message);
+            //    return StatusCode((int)statusCode.Value, new HttpResponse<long>(personId, ex.Message));
+            //}
+            //catch(Exception ex)
+            //{
+            //    return StatusCode(500, new HttpResponse<Exception>(ex, GenericResponseStrings.InternalServerError));
+            //}
         }
 
         [HttpGet("person/{personId}/children")]
