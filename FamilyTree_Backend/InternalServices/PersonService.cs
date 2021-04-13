@@ -35,7 +35,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             _mapper = mapper;
         }
 
-        public async Task<AddNewParentToPersonResponseModel> AddNewParent(string userPerformingCreation, AddNewParentToPersonModel input)
+        public async Task<AddNewParentToPersonResponseModel> AddNewParent(AddNewParentToPersonModel input)
         {
             await using var transaction = await _unitOfWork.CreateTransaction();
             try
@@ -139,7 +139,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             }
         }
 
-        public async Task<PersonDTO> AddNewSpouse(string userPerformingCreation, AddNewSpouseToPersonModel input)
+        public async Task<PersonDTO> AddNewSpouse(AddNewSpouseToPersonModel input)
         {
             await using var transaction = await _unitOfWork.CreateTransaction();
             try
@@ -231,7 +231,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             }
         }
 
-        public async Task<AddNewChildToFamilyResponseModel> AddNewChild(string userPerformingCreation, AddNewChildToFamilyModel input)
+        public async Task<AddNewChildToFamilyResponseModel> AddNewChild(AddNewChildToFamilyModel input)
         {
             await using var transaction = await _unitOfWork.CreateTransaction();
             try

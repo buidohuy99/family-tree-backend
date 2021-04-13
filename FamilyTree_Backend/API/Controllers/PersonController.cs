@@ -23,6 +23,7 @@ using System.Threading.Tasks;
 namespace FamilyTreeBackend.Presentation.API.Controllers
 {
     [Area("person-management")]
+    //Commented for testing
     //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class PersonController : BaseController
     {
@@ -38,22 +39,25 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         [SwaggerResponse(200, Type = typeof(HttpResponse<AddNewParentToPersonResponseModel>), Description = "Return family with the new parent inside")]
         public async Task<IActionResult> AddNewParent(long personId, [FromBody] PersonInputModel input)
         {
-            // Check validity of the request
-            var claimsManager = HttpContext.User;
-            string uid = null;
-            try
-            {
-                uid = GetUserId(claimsManager);
-            }
-            catch (Exception e)
-            {
-                return Unauthorized(e.Message);
-            }
+            //MOVE THIS TO FUTURE PART WHERE IT WILL HANDLE GENERAL PERMISSION
+            //Commented for testing
 
-            if (uid == null)
-            {
-                return Unauthorized("Unauthorized individuals cannot access this route");
-            }
+            //// Check validity of the request
+            //var claimsManager = HttpContext.User;
+            //string uid = null;
+            //try
+            //{
+            //    uid = GetUserId(claimsManager);
+            //}
+            //catch (Exception e)
+            //{
+            //    return Unauthorized(e.Message);
+            //}
+
+            //if (uid == null)
+            //{
+            //    return Unauthorized("Unauthorized individuals cannot access this route");
+            //}
 
             // Carry on with the business logic
             var model = new AddNewParentToPersonModel()
@@ -61,26 +65,10 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
                 PersonId = personId,
                 ParentInfo = input
             };
-            var result = await _personService.AddNewParent(uid, model);
+            var result = await _personService.AddNewParent(model);
 
             return Ok(new HttpResponse<AddNewParentToPersonResponseModel>(result, GenericResponseStrings.PersonController_AddParentToPersonSuccessful));
-            //try
-            //{
-                
-            //}
-            //catch (Exception ex)
-            //{
-            //    string genericMessage = GenericResponseStrings.AnExceptionOccuredInController;
-            //    if (ex is BaseServiceException exception)
-            //    {
-            //        uint? statusCode = ServiceExceptionsProcessor.GetStatusCode(exception.Message);
-            //        if (statusCode != null && statusCode.HasValue)
-            //        {
-            //            return StatusCode((int)statusCode.Value, new HttpResponse<string>(exception.Message, genericMessage));
-            //        }
-            //    }
-            //    return StatusCode(500, new HttpResponse<Exception>(ex, GenericResponseStrings.InternalServerError));
-            //}
+            
         }
 
         [HttpPost("person/{personId}/spouse")]
@@ -88,49 +76,17 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         [SwaggerResponse(200, Type = typeof(HttpResponse<PersonDTO>), Description = "Returns the new spouse")]
         public async Task<IActionResult> AddNewSpouse(long personId, [FromBody] PersonInputModel input)
         {
-            // Check validity of the request
-            var claimsManager = HttpContext.User;
-            string uid = null;
-            try
-            {
-                uid = GetUserId(claimsManager);
-            }
-            catch (Exception e)
-            {
-                return Unauthorized(e.Message);
-            }
-
-            if (uid == null)
-            {
-                return Unauthorized("Unauthorized individuals cannot access this route");
-            }
-
+           
             // Carry on with the business logic
             var model = new AddNewSpouseToPersonModel()
             {
                 PersonId = personId,
                 SpouseInfo = input
             };
-            PersonDTO result = await _personService.AddNewSpouse(uid, model);
+            PersonDTO result = await _personService.AddNewSpouse(model);
 
             return Ok(new HttpResponse<PersonDTO>(result, GenericResponseStrings.PersonController_AddSpouseToPersonSuccessful));
-            //try
-            //{
-                
-            //}
-            //catch (Exception ex)
-            //{
-            //    string genericMessage = GenericResponseStrings.AnExceptionOccuredInController;
-            //    if (ex is BaseServiceException exception)
-            //    {
-            //        uint? statusCode = ServiceExceptionsProcessor.GetStatusCode(exception.Message);
-            //        if (statusCode != null && statusCode.HasValue)
-            //        {
-            //            return StatusCode((int)statusCode.Value, new HttpResponse<string>(exception.Message, genericMessage));
-            //        }
-            //    }
-            //    return StatusCode(500, new HttpResponse<Exception>(ex, GenericResponseStrings.InternalServerError));
-            //}
+           
         }
 
         [HttpPost("person/child")]
@@ -138,43 +94,9 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         [SwaggerResponse(200, Type = typeof(HttpResponse<AddNewChildToFamilyResponseModel>), Description = "Return the info of the new child, along with the new parent created on the spot (if have)")]
         public async Task<IActionResult> AddNewChild([FromBody] AddNewChildToFamilyModel input)
         {
-            // Check validity of the request
-            var claimsManager = HttpContext.User;
-            string uid = null;
-            try
-            {
-                uid = GetUserId(claimsManager);
-            }
-            catch (Exception e)
-            {
-                return Unauthorized(e.Message);
-            }
-
-            if (uid == null)
-            {
-                return Unauthorized("Unauthorized individuals cannot access this route");
-            }
-
-            var result = await _personService.AddNewChild(uid, input);
+            var result = await _personService.AddNewChild(input);
 
             return Ok(new HttpResponse<AddNewChildToFamilyResponseModel>(result, GenericResponseStrings.PersonController_AddChildToPersonSuccessful));
-            //try
-            //{
-                
-            //}
-            //catch (Exception ex)
-            //{
-            //    string genericMessage = GenericResponseStrings.AnExceptionOccuredInController;
-            //    if (ex is BaseServiceException exception)
-            //    {
-            //        uint? statusCode = ServiceExceptionsProcessor.GetStatusCode(exception.Message);
-            //        if (statusCode != null && statusCode.HasValue)
-            //        {
-            //            return StatusCode((int)statusCode.Value, new HttpResponse<string>(exception.Message, genericMessage));
-            //        }
-            //    }
-            //    return StatusCode(500, new HttpResponse<Exception>(ex, GenericResponseStrings.InternalServerError));
-            //}
         }
 
         [HttpGet("person/{personId}")]
@@ -183,20 +105,6 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         {
             PersonModel personModel = await _personService.GetPerson(personId);
             return Ok(personModel);
-            //try
-            //{
-            //    PersonModel personModel = await _personService.GetPerson(personId);
-            //    return Ok(personModel);
-            //}
-            //catch(PersonNotFoundException ex)
-            //{
-            //    uint? statusCode = ServiceExceptionsProcessor.GetStatusCode(ex.Message);
-            //    return StatusCode((int)statusCode.Value, new HttpResponse<long>(personId, ex.Message));
-            //}
-            //catch(Exception ex)
-            //{
-            //    return StatusCode(500, new HttpResponse<Exception>(ex, GenericResponseStrings.InternalServerError));
-            //}
         }
 
         [HttpGet("person/{personId}/children")]
