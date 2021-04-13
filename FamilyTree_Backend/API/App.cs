@@ -64,7 +64,7 @@ namespace FamilyTreeBackend.Presentation.API
         {
             //app.UseExceptionHandler("/error");
 
-            app.UsePersonExceptionHandlerMiddleware();
+            app.UseBaseExceptionHandlerMiddleware();
 
             dbContext.Database.Migrate();
 

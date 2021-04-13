@@ -13,11 +13,11 @@ using System.Threading.Tasks;
 namespace FamilyTreeBackend.Presentation.API.Middlewares
 {
     // You may need to install the Microsoft.AspNetCore.Http.Abstractions package into your project
-    public class PersonExceptionHandlerMiddleware
+    public class BaseExceptionHandlerMiddleware
     {
         private readonly RequestDelegate _next;
 
-        public PersonExceptionHandlerMiddleware(RequestDelegate next)
+        public BaseExceptionHandlerMiddleware(RequestDelegate next)
         {
             _next = next;
         }
@@ -29,29 +29,29 @@ namespace FamilyTreeBackend.Presentation.API.Middlewares
             {
                 await _next(httpContext);
             } 
+            catch (BaseServiceException exception)
+            {
+                await HandleBaseExceptionAsync(httpContext, exception);
+            }
             catch (Exception exception)
             {
-                await HandleExceptionAsync(httpContext, exception);
+                var response = new HttpResponse<Exception>(exception, GenericResponseStrings.InternalServerError);
+                await BuildResponseAsync(httpContext, 500, JsonSerializer.Serialize(response));
             }
         }
 
-        private async Task HandleExceptionAsync(HttpContext httpContext, Exception exception)
+        private async Task HandleBaseExceptionAsync(HttpContext httpContext, Exception exception)
         {
             string genericMessage = GenericResponseStrings.AnExceptionOccuredInController;
-            if (exception is BaseServiceException)
+            uint? statusCode = ServiceExceptionsProcessor.GetStatusCode(exception.Message);
+            if (statusCode != null && statusCode.HasValue)
             {
-                uint? statusCode = ServiceExceptionsProcessor.GetStatusCode(exception.Message);
-                if (statusCode != null && statusCode.HasValue)
-                {
-                    var personResponse = new HttpResponse<string>(exception.Message, genericMessage);
+                var personResponse = new HttpResponse<string>(exception.Message, genericMessage);
 
-                    await BuildResponseAsync(httpContext, (int)statusCode, JsonSerializer.Serialize(personResponse));
-                    return;
-                }
+                await BuildResponseAsync(httpContext, (int)statusCode, JsonSerializer.Serialize(personResponse));
+                return;
             }
-                
-            var response = new HttpResponse<Exception>(exception, GenericResponseStrings.InternalServerError);
-            await BuildResponseAsync(httpContext, 500, JsonSerializer.Serialize(response));
+
 
         }
 
@@ -64,11 +64,11 @@ namespace FamilyTreeBackend.Presentation.API.Middlewares
     }
 
     // Extension method used to add the middleware to the HTTP request pipeline.
-    public static class PersonExceptionHandlerMiddlewareExtensions
+    public static class BaseExceptionHandlerMiddlewareExtensions
     {
-        public static IApplicationBuilder UsePersonExceptionHandlerMiddleware(this IApplicationBuilder builder)
+        public static IApplicationBuilder UseBaseExceptionHandlerMiddleware(this IApplicationBuilder builder)
         {
-            return builder.UseMiddleware<PersonExceptionHandlerMiddleware>();
+            return builder.UseMiddleware<BaseExceptionHandlerMiddleware>();
         }
     }
 }
