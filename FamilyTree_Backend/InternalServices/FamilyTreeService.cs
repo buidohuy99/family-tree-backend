@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FamilyTreeBackend.Core.Application.Helpers.Exceptions.FamilyTreeService;
 using FamilyTreeBackend.Core.Application.Interfaces;
 using FamilyTreeBackend.Core.Application.Models;
 using FamilyTreeBackend.Core.Application.Models.FamilyTree;
@@ -71,6 +72,17 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
                 return people;
             }
+
+        }
+
+        public async Task<FamilyTreeUpdateResponseModel> UpdateFamilyTree(long treeId, FamilyTreeInputModel model)
+        {
+            FamilyTree tree = await _unitOfWork.Repository<FamilyTree>().FindAsync(treeId);
+
+            _mapper.Map(model, tree);
+            await _unitOfWork.SaveChangesAsync();
+
+            return _mapper.Map<FamilyTreeUpdateResponseModel>(tree);
 
         }
     }

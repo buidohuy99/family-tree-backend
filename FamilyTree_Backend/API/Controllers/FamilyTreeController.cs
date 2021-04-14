@@ -30,5 +30,14 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             FamilyTreeModel result = await _familyTreeService.FindFamilyTree(treeId);
             return Ok(result);
         }
+
+        [HttpPut("tree/{treeId}")]
+        [SwaggerResponse(200, Type = typeof(FamilyTreeUpdateResponseModel),
+            Description = "Return the info of tree with given Id)")]
+        public async Task<IActionResult> UpdateFamilyTree(long treeId, [FromBody] FamilyTreeInputModel model)
+        {
+            var result = await _familyTreeService.UpdateFamilyTree(treeId, model);
+            return Ok(result);
+        }
     }
 }

@@ -12,5 +12,7 @@ namespace FamilyTreeBackend.Core.Application.Interfaces
 
         public Task<FamilyTreeModel> FindFamilyTree(long treeId);
 
+        public Task<FamilyTreeUpdateResponseModel> UpdateFamilyTree(long treeId, FamilyTreeInputModel model);
+
     }
 }

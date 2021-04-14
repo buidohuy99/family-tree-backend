@@ -1,4 +1,5 @@
-﻿using FamilyTreeBackend.Core.Domain.Constants;
+﻿using FamilyTreeBackend.Core.Application.Helpers.Exceptions.FamilyTreeService;
+using FamilyTreeBackend.Core.Domain.Constants;
 using System.Collections.Generic;
 
 namespace FamilyTreeBackend.Presentation.API.Controllers.Misc
@@ -19,7 +20,6 @@ namespace FamilyTreeBackend.Presentation.API.Controllers.Misc
 
                 [PersonServiceExceptionMessages.PersonService_CannotFindSpecifiedPersonFromId] = 400,
                 [PersonServiceExceptionMessages.PersonService_CannotFindSpecifiedParentPersonFromId] = 400,
-                [PersonServiceExceptionMessages.PersonService_CannotFindSpecifiedTreeFromId] = 400,
                 [PersonServiceExceptionMessages.PersonService_CannotFindSpecifiedUserFromId] = 400,
                 [PersonServiceExceptionMessages.PersonService_CannotFindSpecifiedFamily] = 400,
                 [PersonServiceExceptionMessages.PersonService_FamilyAlreadyExist] = 400,
@@ -30,6 +30,8 @@ namespace FamilyTreeBackend.Presentation.API.Controllers.Misc
                 [PersonServiceExceptionMessages.PersonService_CannotAddChildToNoFamily] = 400,
                 [PersonServiceExceptionMessages.PersonService_PersonNotFound] = 404,
                 [PersonServiceExceptionMessages.PersonService_CannotDeletePerson] = 400,
+
+                [nameof(TreeNotFoundException)] = 404,
             };
         }
 

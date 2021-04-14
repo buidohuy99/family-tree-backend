@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FamilyTreeBackend.Core.Domain.Constants;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +10,8 @@ namespace FamilyTreeBackend.Core.Application.Helpers.Exceptions.FamilyTreeServic
     [Serializable]
     public class TreeNotFoundException : FamilyTreeServiceException
     {
-        public TreeNotFoundException(string message) : base(message)
+        public TreeNotFoundException(long id) 
+            :base(String.Format(FamilyServiceExceptionMessages.TreeNotFound, id))
         {
         }
     }
