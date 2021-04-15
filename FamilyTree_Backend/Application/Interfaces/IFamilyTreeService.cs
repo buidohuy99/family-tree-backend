@@ -14,5 +14,6 @@ namespace FamilyTreeBackend.Core.Application.Interfaces
 
         public Task<FamilyTreeUpdateResponseModel> UpdateFamilyTree(long treeId, FamilyTreeInputModel model);
 
+        public Task DeleteFamilyTree(long treeId);
     }
 }

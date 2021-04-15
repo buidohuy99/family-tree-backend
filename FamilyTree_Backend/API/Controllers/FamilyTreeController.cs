@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace FamilyTreeBackend.Presentation.API.Controllers
 {
-    [Area("person-management")]
+    [Area("tree-management")]
     [ApiController]
     public class FamilyTreeController : BaseController
     {
@@ -39,5 +39,22 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             var result = await _familyTreeService.UpdateFamilyTree(treeId, model);
             return Ok(result);
         }
+
+        [HttpDelete("tree/{treeId}")]
+        [SwaggerResponse(200, Type = typeof(Nullable),
+            Description = "Return the info of tree with given Id)")]
+        public async Task<IActionResult> DeleteFamilyTree(long treeId)
+        {
+            await _familyTreeService.DeleteFamilyTree(treeId);
+            return Ok();
+        }
+
+        //[HttpPost("tree")]
+        //public async Task<IActionResult> AddFamilyTree([FromBody] FamilyTreeInputModel model)
+        //{
+        //    var result = await _familyTreeService.AddFamilyTree(model);
+
+        //    return Ok(result);
+        //}
     }
 }

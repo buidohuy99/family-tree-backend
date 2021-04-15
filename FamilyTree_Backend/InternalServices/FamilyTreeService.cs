@@ -85,5 +85,79 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             return _mapper.Map<FamilyTreeUpdateResponseModel>(tree);
 
         }
+
+        public async Task DeleteFamilyTree(long treeId)
+        {
+            var tree = await _unitOfWork.Repository<FamilyTree>().FindAsync(treeId);
+
+            if (tree == null)
+            {
+                throw new TreeNotFoundException(treeId);
+            }
+
+            _unitOfWork.Repository<FamilyTree>().Delete(tree);
+
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+    //    public async Task<FamilyTreeModel> AddFamilyTree(FamilyTreeInputModel model)
+    //    {
+    //        var tree = await createDefaultTree(model);
+
+    //    }
+
+    //    private async Task<FamilyTree> createDefaultTree(FamilyTreeInputModel model)
+    //    {
+    //        FamilyTree familyTree = _mapper.Map<FamilyTree>(model);
+
+    //        await _unitOfWork.Repository<FamilyTree>().AddAsync(familyTree);
+
+    //        Person person = new Person
+    //        {
+    //            FirstName = "Person",
+    //            LastName = "Unknown",
+    //            Gender = Gender.MALE,
+    //        };
+
+    //        Person father = new Person
+    //        {
+    //            FirstName = "Father",
+    //            LastName = "Unknown",
+    //            Gender = Gender.MALE,
+    //        };
+
+    //        Person mother = new Person
+    //        {
+    //            FirstName = "Mother",
+    //            LastName = "Unknown",
+    //            Gender = Gender.FEMALE,
+    //        };
+
+    //        familyTree.People.Add(person);
+    //        familyTree.People.Add(mother);
+    //        familyTree.People.Add(father);
+
+    //        Family family = new Family
+    //        {
+    //            Parent1 = father,
+    //            Parent2 = mother,
+    //            Children = new List<Person>(),
+    //        };
+
+    //        family.Children.Add(person);
+
+    //        Marriage relationship = new Marriage
+    //        {
+    //            RelationshipType = RelationshipType.MARRIED,
+    //        };
+
+    //        family.Relationship = relationship;
+
+    //        familyTree.Families.Add(family);
+
+    //        await _unitOfWork.SaveChangesAsync();
+
+    //        return familyTree;
+    //    } 
     }
 }
