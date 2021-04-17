@@ -29,6 +29,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
         {
             FamilyTree tree = await _unitOfWork.Repository<FamilyTree>().GetDbset()
                 .Include(ft => ft.People)
+                .Include(ft => ft.Families)
                 .FirstOrDefaultAsync(ft => ft.Id == treeId);
 
             var model = ManualMapTreeToModel(tree);
@@ -87,6 +88,9 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
         private async Task<FamilyTree> createDefaultTree(FamilyTreeInputModel model)
         {
             FamilyTree familyTree = _mapper.Map<FamilyTree>(model);
+
+            familyTree.People = new List<Person>();
+            familyTree.Families = new List<Family>();
 
             await _unitOfWork.Repository<FamilyTree>().AddAsync(familyTree);
 
