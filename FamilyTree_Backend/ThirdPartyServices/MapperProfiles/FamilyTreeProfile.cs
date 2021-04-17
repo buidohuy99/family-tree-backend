@@ -18,6 +18,8 @@ namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices.MapperProf
 
             CreateMap<FamilyTreeInputModel, FamilyTree>();
             CreateMap<FamilyTree, FamilyTreeUpdateResponseModel>();
+
+            CreateMap<FamilyTree, FamilyTreeListItemModel>();
         }
     }
 }

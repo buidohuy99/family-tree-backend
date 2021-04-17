@@ -49,12 +49,20 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             return Ok();
         }
 
-        //[HttpPost("tree")]
-        //public async Task<IActionResult> AddFamilyTree([FromBody] FamilyTreeInputModel model)
-        //{
-        //    var result = await _familyTreeService.AddFamilyTree(model);
+        [HttpPost("tree")]
+        public async Task<IActionResult> AddFamilyTree([FromBody] FamilyTreeInputModel model)
+        {
+            var result = await _familyTreeService.AddFamilyTree(model);
 
-        //    return Ok(result);
-        //}
+            return Ok(result);
+        }
+
+        [HttpGet("tree")]
+        public async Task<IActionResult> FindAllTrees()
+        {
+            var result = await _familyTreeService.FindAllTree();
+
+            return Ok(result);
+        }
     }
 }

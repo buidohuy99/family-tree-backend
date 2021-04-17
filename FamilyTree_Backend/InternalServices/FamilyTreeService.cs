@@ -31,48 +31,9 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                 .Include(ft => ft.People)
                 .FirstOrDefaultAsync(ft => ft.Id == treeId);
 
-            var model = _mapper.Map<FamilyTreeModel>(tree);
-
-            foreach(var personModel in model.People)
-            {
-                var spouses = await FindPersonSpouses(personModel.Id, personModel.Gender);
-                IEnumerable<PersonModel> models = _mapper.Map<IEnumerable<Person>, IEnumerable<PersonModel>>(spouses);
-                personModel.Spouses = models;
-            }
+            var model = ManualMapTreeToModel(tree);
 
             return model;
-        }
-
-        private async Task<IEnumerable<Person>> FindPersonSpouses(long personId, Gender gender)
-        {
-            //IQueryable<Family> query = _unitOfWork.Repository<Family>().GetDbset();
-
-            if (gender == Gender.MALE)
-            {
-                IEnumerable<Person> people = await _unitOfWork.Repository<Family>().GetDbset()
-                .Include(f => f.Parent2)
-                .Where(f => f.Parent1Id == personId)
-                .Select(f => f.Parent2)
-                .ToListAsync();
-
-                string query = _unitOfWork.Repository<Family>().GetDbset()
-                .Include(f => f.Parent2)
-                .Where(f => f.Parent1Id == personId)
-                .Select(f => f.Parent2).ToQueryString();
-
-                return people;
-            }
-            else
-            {
-                IEnumerable<Person> people = await _unitOfWork.Repository<Family>().GetDbset()
-                .Include(f => f.Parent1)
-                .Where(f => f.Parent2Id == personId)
-                .Select(f => f.Parent1)
-                .ToListAsync();
-
-                return people;
-            }
-
         }
 
         public async Task<FamilyTreeUpdateResponseModel> UpdateFamilyTree(long treeId, FamilyTreeInputModel model)
@@ -100,64 +61,124 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             await _unitOfWork.SaveChangesAsync();
         }
 
-    //    public async Task<FamilyTreeModel> AddFamilyTree(FamilyTreeInputModel model)
-    //    {
-    //        var tree = await createDefaultTree(model);
+        public async Task<FamilyTreeModel> AddFamilyTree(FamilyTreeInputModel model)
+        {
+            var tree = await createDefaultTree(model);
+            var responseModel = ManualMapTreeToModel(tree);
 
-    //    }
+            return responseModel;
 
-    //    private async Task<FamilyTree> createDefaultTree(FamilyTreeInputModel model)
-    //    {
-    //        FamilyTree familyTree = _mapper.Map<FamilyTree>(model);
+        }
 
-    //        await _unitOfWork.Repository<FamilyTree>().AddAsync(familyTree);
+        public async Task<IEnumerable<FamilyTreeListItemModel>> FindAllTree()
+        {
+            IEnumerable<FamilyTree> trees = await _unitOfWork.Repository<FamilyTree>().GetDbset()
+                .ToListAsync();
 
-    //        Person person = new Person
-    //        {
-    //            FirstName = "Person",
-    //            LastName = "Unknown",
-    //            Gender = Gender.MALE,
-    //        };
+            List<FamilyTreeListItemModel> models = new List<FamilyTreeListItemModel>();
+            foreach(var tree in trees)
+            {
+                models.Add(_mapper.Map<FamilyTreeListItemModel>(tree));
+            }
 
-    //        Person father = new Person
-    //        {
-    //            FirstName = "Father",
-    //            LastName = "Unknown",
-    //            Gender = Gender.MALE,
-    //        };
+            return models;
+        }
 
-    //        Person mother = new Person
-    //        {
-    //            FirstName = "Mother",
-    //            LastName = "Unknown",
-    //            Gender = Gender.FEMALE,
-    //        };
+        private async Task<FamilyTree> createDefaultTree(FamilyTreeInputModel model)
+        {
+            FamilyTree familyTree = _mapper.Map<FamilyTree>(model);
 
-    //        familyTree.People.Add(person);
-    //        familyTree.People.Add(mother);
-    //        familyTree.People.Add(father);
+            await _unitOfWork.Repository<FamilyTree>().AddAsync(familyTree);
 
-    //        Family family = new Family
-    //        {
-    //            Parent1 = father,
-    //            Parent2 = mother,
-    //            Children = new List<Person>(),
-    //        };
+            Person person = new Person
+            {
+                FirstName = "Person",
+                LastName = "Unknown",
+                Gender = Gender.MALE,
+            };
 
-    //        family.Children.Add(person);
+            Person father = new Person
+            {
+                FirstName = "Father",
+                LastName = "Unknown",
+                Gender = Gender.MALE,
+            };
 
-    //        Marriage relationship = new Marriage
-    //        {
-    //            RelationshipType = RelationshipType.MARRIED,
-    //        };
+            Person mother = new Person
+            {
+                FirstName = "Mother",
+                LastName = "Unknown",
+                Gender = Gender.FEMALE,
+            };
 
-    //        family.Relationship = relationship;
+            familyTree.People.Add(person);
+            familyTree.People.Add(mother);
+            familyTree.People.Add(father);
 
-    //        familyTree.Families.Add(family);
+            Family family = new Family
+            {
+                Parent1 = father,
+                Parent2 = mother,
+                Children = new List<Person>(),
+            };
 
-    //        await _unitOfWork.SaveChangesAsync();
+            family.Children.Add(person);
 
-    //        return familyTree;
-    //    } 
+            Marriage relationship = new Marriage
+            {
+                RelationshipType = RelationshipType.MARRIED,
+            };
+
+            family.Relationship = relationship;
+
+            familyTree.Families.Add(family);
+
+            await _unitOfWork.SaveChangesAsync();
+
+            return familyTree;
+        }
+
+        private FamilyTreeModel ManualMapTreeToModel(FamilyTree tree)
+        {
+            var model = _mapper.Map<FamilyTreeModel>(tree);
+
+            AddPersonSpousesToModel(tree, model);
+
+            return model;
+        }
+
+        private void AddPersonSpousesToModel(FamilyTree tree, FamilyTreeModel model)
+        {
+            foreach (var personModel in model.People)
+            {
+                var spouses = FindPersonSpousesFromTree(personModel.Id, personModel.Gender, tree);
+                IEnumerable<PersonModel> models = _mapper.Map<IEnumerable<Person>, IEnumerable<PersonModel>>(spouses);
+                personModel.Spouses = models;
+            }
+        }
+
+        private IEnumerable<Person> FindPersonSpousesFromTree(long personId, Gender gender, FamilyTree tree)
+        {
+            Func<Family, bool> whereCondition = null;
+            Func<Family, Person> selectOption = null;
+
+            if (gender == Gender.MALE)
+            {
+                whereCondition = (f => f.Parent1Id == personId);
+                selectOption = (f => f.Parent2);
+            }
+            else
+            {
+                whereCondition = (f => f.Parent2Id == personId);
+                selectOption = (f => f.Parent1);
+            }
+
+            IEnumerable<Person> people = tree.Families
+                .Where(whereCondition)
+                .Select(selectOption)
+                .ToList();
+
+            return people;
+        }
     }
 }
