@@ -62,9 +62,7 @@ namespace FamilyTreeBackend.Presentation.API
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, FamilyTreeDbContext dbContext, IServiceProvider serviceProvider)
         {
-            //app.UseExceptionHandler("/error");
-
-            app.UseBaseExceptionHandlerMiddleware();
+            app.UseExceptionHandler("/error");
 
             dbContext.Database.Migrate();
 
@@ -108,6 +106,11 @@ namespace FamilyTreeBackend.Presentation.API
                 c.RoutePrefix = string.Empty;
             });
             #endregion
+
+            #region BaseServiceException handler middleware
+            app.UseBaseExceptionHandlerMiddleware();
+            #endregion
+
         }
     }
 }

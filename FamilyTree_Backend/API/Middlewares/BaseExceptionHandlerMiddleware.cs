@@ -33,10 +33,10 @@ namespace FamilyTreeBackend.Presentation.API.Middlewares
             {
                 await HandleBaseExceptionAsync(httpContext, exception);
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                var response = new HttpResponse<Exception>(exception, GenericResponseStrings.InternalServerError);
-                await BuildResponseAsync(httpContext, 500, JsonSerializer.Serialize(response));
+
+                throw;
             }
         }
 
