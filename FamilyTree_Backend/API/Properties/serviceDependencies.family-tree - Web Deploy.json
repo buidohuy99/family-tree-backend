@@ -5,6 +5,12 @@
       "type": "mssql.azure",
       "connectionId": "FamilyTree",
       "secretStore": "AzureAppSettings"
+    },
+    "mssql2": {
+      "type": "mssql",
+      "connectionId": "FamilyTreeDbContext",
+      "suggestion": "true",
+      "ignored": "true"
     }
   }
 }
