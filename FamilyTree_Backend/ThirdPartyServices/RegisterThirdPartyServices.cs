@@ -77,6 +77,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices
             var mapperConfig = new MapperConfiguration(mc =>
             {
                 mc.AddProfile(new PersonProfile());
+                mc.AddProfile(new FamilyTreeProfile());
             });
 
             IMapper mapper = mapperConfig.CreateMapper();

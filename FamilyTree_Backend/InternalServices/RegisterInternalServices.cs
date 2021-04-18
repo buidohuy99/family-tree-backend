@@ -17,6 +17,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             #region Register scoped services
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IPersonService, PersonService>();
+            services.AddScoped<IFamilyTreeService, FamilyTreeService>();
             #endregion
         }
     }

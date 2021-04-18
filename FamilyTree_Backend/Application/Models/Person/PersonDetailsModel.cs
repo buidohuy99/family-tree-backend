@@ -1,14 +1,13 @@
-﻿using FamilyTreeBackend.Core.Domain.Entities;
-using FamilyTreeBackend.Core.Domain.Enums;
+﻿using FamilyTreeBackend.Core.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FamilyTreeBackend.Core.Application.Models
+namespace FamilyTreeBackend.Core.Application.Models.Person
 {
-    public class PersonModel
+    class PersonDetailsModel
     {
         public long Id { get; set; }
         public string FirstName { get; set; }
@@ -19,6 +18,9 @@ namespace FamilyTreeBackend.Core.Application.Models
         public long Parent2Id { get; set; }
         public Gender Gender { get; set; }
         public IEnumerable<PersonModel> Spouses;
+        public string PhoneNumber { get; set; }
+        public string HomeAddress { get; set; }
+        public string Occupation { get; set; }
         public string Note { get; set; }
         public string UserId { get; set; }
     }
