@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FamilyTreeBackend.Core.Application.Helpers.Exceptions;
 using FamilyTreeBackend.Core.Application.Helpers.Exceptions.FamilyTreeService;
 using FamilyTreeBackend.Core.Application.Interfaces;
 using FamilyTreeBackend.Core.Application.Models;
@@ -62,9 +63,17 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public async Task<FamilyTreeModel> AddFamilyTree(FamilyTreeInputModel model)
+        public async Task<FamilyTreeModel> AddFamilyTree(FamilyTreeInputModel model, ApplicationUser user)
         {
+            //if (user == null)
+            //{
+            //    throw new UserNotFoundException();
+            //}
+
             var tree = await createDefaultTree(model);
+
+            tree.Owner = user;
+
             var responseModel = ManualMapTreeToModel(tree);
 
             return responseModel;

@@ -1,4 +1,5 @@
-﻿using FamilyTreeBackend.Core.Application.Interfaces;
+﻿using FamilyTreeBackend.Core.Application.Helpers.Exceptions;
+using FamilyTreeBackend.Core.Application.Interfaces;
 using FamilyTreeBackend.Core.Application.Models.FamilyTree;
 using FamilyTreeBackend.Core.Domain.Entities;
 using Microsoft.AspNetCore.Http;
@@ -9,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FamilyTreeBackend.Core.Application.Helpers
 
 namespace FamilyTreeBackend.Presentation.API.Controllers
 {
@@ -52,9 +54,22 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         [HttpPost("tree")]
         public async Task<IActionResult> AddFamilyTree([FromBody] FamilyTreeInputModel model)
         {
-            var result = await _familyTreeService.AddFamilyTree(model);
+            var claimManager = HttpContext.User;
 
-            return Ok(result);
+            try
+            {
+                var user = await _userManager.GetUserAsync(claimManager);
+
+                var result = await _familyTreeService.AddFamilyTree(model, user);
+
+                return Ok(result);
+            }
+            catch (UserNotFoundException e)
+            {
+                //not implemented yet
+                return StatusCode(401, new HttpResponse<Exception>(e, "User not found"));
+            }
+            
         }
 
         [HttpGet("tree")]

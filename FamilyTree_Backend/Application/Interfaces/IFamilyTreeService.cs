@@ -1,4 +1,5 @@
 ﻿using FamilyTreeBackend.Core.Application.Models.FamilyTree;
+using FamilyTreeBackend.Core.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +17,7 @@ namespace FamilyTreeBackend.Core.Application.Interfaces
 
         public Task DeleteFamilyTree(long treeId);
 
-        public Task<FamilyTreeModel> AddFamilyTree(FamilyTreeInputModel model);
+        public Task<FamilyTreeModel> AddFamilyTree(FamilyTreeInputModel model, ApplicationUser user);
 
         public Task<IEnumerable<FamilyTreeListItemModel>> FindAllTree();
     }
