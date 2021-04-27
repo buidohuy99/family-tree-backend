@@ -10,7 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using FamilyTreeBackend.Core.Application.Helpers
+using FamilyTreeBackend.Core.Application.Helpers;
 
 namespace FamilyTreeBackend.Presentation.API.Controllers
 {
@@ -77,6 +77,13 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         {
             var result = await _familyTreeService.FindAllTree();
 
+            return Ok(result);
+        }
+
+        [HttpPost("tree/{treeId}/AddUsersToEditor")]
+        public async Task<IActionResult> AddUsersToEditor([FromBody] List<string> userNames)
+        {
+            var result =  await _familyTreeService.AddUsersToEditor(userNames);
             return Ok(result);
         }
     }
