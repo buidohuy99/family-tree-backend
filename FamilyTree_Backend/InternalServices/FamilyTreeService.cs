@@ -6,6 +6,7 @@ using FamilyTreeBackend.Core.Application.Models;
 using FamilyTreeBackend.Core.Application.Models.FamilyTree;
 using FamilyTreeBackend.Core.Domain.Entities;
 using FamilyTreeBackend.Core.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -21,6 +22,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IAuthorizationService _authorizationService;
 
 
         public FamilyTreeService(IUnitOfWork unitOfWork, IMapper mapper, UserManager<ApplicationUser> userManager)
@@ -116,6 +118,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             return addedUser;
         }
 
+        #region Helper methods
         private async Task<FamilyTree> createDefaultTree(FamilyTreeInputModel model)
         {
             FamilyTree familyTree = _mapper.Map<FamilyTree>(model);
@@ -215,5 +218,6 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
             return people;
         }
+        #endregion
     }
 }

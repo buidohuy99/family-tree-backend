@@ -11,6 +11,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FamilyTreeBackend.Core.Application.Helpers;
+using FamilyTreeBackend.Presentation.API.Handlers;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FamilyTreeBackend.Presentation.API.Controllers
 {
@@ -19,9 +21,15 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
     public class FamilyTreeController : BaseController
     {
         private readonly IFamilyTreeService _familyTreeService;
-        public FamilyTreeController(UserManager<ApplicationUser> userManager, IFamilyTreeService familyTreeService) : base(userManager)
+        private readonly ITreeAuthorizationService _authorizationService;
+        private readonly IAuthorizationService authorizationService1;
+        public FamilyTreeController(
+            UserManager<ApplicationUser> userManager, 
+            IFamilyTreeService familyTreeService,
+            ITreeAuthorizationService authorizationService) : base(userManager)
         {
             _familyTreeService = familyTreeService;
+            _authorizationService = authorizationService;
         }
 
         [HttpGet("tree/{treeId}")]
@@ -44,7 +52,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
 
         [HttpDelete("tree/{treeId}")]
         [SwaggerResponse(200, Type = typeof(Nullable),
-            Description = "Return the info of tree with given Id)")]
+            Description = "Delete tree with given Id)")]
         public async Task<IActionResult> DeleteFamilyTree(long treeId)
         {
             await _familyTreeService.DeleteFamilyTree(treeId);
@@ -81,8 +89,16 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         }
 
         [HttpPost("tree/{treeId}/AddUsersToEditor")]
-        public async Task<IActionResult> AddUsersToEditor([FromBody] List<string> userNames)
+        [SwaggerResponse(200, Type = typeof(IEnumerable<string>),
+            Description = "Add list of users to be tree's editor, return the added users)")]
+        public async Task<IActionResult> AddUsersToEditor(long treeId, [FromBody] List<string> userNames)
         {
+            var authorizeResult = await _authorizationService.AuthorizeAsync(User, treeId, TreeCRUDOperations.Update);
+
+            if (!authorizeResult.Succeeded)
+            {
+                return Unauthorized();
+            }
             var result =  await _familyTreeService.AddUsersToEditor(userNames);
             return Ok(result);
         }
