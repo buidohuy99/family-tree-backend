@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
+using FamilyTreeBackend.Core.Application.Helpers.Exceptions;
 using FamilyTreeBackend.Core.Application.Helpers.Exceptions.FamilyTreeService;
 using FamilyTreeBackend.Core.Application.Interfaces;
 using FamilyTreeBackend.Core.Application.Models;
 using FamilyTreeBackend.Core.Application.Models.FamilyTree;
 using FamilyTreeBackend.Core.Domain.Entities;
 using FamilyTreeBackend.Core.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -18,11 +21,15 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IAuthorizationService _authorizationService;
 
-        public FamilyTreeService(IUnitOfWork unitOfWork, IMapper mapper)
+
+        public FamilyTreeService(IUnitOfWork unitOfWork, IMapper mapper, UserManager<ApplicationUser> userManager)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _userManager = userManager;
         }
 
         public async Task<FamilyTreeModel> FindFamilyTree(long treeId)
@@ -48,6 +55,8 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
         }
 
+
+
         public async Task DeleteFamilyTree(long treeId)
         {
             var tree = await _unitOfWork.Repository<FamilyTree>().FindAsync(treeId);
@@ -62,9 +71,17 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public async Task<FamilyTreeModel> AddFamilyTree(FamilyTreeInputModel model)
+        public async Task<FamilyTreeModel> AddFamilyTree(FamilyTreeInputModel model, ApplicationUser user)
         {
+            //if (user == null)
+            //{
+            //    throw new UserNotFoundException();
+            //}
+
             var tree = await createDefaultTree(model);
+
+            tree.Owner = user;
+
             var responseModel = ManualMapTreeToModel(tree);
 
             return responseModel;
@@ -85,6 +102,23 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             return models;
         }
 
+        public async Task<IEnumerable<string>> AddUsersToEditor(IList<string> userNames)
+        {
+            var addedUser = new List<string>();
+
+            foreach(var username in userNames)
+            {
+                var user = await _userManager.FindByNameAsync(username);
+
+                if (user != null)
+                {
+                    addedUser.Add(username);
+                }
+            }
+            return addedUser;
+        }
+
+        #region Helper methods
         private async Task<FamilyTree> createDefaultTree(FamilyTreeInputModel model)
         {
             FamilyTree familyTree = _mapper.Map<FamilyTree>(model);
@@ -184,5 +218,6 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
             return people;
         }
+        #endregion
     }
 }
