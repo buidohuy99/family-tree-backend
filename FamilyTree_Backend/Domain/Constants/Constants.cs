@@ -29,34 +29,44 @@ namespace FamilyTreeBackend.Core.Domain.Constants
         public const string PersonService_ErrorMessage = "An error occured while processing a person service function";
     }
 
-    public static class AuthServiceExceptionMessages
+    public static class AuthExceptionMessages
     {
-        public const string AuthService_CannotRegisterUser = "Cannot register the user with the above credentials";
-        public const string AuthService_UsernameAlreadyExists = "Cannot register: username already exist";
-        public const string AuthService_EmailAlreadyExists = "Cannot register: email already exist";
-        public const string AuthService_CannotFindUser = "Valid user cannot be found from the specified infos";
-        public const string AuthService_PasswordProvidedIsInvalid = "Provided password is wrong for the username/email";
+        //RegisterUserFail
+        public const string RegisterUserFail = "Cannot register the user with the above credentials";
+        public const string UsernameAlreadyExists = "Cannot register: username already exist";
+        public const string EmailAlreadyExists = "Cannot register: email already exist";
+        
+        //LoginUserFail
+        public const string CannotFindUser = "Valid user cannot be found from the specified infos";
+        public const string InvalidPassword = "Provided password is wrong for the username/email";
     }
 
-    public static class PersonServiceExceptionMessages
+    public static class PersonExceptionMessages
     {
-        public const string PersonService_CannotFindSpecifiedTreeFromId = "Tree cannot be found from the provided id";
-        public const string PersonService_CannotFindSpecifiedUserFromId = "User cannot be found from the provided id";
-        public const string PersonService_CannotFindSpecifiedPersonFromId = "Person cannot be found from the provided id";
-        public const string PersonService_CannotFindSpecifiedParentPersonFromId = "Parent person cannot be found from the provided id";
-        public const string PersonService_CannotFindSpecifiedFamily = "Family cannot be found for the person";
-        public const string PersonService_UserAlreadyExistedInTree = "User already existed as a person in the tree";
-        public const string PersonService_FamilyAlreadyExist = "Family that this person is a child of already exist, cannot add parent";
-        public const string PersonService_FatherGenderIsNotValid = "Father for the operation is not a male";
-        public const string PersonService_MotherGenderIsNotValid = "Mother for the operation is not a female";
-        public const string PersonService_SpouseGenderNotValid = "Gender of the spouse is not valid, spouse gender must be the opposite of the person";
-        public const string PersonService_CannotAddChildToNoFamily = "You have to specify a mother and/or a father to add the child to";
-        public const string PersonService_PersonNotFound = "Cannot find person with provided Id";
-        public const string PersonService_CannotDeletePerson = "Cannot delete person, please remove all the person's descendant relationships before deleting them";
+        //public const string PersonService_CannotFindSpecifiedParentPersonFromId = "Parent person cannot be found from the provided id";
+        
+        //FamilyNotFound
+        public const string FamilyNotFound = "Family cannot be found for the person";
+        public const string UserAlreadyExistedInTree = "User already existed as a person in the tree";
+        public const string FamilyAlreadyExist = "Family that this person is a child of already exist, cannot add parent";
+        
+        //GenderNotValid
+        public const string FatherGenderIsNotValid = "Father for the operation is not a male";
+        public const string MotherGenderIsNotValid = "Mother for the operation is not a female";
+        public const string SpouseGenderNotValid = "Gender of the spouse is not valid, spouse gender must be the opposite of the person";
+        
+        public const string PersonNotFound = "Cannot find person with provided Id";
+        
+        public const string CannotDeletePerson = "Cannot delete person, please remove all the person's personal relationships before deleting them";
     }
 
-    public static class FamilyServiceExceptionMessages
+    public static class TreeExceptionMessages
     {
-        public const string TreeNotFound = @"Cannot find tree with provided Id {1}";
+        public const string TreeNotFound = "Cannot find tree with provided Id";
+    }
+
+    public static class UserExceptionMessages
+    {
+        public const string UserNotFound = "Cannot find user with provided Id";
     }
 }

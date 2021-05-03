@@ -40,13 +40,12 @@ namespace FamilyTreeBackend.Presentation.API.Middlewares
             }
         }
 
-        private async Task HandleBaseExceptionAsync(HttpContext httpContext, Exception exception)
+        private async Task HandleBaseExceptionAsync(HttpContext httpContext, BaseServiceException exception)
         {
-            string genericMessage = GenericResponseStrings.AnExceptionOccuredInController;
             uint? statusCode = ServiceExceptionsProcessor.GetStatusCode(exception.Message);
             if (statusCode != null && statusCode.HasValue)
             {
-                var personResponse = new HttpResponse<string>(exception.Message, genericMessage);
+                var personResponse = new HttpResponse<BaseServiceException>(exception, exception.Message);
 
                 await BuildResponseAsync(httpContext, (int)statusCode, JsonSerializer.Serialize(personResponse));
                 return;
