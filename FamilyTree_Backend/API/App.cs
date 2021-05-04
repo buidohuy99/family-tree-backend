@@ -96,6 +96,10 @@ namespace FamilyTreeBackend.Presentation.API
 
             app.UseAuthorization();
 
+            #region BaseServiceException handler middleware
+            app.UseBaseExceptionHandlerMiddleware();
+            #endregion
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
@@ -114,9 +118,7 @@ namespace FamilyTreeBackend.Presentation.API
             });
             #endregion
 
-            #region BaseServiceException handler middleware
-            app.UseBaseExceptionHandlerMiddleware();
-            #endregion
+            
 
         }
     }

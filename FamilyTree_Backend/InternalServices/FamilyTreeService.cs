@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using FamilyTreeBackend.Core.Application.Helpers.Exceptions;
-using FamilyTreeBackend.Core.Application.Helpers.Exceptions.FamilyTreeService;
 using FamilyTreeBackend.Core.Application.Interfaces;
 using FamilyTreeBackend.Core.Application.Models;
 using FamilyTreeBackend.Core.Application.Models.FamilyTree;
+using FamilyTreeBackend.Core.Domain.Constants;
 using FamilyTreeBackend.Core.Domain.Entities;
 using FamilyTreeBackend.Core.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
@@ -22,8 +22,6 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IAuthorizationService _authorizationService;
-
 
         public FamilyTreeService(IUnitOfWork unitOfWork, IMapper mapper, UserManager<ApplicationUser> userManager)
         {
@@ -39,6 +37,10 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                 .Include(ft => ft.Families)
                 .FirstOrDefaultAsync(ft => ft.Id == treeId);
 
+            if (tree == null)
+            {
+                throw new TreeNotFoundException(TreeExceptionMessages.TreeNotFound, treeId);
+            }
             var model = ManualMapTreeToModel(tree);
 
             return model;
@@ -63,7 +65,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
             if (tree == null)
             {
-                throw new TreeNotFoundException(treeId);
+                throw new TreeNotFoundException(TreeExceptionMessages.TreeNotFound, treeId);
             }
 
             _unitOfWork.Repository<FamilyTree>().Delete(tree);

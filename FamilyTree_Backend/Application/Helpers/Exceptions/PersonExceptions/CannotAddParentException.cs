@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace FamilyTreeBackend.Core.Application.Helpers.Exceptions
 {
-    public class PersonServiceException : BaseServiceException
+    public class CannotAddParentException : PersonException
     {
-        public PersonServiceException(string message) : base(message)
+        public CannotAddParentException(string message, long personId)
+            :base(message, personId)
         {
         }
     }

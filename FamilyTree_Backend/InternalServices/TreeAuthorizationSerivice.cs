@@ -1,5 +1,6 @@
-﻿using FamilyTreeBackend.Core.Application.Helpers.Exceptions.FamilyTreeService;
+﻿using FamilyTreeBackend.Core.Application.Helpers.Exceptions;
 using FamilyTreeBackend.Core.Application.Interfaces;
+using FamilyTreeBackend.Core.Domain.Constants;
 using FamilyTreeBackend.Core.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -33,7 +34,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
             if(tree == null)
             {
-                throw new TreeNotFoundException(treeId);
+                throw new TreeNotFoundException(TreeExceptionMessages.TreeNotFound, treeId);
             }
 
             var result = _authorizationService.AuthorizeAsync(user, tree, requirements);

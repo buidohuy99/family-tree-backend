@@ -22,7 +22,6 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
     {
         private readonly IFamilyTreeService _familyTreeService;
         private readonly ITreeAuthorizationService _authorizationService;
-        private readonly IAuthorizationService authorizationService1;
         public FamilyTreeController(
             UserManager<ApplicationUser> userManager, 
             IFamilyTreeService familyTreeService,
