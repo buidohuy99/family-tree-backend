@@ -99,7 +99,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         }
 
         [HttpGet("person/{personId}")]
-        [SwaggerResponse(200, Type = typeof(HttpResponse<PersonModel>), Description = "Return the info of the person")]
+        [SwaggerResponse(200, Type = typeof(PersonModel), Description = "Return the info of the person")]
         public async Task<IActionResult> FindPerson(long personId)
         {
             PersonModel personModel = await _personService.GetPerson(personId);

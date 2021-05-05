@@ -13,6 +13,8 @@ namespace FamilyTreeBackend.Core.Domain.Constants
         public const string LoginSuccessful = "You have logged in";
         public const string RegisterSuccessful = "You have successfully registered";
 
+        public const string UploadImageSuccessful = "Image is successfully uploaded";
+
         // Person Controller
         public const string PersonController_AddParentToPersonSuccessful = "You have successfully added a parent to the person below, you can also find the family that the new parent belongs to below";
         public const string PersonController_AddSpouseToPersonSuccessful = "You have successfully added a spouse to the person and produced the below family";
@@ -27,6 +29,7 @@ namespace FamilyTreeBackend.Core.Domain.Constants
     {
         public const string AuthService_ErrorMessage = "An error occured while processing an auth service function";
         public const string PersonService_ErrorMessage = "An error occured while processing a person service function";
+        public const string UploadService_ErrorMessage = "An error occured while processing an upload service function";
     }
 
     public static class AuthExceptionMessages

@@ -29,13 +29,15 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             _userManager = userManager;
             _logger = logger;
             _jwtConfig = jwtConfig.Value;
-
         }
 
         private JwtSecurityToken generateAccessToken(ApplicationUser user)
         {
             var claims = new[]
             {
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(ClaimTypes.Email, user.Email),
+                //???
                 new Claim("uid", user.Id)
             };
 
@@ -55,6 +57,9 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
         {
             var claims = new[]
             {
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(ClaimTypes.Email, user.Email),
+                //???
                 new Claim("uid", user.Id)
             };
 
