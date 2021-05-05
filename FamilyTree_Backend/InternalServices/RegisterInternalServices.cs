@@ -19,6 +19,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             services.AddScoped<IPersonService, PersonService>();
             services.AddScoped<IFamilyTreeService, FamilyTreeService>();
             services.AddScoped<ITreeAuthorizationService, TreeAuthorizationSerivice>();
+            services.AddSingleton<IUploadService, UploadService>();
             #endregion
         }
     }
