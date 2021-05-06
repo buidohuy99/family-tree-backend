@@ -17,8 +17,16 @@ namespace FamilyTreeBackend.Core.Domain.Constants
         public const string PersonController_AddParentToPersonSuccessful = "You have successfully added a parent to the person below, you can also find the family that the new parent belongs to below";
         public const string PersonController_AddSpouseToPersonSuccessful = "You have successfully added a spouse to the person and produced the below family";
         public const string PersonController_AddChildToPersonSuccessful = "You have successfully added a child to the person and the info of that child is below, along with the family he was added in";
-        public const string PersonController_UpdatePersonSuccessful = "Person updated successfully";
-        public const string PersonController_RemovePersonSuccessful = "Person removed successfully";
+        public const string PersonController_FindPersonSuccessful = "Person has been found successfully";
+        public const string PersonController_UpdatePersonSuccessful = "Person has been updated successfully";
+        public const string PersonController_RemovePersonSuccessful = "Person has been removed successfully";
+
+        //Family Tree Controller
+        public const string TreeController_FindTreeSuccessful = "Tree has been found successfully";
+        public const string TreeController_FindAllTreeSuccessful = "List of trees has been found successfully";
+        public const string TreeController_AddTreeSuccessful = "Tree has been added successfully";
+        public const string TreeController_UpdateTreeSuccessful = "Tree has been updated successfully";
+        public const string TreeController_RemoveTreeSuccessful = "Tree has been removed successful";
 
         public const string InternalServerError = "Server encountered an exception";
     }
