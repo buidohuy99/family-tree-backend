@@ -84,8 +84,8 @@ namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices
             services.AddSingleton(mapper);
             #endregion
 
-            #region Cloudinary configuration
-            services.Configure<CloudinaryAccounts>(Configuration.GetSection("Cloudinary"));
+            #region ImageKit configuration
+            services.Configure<ImageKitAccounts>(Configuration.GetSection("ImageKit"));
             #endregion
         }
     }
