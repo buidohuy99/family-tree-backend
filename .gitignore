@@ -358,3 +358,4 @@ appsettings.Docker.json
 
 # Ignore SysLogs
 SysLogs
+FamilyTree_Backend/.env
