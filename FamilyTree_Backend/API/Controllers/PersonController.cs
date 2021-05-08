@@ -8,7 +8,6 @@ using FamilyTreeBackend.Presentation.API.Controllers.Misc;
 using FamilyTreeBackend.Core.Application.Models;
 using FamilyTreeBackend.Core.Domain.Entities;
 using FamilyTreeBackend.Infrastructure.Service.InternalServices;
-using FamilyTreeBackend.Infrastructure.Service.InternalServices.CustomException;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;

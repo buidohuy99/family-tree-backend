@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace FamilyTreeBackend.Core.Application.Helpers.Exceptions
 {
-    public class AuthServiceException : BaseServiceException
+    public class AuthException : BaseServiceException
     {
         public List<IdentityError> IdentityErrors { get; set; }
 
-        public AuthServiceException(string message, List<IdentityError> identityErrors = null) : base(message)
+        public AuthException(string message, List<IdentityError> identityErrors = null) : base(message)
         {
             IdentityErrors = identityErrors;
         }

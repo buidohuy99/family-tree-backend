@@ -1,4 +1,4 @@
-﻿using FamilyTreeBackend.Core.Application.Helpers.Exceptions.FamilyTreeService;
+﻿using FamilyTreeBackend.Core.Application.Helpers.Exceptions;
 using FamilyTreeBackend.Core.Domain.Constants;
 using System.Collections.Generic;
 
@@ -12,34 +12,41 @@ namespace FamilyTreeBackend.Presentation.API.Controllers.Misc
         {
             statusCodeDictionary = new Dictionary<string, uint>()
             {
-                [AuthServiceExceptionMessages.AuthService_CannotRegisterUser] = 500,
-                [AuthServiceExceptionMessages.AuthService_CannotFindUser] = 400,
-                [AuthServiceExceptionMessages.AuthService_PasswordProvidedIsInvalid] = 400,
-                [AuthServiceExceptionMessages.AuthService_UsernameAlreadyExists] = 400,
-                [AuthServiceExceptionMessages.AuthService_EmailAlreadyExists] = 400,
+                [AuthExceptionMessages.RegisterUserFail] = 500,
+                [AuthExceptionMessages.CannotFindUser] = 400,
+                [AuthExceptionMessages.InvalidPassword] = 400,
+                [AuthExceptionMessages.UsernameAlreadyExists] = 400,
+                [AuthExceptionMessages.EmailAlreadyExists] = 400,
 
-                [PersonServiceExceptionMessages.PersonService_CannotFindSpecifiedPersonFromId] = 400,
-                [PersonServiceExceptionMessages.PersonService_CannotFindSpecifiedParentPersonFromId] = 400,
-                [PersonServiceExceptionMessages.PersonService_CannotFindSpecifiedUserFromId] = 400,
-                [PersonServiceExceptionMessages.PersonService_CannotFindSpecifiedFamily] = 400,
-                [PersonServiceExceptionMessages.PersonService_FamilyAlreadyExist] = 400,
-                [PersonServiceExceptionMessages.PersonService_UserAlreadyExistedInTree] = 403,
-                [PersonServiceExceptionMessages.PersonService_FatherGenderIsNotValid] = 400,
-                [PersonServiceExceptionMessages.PersonService_MotherGenderIsNotValid] = 400,
-                [PersonServiceExceptionMessages.PersonService_SpouseGenderNotValid] = 400,
-                [PersonServiceExceptionMessages.PersonService_CannotAddChildToNoFamily] = 400,
-                [PersonServiceExceptionMessages.PersonService_PersonNotFound] = 404,
-                [PersonServiceExceptionMessages.PersonService_CannotDeletePerson] = 400,
+                [PersonExceptionMessages.FamilyNotFound] = 400,
+                [PersonExceptionMessages.FamilyAlreadyExist] = 400,
+                [PersonExceptionMessages.UserAlreadyExistedInTree] = 403,
+                [PersonExceptionMessages.FatherGenderIsNotValid] = 400,
+                [PersonExceptionMessages.MotherGenderIsNotValid] = 400,
+                [PersonExceptionMessages.SpouseGenderNotValid] = 400,
+                [PersonExceptionMessages.PersonNotFound] = 400,
+                [PersonExceptionMessages.CannotDeletePerson] = 400,
 
-                [nameof(TreeNotFoundException)] = 404,
+                [TreeExceptionMessages.TreeNotFound] = 404,
+
+                [UserExceptionMessages.UserNotFound] = 400
             };
         }
 
         public static uint? GetStatusCode(string input)
         {
             if (input == null) return null;
-            uint? result = statusCodeDictionary[input];
-            return result;
+
+            if (statusCodeDictionary.ContainsKey(input))
+            {
+                uint? result = statusCodeDictionary[input];
+                return result;
+            }
+            else
+            {
+                return null;
+            }
+            
         }
     }
 }

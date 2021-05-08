@@ -7,7 +7,6 @@ using FamilyTreeBackend.Core.Domain.Constants;
 using FamilyTreeBackend.Core.Application.Models;
 using FamilyTreeBackend.Core.Domain.Entities;
 using FamilyTreeBackend.Core.Domain.Enums;
-using FamilyTreeBackend.Infrastructure.Service.InternalServices.CustomException;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -44,7 +43,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                 var operatingPerson = await _unitOfWork.Repository<Person>().GetDbset().FirstOrDefaultAsync(e => e.Id == input.PersonId);
                 if (operatingPerson == null)
                 {
-                    throw new PersonServiceException(PersonServiceExceptionMessages.PersonService_CannotFindSpecifiedPersonFromId);
+                    throw new PersonNotFoundException(PersonExceptionMessages.PersonNotFound, input.PersonId);
                 }
 
                 // check if user connected to this new parent node is an existing tree node or not (we dont want the user to exist as a tree node)
@@ -53,12 +52,13 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                     var connectedUser = await _userManager.FindByIdAsync(input.ParentInfo.UserId);
                     if (connectedUser == null)
                     {
-                        throw new PersonServiceException(PersonServiceExceptionMessages.PersonService_CannotFindSpecifiedUserFromId);
+                        throw new UserNotFoundException(UserExceptionMessages.UserNotFound, input.ParentInfo.UserId);
                     }
                     var existingNodeRelatedToUser = await _unitOfWork.Repository<Person>().GetDbset().AnyAsync(e => e.FamilyTreeId == operatingPerson.FamilyTreeId && e.UserId == input.ParentInfo.UserId);
                     if (existingNodeRelatedToUser)
                     {
-                        throw new PersonServiceException(PersonServiceExceptionMessages.PersonService_UserAlreadyExistedInTree);
+
+                        throw new UserExistsInTreeException(PersonExceptionMessages.UserAlreadyExistedInTree, input.ParentInfo.UserId, operatingPerson.FamilyTreeId);
                     }
                 }
 
@@ -82,7 +82,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                 if(connectedFamily != null)
                 {
                     // if he is already in family => cannot add parent
-                    throw new PersonServiceException(PersonServiceExceptionMessages.PersonService_FamilyAlreadyExist);
+                    throw new CannotAddParentException(PersonExceptionMessages.FamilyAlreadyExist, operatingPerson.Id);
                 }
                 else
                 {
@@ -148,13 +148,13 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                 var operatingPerson = await _unitOfWork.Repository<Person>().GetDbset().FirstOrDefaultAsync(e => e.Id == input.PersonId);
                 if (operatingPerson == null)
                 {
-                    throw new PersonServiceException(PersonServiceExceptionMessages.PersonService_CannotFindSpecifiedPersonFromId);
+                    throw new PersonNotFoundException(PersonExceptionMessages.PersonNotFound, input.PersonId);
                 }
 
                 // Check gender validity
                 if (operatingPerson.Gender == input.SpouseInfo.Gender)
                 {
-                    throw new PersonServiceException(PersonServiceExceptionMessages.PersonService_SpouseGenderNotValid);
+                    throw new InvalidGenderException(PersonExceptionMessages.SpouseGenderNotValid, operatingPerson.Id, operatingPerson.Gender);
                 }
 
                 // check if user connected to this new parent node is an existing tree node or not (we dont want the user to exist as a tree node)
@@ -163,12 +163,12 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                     var connectedUser = await _userManager.FindByIdAsync(input.SpouseInfo.UserId);
                     if (connectedUser == null)
                     {
-                        throw new PersonServiceException(PersonServiceExceptionMessages.PersonService_CannotFindSpecifiedUserFromId);
+                        throw new UserNotFoundException(UserExceptionMessages.UserNotFound, input.SpouseInfo.UserId);
                     }
                     var existingNodeRelatedToUser = await _unitOfWork.Repository<Person>().GetDbset().AnyAsync(e => e.FamilyTreeId == operatingPerson.FamilyTreeId && e.UserId == connectedUser.Id);
                     if (existingNodeRelatedToUser)
                     {
-                        throw new PersonServiceException(PersonServiceExceptionMessages.PersonService_UserAlreadyExistedInTree);
+                        throw new UserExistsInTreeException(PersonExceptionMessages.UserAlreadyExistedInTree, connectedUser.Id, operatingPerson.FamilyTreeId);
                     }
                 }
 
@@ -243,39 +243,45 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                     operatingFather = await _unitOfWork.Repository<Person>().GetDbset().FirstOrDefaultAsync(e => e.Id == input.FatherId);
                     if (operatingFather == null)
                     {
-                        throw new PersonServiceException(PersonServiceExceptionMessages.PersonService_CannotFindSpecifiedPersonFromId);
+                        throw new PersonNotFoundException(
+                            PersonExceptionMessages.PersonNotFound,
+                            input.FatherId.Value);
                     } else if (operatingFather.Gender != Gender.MALE) {
-                        throw new PersonServiceException(PersonServiceExceptionMessages.PersonService_FatherGenderIsNotValid);
+                        throw new InvalidGenderException(
+                            PersonExceptionMessages.FatherGenderIsNotValid, 
+                            operatingFather.Id, 
+                            operatingFather.Gender);
                     }
                 }
                 if (input.MotherId != null) {
                     operatingMother = await _unitOfWork.Repository<Person>().GetDbset().FirstOrDefaultAsync(e => e.Id == input.MotherId);
                     if (operatingMother == null)
                     {
-                        throw new PersonServiceException(PersonServiceExceptionMessages.PersonService_CannotFindSpecifiedPersonFromId);
+                        throw new PersonNotFoundException(
+                            PersonExceptionMessages.PersonNotFound,
+                            input.MotherId.Value);
                     }
                     else if (operatingMother.Gender != Gender.FEMALE)
                     {
-                        throw new PersonServiceException(PersonServiceExceptionMessages.PersonService_MotherGenderIsNotValid);
+                        throw new InvalidGenderException(
+                            PersonExceptionMessages.MotherGenderIsNotValid, 
+                            operatingMother.Id, 
+                            operatingMother.Gender);
                     }
                 }
-                if (operatingMother == null && operatingFather == null)
-                {
-                    throw new PersonServiceException(PersonServiceExceptionMessages.PersonService_CannotAddChildToNoFamily);
-                }
-
+                
                 // check if user connected to this new parent node is an existing tree node or not (we dont want the user to exist as a tree node)
                 if (input.ChildInfo.UserId != null)
                 {
                     var connectedUser = await _userManager.FindByIdAsync(input.ChildInfo.UserId);
                     if (connectedUser == null)
                     {
-                        throw new PersonServiceException(PersonServiceExceptionMessages.PersonService_CannotFindSpecifiedUserFromId);
+                        throw new UserNotFoundException(UserExceptionMessages.UserNotFound, input.ChildInfo.UserId);
                     }
                     var existingNodeRelatedToUser = await _unitOfWork.Repository<Person>().GetDbset().AnyAsync(e => e.FamilyTreeId == operatingFather.FamilyTreeId && e.FamilyTreeId == operatingMother.FamilyTreeId && e.UserId == connectedUser.Id);
                     if (existingNodeRelatedToUser)
                     {
-                        throw new PersonServiceException(PersonServiceExceptionMessages.PersonService_UserAlreadyExistedInTree);
+                        throw new UserExistsInTreeException(PersonExceptionMessages.UserAlreadyExistedInTree, connectedUser.Id, operatingFather.FamilyTreeId);
                     }
                 }
 
@@ -300,7 +306,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                     var operatingFamily = await _unitOfWork.Repository<Family>().GetDbset().FirstOrDefaultAsync(e => (e.Parent1Id == operatingFather.Id && e.Parent2Id == operatingMother.Id) || (e.Parent1Id == operatingMother.Id && e.Parent2Id == operatingFather.Id));
                     if(operatingFamily == null)
                     {
-                        throw new PersonServiceException(PersonServiceExceptionMessages.PersonService_CannotFindSpecifiedFamily); ;
+                        throw new FamilyNotFoundException(PersonExceptionMessages.FamilyNotFound);
                     }
                     newChild.ChildOfFamily = operatingFamily;
                 } else {
@@ -400,7 +406,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
             if (person == null)
             {
-                throw new PersonNotFoundException(PersonServiceExceptionMessages.PersonService_PersonNotFound);
+                throw new PersonNotFoundException(PersonExceptionMessages.PersonNotFound, id);
             }
 
             var personModel = _mapper.Map<Person, PersonModel>(person);
@@ -471,7 +477,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
             if (anyChildren)
             {
-                throw new DeletePersonException(PersonServiceExceptionMessages.PersonService_CannotDeletePerson);
+                throw new DeletePersonException(PersonExceptionMessages.CannotDeletePerson, id);
             }
             Person deletedPerson = await _unitOfWork.Repository<Person>().DeleteAsync(id);
             return;
@@ -483,7 +489,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
             if (person == null)
             {
-                throw new PersonNotFoundException(PersonServiceExceptionMessages.PersonService_PersonNotFound);
+                throw new PersonNotFoundException(PersonExceptionMessages.PersonNotFound, personId);
             }
 
             _mapper.Map(updatedPersonModel, person);

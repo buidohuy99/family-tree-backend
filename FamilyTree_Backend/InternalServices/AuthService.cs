@@ -1,5 +1,6 @@
 ﻿using FamilyTreeBackend.Core.Application.Helpers.ConfigModels;
 using FamilyTreeBackend.Core.Application.Helpers.Exceptions;
+using FamilyTreeBackend.Core.Application.Helpers.Exceptions.AuthExceptions;
 using FamilyTreeBackend.Core.Application.Interfaces;
 using FamilyTreeBackend.Core.Application.Models.Auth;
 using FamilyTreeBackend.Core.Domain.Constants;
@@ -28,13 +29,15 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             _userManager = userManager;
             _logger = logger;
             _jwtConfig = jwtConfig.Value;
-
         }
 
         private JwtSecurityToken generateAccessToken(ApplicationUser user)
         {
             var claims = new[]
             {
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(ClaimTypes.Email, user.Email),
+                //???
                 new Claim("uid", user.Id)
             };
 
@@ -54,6 +57,9 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
         {
             var claims = new[]
             {
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(ClaimTypes.Email, user.Email),
+                //???
                 new Claim("uid", user.Id)
             };
 
@@ -77,7 +83,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             
                 if(user == null)
                 {
-                    throw new AuthServiceException(AuthServiceExceptionMessages.AuthService_CannotFindUser);
+                    throw new UserNotFoundException(UserExceptionMessages.UserNotFound);
                 }
                 else
                 {
@@ -94,7 +100,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
                         return new AuthResponseModel(user, accessToken, refreshToken);
                     }
-                    throw new AuthServiceException(AuthServiceExceptionMessages.AuthService_PasswordProvidedIsInvalid);
+                    throw new LoginUserFailException(AuthExceptionMessages.InvalidPassword);
                 }
             }
             catch(Exception e)
@@ -118,14 +124,14 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
                 if (sameUsernameUser != null)
                 {
-                    throw new AuthServiceException(AuthServiceExceptionMessages.AuthService_UsernameAlreadyExists);
+                    throw new RegisterUserFailException(AuthExceptionMessages.UsernameAlreadyExists, username: model.UserName);
                 }
 
                 var sameEmailUser = await _userManager.FindByEmailAsync(model.Email);
 
                 if (sameEmailUser != null)
                 {
-                    throw new AuthServiceException(AuthServiceExceptionMessages.AuthService_EmailAlreadyExists);
+                    throw new RegisterUserFailException(AuthExceptionMessages.EmailAlreadyExists, email: model.Email);
                 }
 
                 var newUser = new ApplicationUser()
@@ -153,7 +159,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                 }
                 else
                 {
-                    throw new AuthServiceException(AuthServiceExceptionMessages.AuthService_CannotRegisterUser, identityResult.Errors.ToList());
+                    throw new RegisterUserFailException(AuthExceptionMessages.RegisterUserFail, identityResult.Errors.ToList());
                 }
             }
             catch (Exception ex)

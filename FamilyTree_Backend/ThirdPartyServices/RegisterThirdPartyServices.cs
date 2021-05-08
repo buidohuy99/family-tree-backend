@@ -80,6 +80,10 @@ namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices
             IMapper mapper = mapperConfig.CreateMapper();
             services.AddSingleton(mapper);
             #endregion
+
+            #region ImageKit configuration
+            services.Configure<ImageKitAccounts>(Configuration.GetSection("ImageKit"));
+            #endregion
         }
     }
 }

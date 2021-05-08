@@ -44,7 +44,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
                     uint? statusCode = ServiceExceptionsProcessor.GetStatusCode(exception.Message);
                     if (statusCode != null && statusCode.HasValue)
                     {
-                        if (ex is AuthServiceException authException)
+                        if (ex is AuthException authException)
                         {
                             return StatusCode((int)statusCode.Value, new HttpResponse<string>(exception.Message, genericMessage, authException.IdentityErrors));
                         }
@@ -76,7 +76,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
                     uint? statusCode = ServiceExceptionsProcessor.GetStatusCode(exception.Message);
                     if (statusCode != null && statusCode.HasValue)
                     {
-                        if (ex is AuthServiceException authException)
+                        if (ex is AuthException authException)
                         {
                             return StatusCode((int)statusCode.Value, new HttpResponse<string>(exception.Message, genericMessage, authException.IdentityErrors));
                         }

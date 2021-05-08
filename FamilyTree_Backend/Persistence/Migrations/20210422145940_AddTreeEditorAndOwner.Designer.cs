@@ -4,14 +4,16 @@ using FamilyTreeBackend.Infrastructure.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(FamilyTreeDbContext))]
-    partial class FamilyTreeDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210422145940_AddTreeEditorAndOwner")]
+    partial class AddTreeEditorAndOwner
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -132,17 +134,18 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                         .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<DateTime>("DateCreated")
+                    b.Property<DateTime?>("DateCreated")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasColumnName("createdAt")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                        .HasDefaultValueSql("GETUTCDATE()");
 
                     b.Property<long>("FamilyTreeId")
                         .HasColumnType("bigint");
 
-                    b.Property<DateTime>("LastModified")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTime?>("LastModified")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
 
                     b.Property<long?>("Parent1Id")
                         .HasColumnType("bigint");
@@ -168,14 +171,18 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                         .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTime?>("DateCreated")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("LastModified")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTime?>("LastModified")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
@@ -200,8 +207,10 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                     b.Property<long?>("ChildOf")
                         .HasColumnType("bigint");
 
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTime?>("DateCreated")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
 
                     b.Property<DateTime?>("DateOfBirth")
                         .HasColumnType("datetime2");
@@ -239,13 +248,15 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ChildOf");
 
                     b.HasIndex("FamilyTreeId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Person");
                 });
@@ -268,11 +279,15 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                     b.Property<long>("Id")
                         .HasColumnType("bigint");
 
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTime?>("DateCreated")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
 
-                    b.Property<DateTime>("LastModified")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTime?>("LastModified")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
 
                     b.Property<int>("RelationshipType")
                         .HasColumnType("int");
@@ -435,10 +450,10 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("FamilyTreeBackend.Core.Domain.Entities.Family", b =>
                 {
-                    b.HasOne("FamilyTreeBackend.Core.Domain.Entities.FamilyTree", null)
+                    b.HasOne("FamilyTreeBackend.Core.Domain.Entities.FamilyTree", "FamilyTree")
                         .WithMany("Families")
                         .HasForeignKey("FamilyTreeId")
-                        .HasConstraintName("Constraints_FamiliesOfTree")
+                        .HasConstraintName("FK_FamilyOfTree")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -449,6 +464,8 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                     b.HasOne("FamilyTreeBackend.Core.Domain.Entities.Person", "Parent2")
                         .WithMany()
                         .HasForeignKey("Parent2Id");
+
+                    b.Navigation("FamilyTree");
 
                     b.Navigation("Parent1");
 
@@ -472,14 +489,24 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                         .HasConstraintName("FK_Child_OfFamily")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("FamilyTreeBackend.Core.Domain.Entities.FamilyTree", null)
+                    b.HasOne("FamilyTreeBackend.Core.Domain.Entities.FamilyTree", "FamilyTree")
                         .WithMany("People")
                         .HasForeignKey("FamilyTreeId")
-                        .HasConstraintName("Constraints_PeopleOfTree")
+                        .HasConstraintName("FK_PersonOfTree")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("FamilyTreeBackend.Core.Domain.Entities.ApplicationUser", "ConnectedUser")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .HasConstraintName("FK_ConnectedWith_User")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.Navigation("ChildOfFamily");
+
+                    b.Navigation("ConnectedUser");
+
+                    b.Navigation("FamilyTree");
                 });
 
             modelBuilder.Entity("FamilyTreeBackend.Core.Domain.Entities.Relationship", b =>
