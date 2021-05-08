@@ -4,19 +4,21 @@ using FamilyTreeBackend.Infrastructure.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(FamilyTreeDbContext))]
-    partial class FamilyTreeDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210329093649_AddReferenceToUserForPerson")]
+    partial class AddReferenceToUserForPerson
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("ProductVersion", "5.0.5")
+                .HasAnnotation("ProductVersion", "5.0.3")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("FamilyTreeBackend.Core.Domain.Entities.ApplicationUser", b =>
@@ -49,9 +51,6 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
-
-                    b.Property<long?>("FamilyTreeId")
-                        .HasColumnType("bigint");
 
                     b.Property<string>("FirstName")
                         .HasColumnType("nvarchar(max)");
@@ -111,8 +110,6 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                         .HasColumnType("nvarchar(256)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("FamilyTreeId");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -185,12 +182,7 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("OwnerId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("OwnerId");
 
                     b.ToTable("FamilyTree");
                 });
@@ -225,9 +217,6 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                     b.Property<int>("Gender")
                         .HasColumnType("int");
 
-                    b.Property<string>("HomeAddress")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime?>("LastModified")
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
@@ -237,12 +226,6 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Note")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Occupation")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
@@ -439,13 +422,6 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                     b.ToTable("Marriage");
                 });
 
-            modelBuilder.Entity("FamilyTreeBackend.Core.Domain.Entities.ApplicationUser", b =>
-                {
-                    b.HasOne("FamilyTreeBackend.Core.Domain.Entities.FamilyTree", null)
-                        .WithMany("Editors")
-                        .HasForeignKey("FamilyTreeId");
-                });
-
             modelBuilder.Entity("FamilyTreeBackend.Core.Domain.Entities.Family", b =>
                 {
                     b.HasOne("FamilyTreeBackend.Core.Domain.Entities.FamilyTree", "FamilyTree")
@@ -468,15 +444,6 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                     b.Navigation("Parent1");
 
                     b.Navigation("Parent2");
-                });
-
-            modelBuilder.Entity("FamilyTreeBackend.Core.Domain.Entities.FamilyTree", b =>
-                {
-                    b.HasOne("FamilyTreeBackend.Core.Domain.Entities.ApplicationUser", "Owner")
-                        .WithMany()
-                        .HasForeignKey("OwnerId");
-
-                    b.Navigation("Owner");
                 });
 
             modelBuilder.Entity("FamilyTreeBackend.Core.Domain.Entities.Person", b =>
@@ -588,8 +555,6 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("FamilyTreeBackend.Core.Domain.Entities.FamilyTree", b =>
                 {
-                    b.Navigation("Editors");
-
                     b.Navigation("Families");
 
                     b.Navigation("People");

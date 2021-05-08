@@ -4,19 +4,21 @@ using FamilyTreeBackend.Infrastructure.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(FamilyTreeDbContext))]
-    partial class FamilyTreeDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210327044014_ClarifyReferenceToFamilyTree")]
+    partial class ClarifyReferenceToFamilyTree
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("ProductVersion", "5.0.5")
+                .HasAnnotation("ProductVersion", "5.0.3")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("FamilyTreeBackend.Core.Domain.Entities.ApplicationUser", b =>
@@ -49,9 +51,6 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
-
-                    b.Property<long?>("FamilyTreeId")
-                        .HasColumnType("bigint");
 
                     b.Property<string>("FirstName")
                         .HasColumnType("nvarchar(max)");
@@ -112,8 +111,6 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("FamilyTreeId");
-
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -132,18 +129,17 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                         .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<DateTime?>("DateCreated")
+                    b.Property<DateTime>("DateCreated")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
+                        .HasColumnName("createdAt")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<long>("FamilyTreeId")
                         .HasColumnType("bigint");
 
-                    b.Property<DateTime?>("LastModified")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
 
                     b.Property<long?>("Parent1Id")
                         .HasColumnType("bigint");
@@ -169,28 +165,19 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                         .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<DateTime?>("DateCreated")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("LastModified")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("OwnerId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("OwnerId");
 
                     b.ToTable("FamilyTree");
                 });
@@ -205,10 +192,8 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                     b.Property<long?>("ChildOf")
                         .HasColumnType("bigint");
 
-                    b.Property<DateTime?>("DateCreated")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("DateOfBirth")
                         .HasColumnType("datetime2");
@@ -225,13 +210,8 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                     b.Property<int>("Gender")
                         .HasColumnType("int");
 
-                    b.Property<string>("HomeAddress")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("LastModified")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("LastName")
                         .HasColumnType("nvarchar(max)");
@@ -239,22 +219,14 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                     b.Property<string>("Note")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Occupation")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ChildOf");
 
                     b.HasIndex("FamilyTreeId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Person");
                 });
@@ -277,15 +249,11 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                     b.Property<long>("Id")
                         .HasColumnType("bigint");
 
-                    b.Property<DateTime?>("DateCreated")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("LastModified")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("RelationshipType")
                         .HasColumnType("int");
@@ -439,13 +407,6 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                     b.ToTable("Marriage");
                 });
 
-            modelBuilder.Entity("FamilyTreeBackend.Core.Domain.Entities.ApplicationUser", b =>
-                {
-                    b.HasOne("FamilyTreeBackend.Core.Domain.Entities.FamilyTree", null)
-                        .WithMany("Editors")
-                        .HasForeignKey("FamilyTreeId");
-                });
-
             modelBuilder.Entity("FamilyTreeBackend.Core.Domain.Entities.Family", b =>
                 {
                     b.HasOne("FamilyTreeBackend.Core.Domain.Entities.FamilyTree", "FamilyTree")
@@ -470,15 +431,6 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                     b.Navigation("Parent2");
                 });
 
-            modelBuilder.Entity("FamilyTreeBackend.Core.Domain.Entities.FamilyTree", b =>
-                {
-                    b.HasOne("FamilyTreeBackend.Core.Domain.Entities.ApplicationUser", "Owner")
-                        .WithMany()
-                        .HasForeignKey("OwnerId");
-
-                    b.Navigation("Owner");
-                });
-
             modelBuilder.Entity("FamilyTreeBackend.Core.Domain.Entities.Person", b =>
                 {
                     b.HasOne("FamilyTreeBackend.Core.Domain.Entities.Family", "ChildOfFamily")
@@ -494,15 +446,7 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FamilyTreeBackend.Core.Domain.Entities.ApplicationUser", "ConnectedUser")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .HasConstraintName("FK_ConnectedWith_User")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.Navigation("ChildOfFamily");
-
-                    b.Navigation("ConnectedUser");
 
                     b.Navigation("FamilyTree");
                 });
@@ -588,8 +532,6 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("FamilyTreeBackend.Core.Domain.Entities.FamilyTree", b =>
                 {
-                    b.Navigation("Editors");
-
                     b.Navigation("Families");
 
                     b.Navigation("People");

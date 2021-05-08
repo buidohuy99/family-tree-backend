@@ -8,6 +8,8 @@ using System;
 using System.Text;
 using FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices.Swagger.OperationFilters;
 using FamilyTreeBackend.Core.Application.Helpers.ConfigModels;
+using AutoMapper;
+using FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices.MapperProfiles;
 
 namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices
 {
@@ -45,6 +47,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices
                 });
                 c.OperationFilter<AuthorizationHeader_Param_OperationFilter>();
                 c.OperationFilter<DefaultForMostRequests_OperationFilter>();
+                c.EnableAnnotations();
             });
 
             services.AddSwaggerGenNewtonsoftSupport();
