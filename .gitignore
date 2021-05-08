@@ -354,6 +354,7 @@ MigrationBackup/
 
 # Ignore deploy appsettings
 appsettings.Deployment.json
+appsettings.Docker.json
 
 # Ignore SysLogs
 SysLogs

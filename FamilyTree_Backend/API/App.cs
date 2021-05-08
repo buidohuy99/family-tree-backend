@@ -11,6 +11,7 @@ using System;
 using Microsoft.AspNetCore.Identity;
 using FamilyTreeBackend.Core.Domain.Entities;
 using FamilyTreeBackend.Infrastructure.Persistence.Context;
+using FamilyTreeBackend.Presentation.API.Middlewares;
 
 namespace FamilyTreeBackend.Presentation.API
 {
@@ -26,7 +27,14 @@ namespace FamilyTreeBackend.Presentation.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddCors();
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(
+                    builder =>
+                    {
+                        builder.WithOrigins("*");
+                    });
+            });
 
             services.AddOptions();
 
@@ -105,6 +113,11 @@ namespace FamilyTreeBackend.Presentation.API
                 c.RoutePrefix = string.Empty;
             });
             #endregion
+
+            #region BaseServiceException handler middleware
+            app.UseBaseExceptionHandlerMiddleware();
+            #endregion
+
         }
     }
 }

@@ -69,6 +69,17 @@ namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices
                 };
             });
             #endregion
+
+            #region AutoMapper configuration
+            var mapperConfig = new MapperConfiguration(mc =>
+            {
+                mc.AddProfile(new PersonProfile());
+                mc.AddProfile(new FamilyTreeProfile());
+            });
+
+            IMapper mapper = mapperConfig.CreateMapper();
+            services.AddSingleton(mapper);
+            #endregion
         }
     }
 }

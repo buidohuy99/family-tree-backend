@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 using System;
 
 namespace FamilyTreeBackend.Presentation.API.Controllers.Misc
@@ -7,6 +8,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers.Misc
     [ApiExplorerSettings(IgnoreApi = true)]
     public class ErrorController : ControllerBase
     {
+
         public class MyErrorResponse
         {
             public string Type { get; set; }
@@ -34,9 +36,14 @@ namespace FamilyTreeBackend.Presentation.API.Controllers.Misc
         {
             var context = HttpContext.Features.Get<IExceptionHandlerFeature>();
             var exception = context?.Error; // Your exception
+
+            //log exception
+            Log.Logger.Error(exception, $"Unexpected System Exception: {exception.Message}");
+
             var code = 500; // Internal Server Error by default
 
             return StatusCode(code, new MyErrorResponse(exception)); // Your error model
+
         }
     }
 }
