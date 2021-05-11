@@ -20,6 +20,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             services.AddScoped<IFamilyTreeService, FamilyTreeService>();
             services.AddScoped<ITreeAuthorizationService, TreeAuthorizationSerivice>();
             services.AddSingleton<IUploadService, UploadService>();
+            services.AddSingleton<IEmailService, EmailService>();
             #endregion
         }
     }
