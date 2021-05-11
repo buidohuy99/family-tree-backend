@@ -99,15 +99,18 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         }
 
         [HttpGet("person/{personId}")]
-        [SwaggerResponse(200, Type = typeof(PersonModel), Description = "Return the info of the person")]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<PersonModel>), 
+            Description = "Return the info of the person")]
         public async Task<IActionResult> FindPerson(long personId)
         {
             PersonModel personModel = await _personService.GetPerson(personId);
-            return Ok(personModel);
+            return Ok(new HttpResponse<PersonModel>(
+                personModel, GenericResponseStrings.PersonController_FindPersonSuccessful));
         }
 
         [HttpGet("person/{personId}/children")]
-        [SwaggerResponse(200, Type = typeof(HttpResponse<IEnumerable<PersonModel>>), Description = "Return the children of the person")]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<IEnumerable<PersonModel>>), 
+            Description = "Return the children of the person")]
         public async Task<IActionResult> FindChildren(long personId)
         {
             IEnumerable<PersonModel> result = await _personService.GetPersonChildren(personId);
@@ -115,6 +118,8 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         }
 
         [HttpDelete("person/{personId}")]
+        [SwaggerResponse(200, Type = typeof(string),
+            Description = "Remove the person with given Id")]
         public async Task<IActionResult> RemovePerson(long personId)
         {
             await _personService.RemovePerson(personId);
@@ -122,7 +127,8 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         }
 
         [HttpPut("person/{personId}")]
-        [SwaggerResponse(200, Type = typeof(HttpResponse<PersonModel>), Description = "Return the info of the person")]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<PersonModel>), 
+            Description = "Update the info of the person")]
         public async Task<IActionResult> UpdatePersonInfo(long personId, [FromBody] PersonInputModel updatedPersonModel)
         {
 
