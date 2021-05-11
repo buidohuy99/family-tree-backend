@@ -8,6 +8,7 @@ using FamilyTreeBackend.Core.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,6 +29,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         }
 
         [HttpPost("sendTestEmail")]
+        [SwaggerOperation(Summary = "This is used to test sending email")]
         public async Task<IActionResult> TestSendEmail([FromBody] string email)
         {
             string body = "<div>Hello world</div>";
@@ -37,6 +39,8 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         }
 
         [AllowAnonymous]
+        [SwaggerOperation(Summary = "Generate and return a token required for resetting password")]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<string>), Description = "Returns token")]
         public async Task<IActionResult> SendResetPassword([FromBody] string email)
         {
             var resetPasswordUrl = await _userService.GenerateResetPasswordUrl(email);
@@ -45,6 +49,8 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
 
         [AllowAnonymous]
         [HttpPost("resetPassword")]
+        [SwaggerOperation(Summary = "Reset password for the user with provided email, require reset password token")]
+        [SwaggerResponse(200, Description = "Pasword changed successfully")]
         public  async Task<IActionResult> ResetPassword([FromBody] ResetPasswordModel model)
         {
             IdentityResult result = await _userService.ResetPasswordWithToken(model);
