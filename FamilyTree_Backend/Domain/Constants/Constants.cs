@@ -31,6 +31,8 @@ namespace FamilyTreeBackend.Core.Domain.Constants
         public const string TreeController_AddTreeSuccessful = "Tree has been added successfully";
         public const string TreeController_UpdateTreeSuccessful = "Tree has been updated successfully";
         public const string TreeController_RemoveTreeSuccessful = "Tree has been removed successful";
+        public const string TreeController_AddEditorsToTreeSuccessful = "Editors has been added to tree successfully";
+        public const string TreeController_NoPermissionToEditTree = "User doesn't have permission to edit tree";
 
         public const string InternalServerError = "Server encountered an exception";
     }

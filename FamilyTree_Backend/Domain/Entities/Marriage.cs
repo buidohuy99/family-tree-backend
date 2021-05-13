@@ -8,5 +8,7 @@ namespace FamilyTreeBackend.Core.Domain.Entities
     {
         public DateTime DateOfMarriage { get; set; }
         public DateTime? EndOfMarriage { get; set; }
+
+        public Relationship ParentRelationship { get; set; }
     }
 }
