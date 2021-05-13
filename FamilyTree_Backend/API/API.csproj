@@ -12,9 +12,13 @@
   
   <ItemGroup>
     <Compile Remove="bin\**" />
+    <Compile Remove="obj\**" />
     <Content Remove="bin\**" />
+    <Content Remove="obj\**" />
     <EmbeddedResource Remove="bin\**" />
+    <EmbeddedResource Remove="obj\**" />
     <None Remove="bin\**" />
+    <None Remove="obj\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -45,32 +49,6 @@
 
   <ItemGroup>
     <Content Include=".config\dotnet-tools.json" />
-    <Content Include="obj\API.csproj.nuget.dgspec.json" />
-    <Content Include="obj\Debug\net5.0\API.csproj.FileListAbsolute.txt" />
-    <Content Include="obj\project.assets.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="obj\Debug\net5.0\ref\" />
-    <Folder Include="obj\Debug\net5.0\staticwebassets\" />
-    <Folder Include="obj\Docker\empty\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="obj\API.csproj.nuget.g.props" />
-    <None Include="obj\API.csproj.nuget.g.targets" />
-    <None Include="obj\Debug\net5.0\API.AssemblyInfoInputs.cache" />
-    <None Include="obj\Debug\net5.0\API.assets.cache" />
-    <None Include="obj\Debug\net5.0\API.csproj.CoreCompileInputs.cache" />
-    <None Include="obj\Debug\net5.0\API.csprojAssemblyReference.cache" />
-    <None Include="obj\Debug\net5.0\API.GeneratedMSBuildEditorConfig.editorconfig" />
-    <None Include="obj\Debug\net5.0\API.MvcApplicationPartsAssemblyInfo.cache" />
-    <None Include="obj\Debug\net5.0\apphost.exe" />
-    <None Include="obj\Docker\BuildContextPath.cache" />
-    <None Include="obj\Docker\CanonicalServiceNames.cache" />
-    <None Include="obj\Docker\ProjectType.cache" />
-    <None Include="obj\Docker\TargetFramework.cache" />
-    <None Include="obj\project.nuget.cache" />
   </ItemGroup>
 
   <Target Name="BeforeBuild">
