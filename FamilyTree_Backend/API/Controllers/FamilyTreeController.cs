@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using FamilyTreeBackend.Core.Application.Helpers;
 using FamilyTreeBackend.Presentation.API.Handlers;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace FamilyTreeBackend.Presentation.API.Controllers
 {
@@ -95,7 +96,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         }
 
         [HttpPost("tree/{treeId}/AddUsersToEditor")]
-        [SwaggerResponse(200, Type = typeof(IEnumerable<string>),
+        [SwaggerResponse(200, Type = typeof(HttpResponse<IEnumerable<string>>),
             Description = "Add list of users to be tree's editor, return the added users)")]
         public async Task<IActionResult> AddUsersToEditor(long treeId, [FromBody] List<string> userNames)
         {
@@ -103,10 +104,10 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
 
             if (!authorizeResult.Succeeded)
             {
-                return Unauthorized();
+                return Unauthorized(GenericResponseStrings.TreeController_NoPermissionToEditTree);
             }
-            var result =  await _familyTreeService.AddUsersToEditor(userNames);
-            return Ok(result);
+            var result =  await _familyTreeService.AddUsersToEditor(treeId, userNames);
+            return Ok(new HttpResponse<IEnumerable<string>>(result, GenericResponseStrings.TreeController_AddEditorsToTreeSuccessful));
         }
     }
 }

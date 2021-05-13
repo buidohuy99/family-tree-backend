@@ -87,6 +87,10 @@ namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices
             #region ImageKit configuration
             services.Configure<ImageKitAccounts>(Configuration.GetSection("ImageKit"));
             #endregion
+
+            #region Email Sender configuration
+            services.Configure<SmtpSettings>(Configuration.GetSection("SmtpSettings"));
+            #endregion
         }
     }
 }

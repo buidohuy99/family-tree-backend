@@ -9,8 +9,10 @@ namespace FamilyTreeBackend.Core.Application.Helpers.Exceptions
 {
     public class UserNotFoundException : UserException
     {
-        public UserNotFoundException(string message, string userId = null) :base(message, userId) 
+        public string Email { get; set; }
+        public UserNotFoundException(string message, string userId = null, string email = null) :base(message, userId) 
         {
+            Email = email;
         }
     }
 }

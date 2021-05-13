@@ -11,11 +11,10 @@
 
   <ItemGroup>
     <Folder Include="DTOs\" />
-    <Folder Include="Models\User\" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="5.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="5.0.6" />
   </ItemGroup>
 
 </Project>

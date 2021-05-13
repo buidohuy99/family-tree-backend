@@ -4,14 +4,16 @@ using FamilyTreeBackend.Infrastructure.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(FamilyTreeDbContext))]
-    partial class FamilyTreeDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210513042009_AddEditorsOwnerFKForFamilyTree")]
+    partial class AddEditorsOwnerFKForFamilyTree
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -592,14 +594,11 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("FamilyTreeBackend.Core.Domain.Entities.Marriage", b =>
                 {
-                    b.HasOne("FamilyTreeBackend.Core.Domain.Entities.Relationship", "ParentRelationship")
+                    b.HasOne("FamilyTreeBackend.Core.Domain.Entities.Relationship", null)
                         .WithOne()
                         .HasForeignKey("FamilyTreeBackend.Core.Domain.Entities.Marriage", "Id")
-                        .HasConstraintName("FK_ParentRelationship_OfMarriage")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
-
-                    b.Navigation("ParentRelationship");
                 });
 
             modelBuilder.Entity("FamilyTreeBackend.Core.Domain.Entities.Family", b =>

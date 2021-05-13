@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Identity;
 using FamilyTreeBackend.Core.Domain.Entities;
 using FamilyTreeBackend.Infrastructure.Persistence.Context;
 using FamilyTreeBackend.Presentation.API.Middlewares;
+using Microsoft.AspNetCore.Authorization;
+using FamilyTreeBackend.Presentation.API.Handlers;
 
 namespace FamilyTreeBackend.Presentation.API
 {
@@ -64,6 +66,8 @@ namespace FamilyTreeBackend.Presentation.API
                 config.ReportApiVersions = true;
             });
             #endregion
+
+            services.AddScoped<IAuthorizationHandler, TreeOperationHandler>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -98,6 +102,10 @@ namespace FamilyTreeBackend.Presentation.API
 
             #region BaseServiceException handler middleware
             app.UseBaseExceptionHandlerMiddleware();
+            #endregion
+
+            #region Extract user from token middleware
+            app.UseUserExtractionMiddleware();
             #endregion
 
             app.UseEndpoints(endpoints =>

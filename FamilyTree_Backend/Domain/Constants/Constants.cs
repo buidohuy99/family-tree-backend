@@ -15,6 +15,8 @@ namespace FamilyTreeBackend.Core.Domain.Constants
 
         public const string UploadImageSuccessful = "Image is successfully uploaded";
 
+        public const string GenerateResetPasswordUrlSuccessful = "Reset password url has been generated successfully";
+
         // Person Controller
         public const string PersonController_AddParentToPersonSuccessful = "You have successfully added a parent to the person below, you can also find the family that the new parent belongs to below";
         public const string PersonController_AddSpouseToPersonSuccessful = "You have successfully added a spouse to the person and produced the below family";
@@ -29,6 +31,8 @@ namespace FamilyTreeBackend.Core.Domain.Constants
         public const string TreeController_AddTreeSuccessful = "Tree has been added successfully";
         public const string TreeController_UpdateTreeSuccessful = "Tree has been updated successfully";
         public const string TreeController_RemoveTreeSuccessful = "Tree has been removed successful";
+        public const string TreeController_AddEditorsToTreeSuccessful = "Editors has been added to tree successfully";
+        public const string TreeController_NoPermissionToEditTree = "User doesn't have permission to edit tree";
 
         public const string InternalServerError = "Server encountered an exception";
     }
@@ -79,6 +83,12 @@ namespace FamilyTreeBackend.Core.Domain.Constants
     public static class UserExceptionMessages
     {
         public const string UserNotFound = "Cannot find user with provided Id";
+        public const string ResetPasswordFail = "Reset password failed";
+    }
+
+    public static class SendEmailExceptionMessages
+    {
+        public const string SendEmailFailed = "Cannot send message to the provided email";
     }
 
     public static class PersonServiceExceptionMessages
