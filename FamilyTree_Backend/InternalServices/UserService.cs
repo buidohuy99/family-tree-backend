@@ -10,10 +10,16 @@ using System.Threading.Tasks;
 
 namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 {
-    class UserService : IUserService
+    public class UserService : IUserService
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _configuration;
+
+        public UserService(UserManager<ApplicationUser> userManager, IConfiguration configuration)
+        {
+            _userManager = userManager;
+            _configuration = configuration;
+        }
 
         public async Task<string> GenerateResetPasswordUrl(string email)
         {
