@@ -55,6 +55,9 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
                 entity.HasOne(e => e.Parent2)
                     .WithMany()
                     .HasForeignKey(e => e.Parent2Id);
+
+                entity.HasOne(e => e.Relationship)
+                    .WithOne(e => e.Family);
             });
 
             modelBuilder.Entity<Person>((entity) => {
@@ -101,12 +104,19 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
                 entity.HasOne(e => e.Family)
                     .WithOne(f => f.Relationship)
                     .HasForeignKey<Relationship>(e => e.Id)
-                    .HasConstraintName("FK_Relationship_OfFamily");
+                    .HasConstraintName("FK_Relationship_OfFamily")
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<Marriage>((entity) =>
             {
                 entity.ToTable("Marriage");
+                entity.HasBaseType<Relationship>()
+                    .HasOne(e => e.ParentRelationship)
+                    .WithOne()
+                    .HasForeignKey<Marriage>(e => e.Id)
+                    .HasConstraintName("FK_ParentRelationship_OfMarriage")
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<FamilyTree>((entity) => {
