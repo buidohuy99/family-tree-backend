@@ -58,15 +58,21 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
         }
 
 
-
         public async Task DeleteFamilyTree(long treeId)
         {
-            var tree = await _unitOfWork.Repository<FamilyTree>().FindAsync(treeId);
+            var tree = _unitOfWork.Repository<FamilyTree>().GetDbset()
+                .Include(tr => tr.Owner)
+                .Include(tr => tr.Editors)
+                .SingleOrDefault(tr => tr.Id == treeId);
 
             if (tree == null)
             {
                 throw new TreeNotFoundException(TreeExceptionMessages.TreeNotFound, treeId);
             }
+
+            tree.Editors?.Clear();
+
+            _unitOfWork.Repository<FamilyTree>().Update(tree);
 
             _unitOfWork.Repository<FamilyTree>().Delete(tree);
 
@@ -75,14 +81,18 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
         public async Task<FamilyTreeModel> AddFamilyTree(FamilyTreeInputModel model, ApplicationUser user)
         {
-            //if (user == null)
-            //{
-            //    throw new UserNotFoundException();
-            //}
+            if (user == null)
+            {
+                throw new UserNotFoundException(UserExceptionMessages.UserNotFound);
+            }
 
             var tree = await createDefaultTree(model);
 
             tree.Owner = user;
+
+            _unitOfWork.Repository<FamilyTree>().Update(tree);
+
+            await _unitOfWork.SaveChangesAsync();
 
             var responseModel = ManualMapTreeToModel(tree);
 
@@ -104,8 +114,18 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             return models;
         }
 
-        public async Task<IEnumerable<string>> AddUsersToEditor(IList<string> userNames)
+        public async Task<IEnumerable<string>> AddUsersToEditor(long treeId, IList<string> userNames)
         {
+            var tree = _unitOfWork.Repository<FamilyTree>().GetDbset()
+                .Include(tr => tr.Owner)
+                .Include(tr => tr.Editors)
+                .SingleOrDefault(tr => tr.Id == treeId);
+
+            if (tree == null)
+            {
+                throw new TreeNotFoundException(TreeExceptionMessages.TreeNotFound, treeId);
+            }
+
             var addedUser = new List<string>();
 
             foreach(var username in userNames)
@@ -114,9 +134,13 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
                 if (user != null)
                 {
+                    tree.Editors.Add(user);
                     addedUser.Add(username);
                 }
             }
+
+            await _unitOfWork.SaveChangesAsync();
+
             return addedUser;
         }
 

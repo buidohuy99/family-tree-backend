@@ -96,7 +96,7 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
 
                 entity.Property(e => e.LastModified)
                     .HasDefaultValueSql("GETUTCDATE()")
-                   .ValueGeneratedOnAddOrUpdate();
+                    .ValueGeneratedOnAddOrUpdate();
 
                 entity.HasOne(e => e.Family)
                     .WithOne(f => f.Relationship)
@@ -132,32 +132,16 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
                     .WithOne(e => e.FamilyTree)
                     .HasForeignKey(e => e.FamilyTreeId)
                     .HasConstraintName("FK_FamilyOfTree");
+
+                entity.HasMany(e => e.Editors)
+                    .WithMany(e => e.EditorOfFamilyTrees);
+
+                entity.HasOne(e => e.Owner)
+                    .WithMany()
+                    .HasForeignKey(e => e.OwnerId)
+                    .HasConstraintName("FK_OwnerOfTree")
+                    .OnDelete(DeleteBehavior.SetNull);
             });
-
-
-            // Set asp net table to be compatible with mysql 8
-            //modelBuilder.Entity<ApplicationUser>(entity => entity.Property(m => m.Id).HasMaxLength(85));
-            //modelBuilder.Entity<ApplicationUser>(entity => entity.Property(m => m.NormalizedEmail).HasMaxLength(85));
-            //modelBuilder.Entity<ApplicationUser>(entity => entity.Property(m => m.NormalizedUserName).HasMaxLength(85));
-
-            //modelBuilder.Entity<IdentityRole>(entity => entity.Property(m => m.Id).HasMaxLength(85));
-            //modelBuilder.Entity<IdentityRole>(entity => entity.Property(m => m.NormalizedName).HasMaxLength(85));
-
-            //modelBuilder.Entity<IdentityUserLogin<string>>(entity => entity.Property(m => m.LoginProvider).HasMaxLength(85));
-            //modelBuilder.Entity<IdentityUserLogin<string>>(entity => entity.Property(m => m.ProviderKey).HasMaxLength(85));
-            //modelBuilder.Entity<IdentityUserLogin<string>>(entity => entity.Property(m => m.UserId).HasMaxLength(85));
-            //modelBuilder.Entity<IdentityUserRole<string>>(entity => entity.Property(m => m.UserId).HasMaxLength(85));
-
-            //modelBuilder.Entity<IdentityUserRole<string>>(entity => entity.Property(m => m.RoleId).HasMaxLength(85));
-
-            //modelBuilder.Entity<IdentityUserToken<string>>(entity => entity.Property(m => m.UserId).HasMaxLength(85));
-            //modelBuilder.Entity<IdentityUserToken<string>>(entity => entity.Property(m => m.LoginProvider).HasMaxLength(85));
-            //modelBuilder.Entity<IdentityUserToken<string>>(entity => entity.Property(m => m.Name).HasMaxLength(85));
-
-            //modelBuilder.Entity<IdentityUserClaim<string>>(entity => entity.Property(m => m.Id).HasMaxLength(85));
-            //modelBuilder.Entity<IdentityUserClaim<string>>(entity => entity.Property(m => m.UserId).HasMaxLength(85));
-            //modelBuilder.Entity<IdentityRoleClaim<string>>(entity => entity.Property(m => m.Id).HasMaxLength(85));
-            //modelBuilder.Entity<IdentityRoleClaim<string>>(entity => entity.Property(m => m.RoleId).HasMaxLength(85));
         }
 
         //public void SeedData(ModelBuilder modelBuilder)

@@ -8,6 +8,7 @@ namespace FamilyTreeBackend.Core.Domain.Entities
     {
         public string Name { get; set; }
         public string Description { get; set; }
+        public string OwnerId { get; set; }
 
         public ICollection<Person> People { get; set; }
         public ICollection<Family> Families { get; set; }

@@ -38,26 +38,6 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         [SwaggerResponse(200, Type = typeof(HttpResponse<AddNewParentToPersonResponseModel>), Description = "Return family with the new parent inside")]
         public async Task<IActionResult> AddNewParent(long personId, [FromBody] PersonInputModel input)
         {
-            //MOVE THIS TO FUTURE PART WHERE IT WILL HANDLE GENERAL PERMISSION
-            //Commented for testing
-
-            //// Check validity of the request
-            //var claimsManager = HttpContext.User;
-            //string uid = null;
-            //try
-            //{
-            //    uid = GetUserId(claimsManager);
-            //}
-            //catch (Exception e)
-            //{
-            //    return Unauthorized(e.Message);
-            //}
-
-            //if (uid == null)
-            //{
-            //    return Unauthorized("Unauthorized individuals cannot access this route");
-            //}
-
             // Carry on with the business logic
             var model = new AddNewParentToPersonModel()
             {

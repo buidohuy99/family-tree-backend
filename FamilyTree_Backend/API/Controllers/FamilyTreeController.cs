@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using FamilyTreeBackend.Core.Application.Helpers;
 using FamilyTreeBackend.Presentation.API.Handlers;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace FamilyTreeBackend.Presentation.API.Controllers
 {
@@ -105,7 +106,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             {
                 return Unauthorized();
             }
-            var result =  await _familyTreeService.AddUsersToEditor(userNames);
+            var result =  await _familyTreeService.AddUsersToEditor(treeId, userNames);
             return Ok(result);
         }
     }

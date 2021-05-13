@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace FamilyTreeBackend.Presentation.API.Handlers
@@ -27,7 +28,7 @@ namespace FamilyTreeBackend.Presentation.API.Handlers
                 entry.Reference(tr => tr.Owner).Load();
             }
 
-            if (user.Identity?.Name.Equals(resource.Owner.UserName) == true)
+            if (user?.FindFirst(ClaimTypes.NameIdentifier)?.Value.Equals(resource.Owner.Id) == true)
             {
                 context.Succeed(requirement);
                 return Task.CompletedTask; ;
@@ -41,7 +42,7 @@ namespace FamilyTreeBackend.Presentation.API.Handlers
 
                 foreach (var editor in resource.Editors)
                 {
-                    if (user.Identity?.Name.Equals(editor.UserName) == true)
+                    if (user?.FindFirst(ClaimTypes.NameIdentifier)?.Value.Equals(editor.Id) == true)
                     {
                         if (requirement.Name == TreeCRUDOperations.Update.Name || requirement.Name == TreeCRUDOperations.Create.Name)
                         {

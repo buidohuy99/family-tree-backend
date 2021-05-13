@@ -23,9 +23,10 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         private readonly IEmailService _emailService;
         private readonly IUserService _userService;
         
-        public UserController(IEmailService emailService, UserManager<ApplicationUser> userManager) : base(userManager)
+        public UserController(IEmailService emailService, IUserService userService, UserManager<ApplicationUser> userManager) : base(userManager)
         {
             _emailService = emailService;
+            _userService = userService;
         }
 
         [HttpPost("sendTestEmail")]
@@ -39,6 +40,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         }
 
         [AllowAnonymous]
+        [HttpPost("retrieveResetPasswordUrl")]
         [SwaggerOperation(Summary = "Generate and return a token required for resetting password")]
         [SwaggerResponse(200, Type = typeof(HttpResponse<string>), Description = "Returns token")]
         public async Task<IActionResult> SendResetPassword([FromBody] string email)
