@@ -17,4 +17,11 @@
     <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="5.0.6" />
   </ItemGroup>
 
+  <Target Name="BeforeBuild">
+    <!-- Remove obj folder -->
+    <RemoveDir Directories="$(BaseIntermediateOutputPath)" />
+    <!-- Remove bin folder -->
+    <RemoveDir Directories="$(BaseOutputPath)" />
+  </Target>
+
 </Project>
