@@ -19,5 +19,7 @@ namespace FamilyTreeBackend.Core.Domain.Entities
         public byte Status { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime? UpdatedDate { get; set; }
+
+        public ICollection<FamilyTree> EditorOfFamilyTrees { get; set; }
     }
 }
