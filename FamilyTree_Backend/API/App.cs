@@ -34,7 +34,9 @@ namespace FamilyTreeBackend.Presentation.API
                 options.AddDefaultPolicy(
                     builder =>
                     {
-                        builder.WithOrigins("*");
+                        builder.AllowAnyOrigin();
+                        builder.AllowAnyHeader();
+                        builder.AllowAnyMethod();
                     });
             });
 
@@ -92,7 +94,7 @@ namespace FamilyTreeBackend.Presentation.API
                 logger.Error(ex, "An error occurred when seeding the DB.");
             }     
 
-            app.UseCors();
+            app.UseCors(e => e.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
             app.UseAuthentication();
 
