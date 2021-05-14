@@ -81,10 +81,10 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
         public async Task<FamilyTreeModel> AddFamilyTree(FamilyTreeInputModel model, ApplicationUser user)
         {
-            if (user == null)
+            /*if (user == null)
             {
                 throw new UserNotFoundException(UserExceptionMessages.UserNotFound);
-            }
+            }*/
 
             var tree = await createDefaultTree(model);
 
