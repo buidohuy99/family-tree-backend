@@ -74,7 +74,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
 
                 var result = await _familyTreeService.AddFamilyTree(model, user);
 
-                return Ok(result);
+                return Ok(new HttpResponse<FamilyTreeModel>(result, GenericResponseStrings.TreeController_AddTreeSuccessful));
             }
             catch (UserNotFoundException e)
             {
