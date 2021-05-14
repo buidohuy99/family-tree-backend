@@ -116,7 +116,5 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             var response = new HttpResponse<PersonModel>(personModel, GenericResponseStrings.PersonController_UpdatePersonSuccessful);
             return Ok(response);
         }
-        
-
     }
 }
