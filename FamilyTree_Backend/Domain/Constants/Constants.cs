@@ -17,6 +17,9 @@ namespace FamilyTreeBackend.Core.Domain.Constants
 
         public const string GenerateResetPasswordUrlSuccessful = "Reset password url has been generated successfully";
 
+        // Auth related
+        public const string Auth_UserIsNotValid = "Cannot find valid user from claims provided";
+
         // Person Controller
         public const string PersonController_AddParentToPersonSuccessful = "You have successfully added a parent to the person below, you can also find the family that the new parent belongs to below";
         public const string PersonController_AddSpouseToPersonSuccessful = "You have successfully added a spouse to the person and produced the below family";
