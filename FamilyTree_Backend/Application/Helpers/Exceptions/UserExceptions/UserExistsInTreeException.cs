@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace FamilyTreeBackend.Core.Application.Helpers.Exceptions
 {
+    [Serializable]
     public class UserExistsInTreeException : UserException
     {
         public long TreeId { get; set; }

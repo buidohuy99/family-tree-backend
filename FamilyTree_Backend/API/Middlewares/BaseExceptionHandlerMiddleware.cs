@@ -29,10 +29,10 @@ namespace FamilyTreeBackend.Presentation.API.Middlewares
             {
                 await _next(httpContext);
             } 
-            catch (BaseServiceException exception)
-            {
-                await HandleBaseExceptionAsync(httpContext, exception);
-            }
+            //catch (BaseServiceException exception)
+            //{
+            //    //await HandleBaseExceptionAsync(httpContext, exception);
+            //}
             catch (Exception)
             {
 
@@ -47,7 +47,9 @@ namespace FamilyTreeBackend.Presentation.API.Middlewares
             {
                 var personResponse = new HttpResponse<BaseServiceException>(exception, exception.Message);
 
-                await BuildResponseAsync(httpContext, (int)statusCode, JsonSerializer.Serialize(personResponse));
+                var responseStr = JsonSerializer.Serialize(personResponse);
+
+                await BuildResponseAsync(httpContext, (int)statusCode, responseStr); ;
                 return;
             }
 

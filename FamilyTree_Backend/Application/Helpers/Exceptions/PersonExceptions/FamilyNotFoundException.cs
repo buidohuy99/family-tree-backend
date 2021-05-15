@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace FamilyTreeBackend.Core.Application.Helpers.Exceptions
 {
+    [Serializable]
     public class FamilyNotFoundException : PersonException
     {
         public long FamilyId { get; set; }
