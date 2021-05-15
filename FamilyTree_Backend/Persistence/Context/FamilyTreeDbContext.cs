@@ -32,6 +32,14 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
                 entity.ToTable("RefreshToken");
 
                 entity.HasKey(e => e.Token);
+
+                entity.Property(e => e.Token).ValueGeneratedNever();
+
+                entity.HasOne(e => e.User)
+                    .WithMany()
+                    .HasForeignKey(e => e.UserId)
+                    .HasConstraintName("FK_BelongsTo_User")
+                    .OnDelete(DeleteBehavior.SetNull);
             });
 
             modelBuilder.Entity<Family>((entity) => {

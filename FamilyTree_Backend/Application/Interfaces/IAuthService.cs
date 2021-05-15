@@ -8,6 +8,6 @@ namespace FamilyTreeBackend.Core.Application.Interfaces
     {
         public Task<AuthResponseModel> RegisterUser(AuthRegisterModel model);
         public Task<AuthResponseModel> Login(AuthLoginModel model);
-        public Task<string> RefreshAccessToken(string refreshToken);
+        public Task<RefreshTokenResponseModel> RefreshAccessToken(string refreshToken);
     }
 }

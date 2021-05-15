@@ -17,6 +17,8 @@ namespace FamilyTreeBackend.Presentation.API.Controllers.Misc
                 [AuthExceptionMessages.InvalidPassword] = 400,
                 [AuthExceptionMessages.UsernameAlreadyExists] = 400,
                 [AuthExceptionMessages.EmailAlreadyExists] = 400,
+                [AuthExceptionMessages.InvalidRefreshToken] = 401,
+                [AuthExceptionMessages.RefreshTokenIsCorrupted] = 401,
 
                 [PersonExceptionMessages.FamilyNotFound] = 400,
                 [PersonExceptionMessages.FamilyAlreadyExist] = 400,
