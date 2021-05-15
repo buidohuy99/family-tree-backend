@@ -29,7 +29,9 @@ namespace FamilyTreeBackend.Presentation.API.Middlewares
 
         public async Task Invoke(HttpContext httpContext, UserManager<ApplicationUser> userManager)
         {
-            if (httpContext.User != null)
+            var token = httpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+
+            if (token != null)
             {
                 await extractUserFromToken(httpContext, userManager);
             }
