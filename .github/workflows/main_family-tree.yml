@@ -53,4 +53,4 @@ jobs:
         app-name: 'family-tree'
         slot-name: 'production'
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_6434d28a5f0b48d788e50074a14e61ec }}
-        package: . 
+        package: .
