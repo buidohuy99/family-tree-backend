@@ -4,14 +4,16 @@ using FamilyTreeBackend.Infrastructure.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(FamilyTreeDbContext))]
-    partial class FamilyTreeDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210516045455_UpdateGenderTypeOfApplicationUser")]
+    partial class UpdateGenderTypeOfApplicationUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -277,12 +279,7 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                     b.Property<DateTime>("ExpiredDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.HasKey("Token");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("RefreshToken");
                 });
@@ -530,17 +527,6 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                     b.Navigation("ConnectedUser");
 
                     b.Navigation("FamilyTree");
-                });
-
-            modelBuilder.Entity("FamilyTreeBackend.Core.Domain.Entities.RefreshToken", b =>
-                {
-                    b.HasOne("FamilyTreeBackend.Core.Domain.Entities.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .HasConstraintName("FK_BelongsTo_User")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("FamilyTreeBackend.Core.Domain.Entities.Relationship", b =>

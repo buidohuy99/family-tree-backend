@@ -23,7 +23,6 @@ namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices.Swagger.Op
             {
                 // Add possible responses for these routes that needs authorization
                 operation.Responses.TryAdd("401", new OpenApiResponse { Description = "Unauthorized"});
-                operation.Responses.TryAdd("403", new OpenApiResponse { Description = "Forbidden" });
 
                 var jwtbearerScheme = new OpenApiSecurityScheme
                 {

@@ -46,7 +46,6 @@ namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices
                     In = ParameterLocation.Header
                 });
                 c.OperationFilter<AuthorizationHeader_Param_OperationFilter>();
-                c.OperationFilter<DefaultForMostRequests_OperationFilter>();
                 c.EnableAnnotations();
             });
 
