@@ -18,5 +18,7 @@ namespace FamilyTreeBackend.Core.Application.Helpers.Exceptions
         }
         public BaseServiceException(string message, Exception inner)
         : base(message, inner) { }
+
+        
     }
 }

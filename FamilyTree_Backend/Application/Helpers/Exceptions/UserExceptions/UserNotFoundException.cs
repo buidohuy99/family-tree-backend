@@ -10,7 +10,7 @@ namespace FamilyTreeBackend.Core.Application.Helpers.Exceptions
     [Serializable]
     public class UserNotFoundException : UserException
     {
-        public string Email { get; set; }
+        public string Email { get; }
         public UserNotFoundException(string message, string userId = null, string email = null) :base(message, userId) 
         {
             Email = email;
