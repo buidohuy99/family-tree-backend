@@ -1,20 +1,23 @@
-﻿using FamilyTreeBackend.Core.Application.Helpers;
-using FamilyTreeBackend.Core.Application.Helpers.Exceptions;
-using FamilyTreeBackend.Core.Domain.Constants;
+﻿using FamilyTreeBackend.Core.Application.Helpers.Exceptions;
 using FamilyTreeBackend.Presentation.API.Controllers.Misc;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace FamilyTreeBackend.Presentation.API.Middlewares
 {
+
     // You may need to install the Microsoft.AspNetCore.Http.Abstractions package into your project
     public class BaseExceptionHandlerMiddleware
     {
+        public class ExceptionResponse
+        {
+            public string Message { get; set; }
+            public Dictionary<string, string> Data;
+        }
         private readonly RequestDelegate _next;
 
         public BaseExceptionHandlerMiddleware(RequestDelegate next)
@@ -28,26 +31,31 @@ namespace FamilyTreeBackend.Presentation.API.Middlewares
             try
             {
                 await _next(httpContext);
-            } 
-            //catch (BaseServiceException exception)
-            //{
-            //    //await HandleBaseExceptionAsync(httpContext, exception);
-            //}
+            }
+            catch (BaseServiceException exception)
+            {
+                await HandleBaseExceptionAsync(httpContext, exception);
+            }
             catch (Exception)
             {
-
                 throw;
             }
         }
 
         private async Task HandleBaseExceptionAsync(HttpContext httpContext, BaseServiceException exception)
         {
+            var data = GetDataFromException(exception);
             uint? statusCode = ServiceExceptionsProcessor.GetStatusCode(exception.Message);
+            var type = exception.GetType();
             if (statusCode != null && statusCode.HasValue)
             {
-                var personResponse = new HttpResponse<BaseServiceException>(exception, exception.Message);
+                var response = new ExceptionResponse()
+                {
+                    Message = exception.Message,
+                    Data = data,
+                };
 
-                var responseStr = JsonSerializer.Serialize(personResponse);
+                var responseStr = JsonConvert.SerializeObject(response);
 
                 await BuildResponseAsync(httpContext, (int)statusCode, responseStr); ;
                 return;
@@ -56,11 +64,32 @@ namespace FamilyTreeBackend.Presentation.API.Middlewares
 
         }
 
-        private async Task BuildResponseAsync(HttpContext httpContext, int statusCode, string bodyResponse) 
+        private async Task BuildResponseAsync(HttpContext httpContext, int statusCode, string bodyResponse)
         {
             httpContext.Response.ContentType = "application/json";
             httpContext.Response.StatusCode = statusCode;
             await httpContext.Response.WriteAsync(bodyResponse);
+        }
+
+        private Dictionary<string, string> GetDataFromException(BaseServiceException exception)
+        {
+            Dictionary<string, string> result = new Dictionary<string, string>();
+
+            var properties = exception.GetType().GetProperties();
+
+            foreach (var prop in properties)
+            {
+                result[prop.Name] = prop.GetValue(exception) != null ? prop.GetValue(exception).ToString() : "";
+
+            }
+
+            var excludedProps = typeof(Exception).GetProperties();
+            foreach (var prop in excludedProps)
+            {
+                result.Remove(prop.Name);
+            }
+            return result;
+
         }
     }
 

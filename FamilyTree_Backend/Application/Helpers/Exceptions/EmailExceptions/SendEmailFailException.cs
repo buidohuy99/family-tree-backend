@@ -9,7 +9,7 @@ namespace FamilyTreeBackend.Core.Application.Helpers.Exceptions.EmailExceptions
     [Serializable]
     public class SendEmailFailException : BaseServiceException
     {
-        public string FailedEmail { get; set; }
+        public string FailedEmail { get; }
 
         public SendEmailFailException(string message, string failedEmail = "") : base(message)
         {

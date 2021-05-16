@@ -9,7 +9,7 @@ namespace FamilyTreeBackend.Core.Application.Helpers.Exceptions.UserExceptions
     public class UserException : BaseServiceException
     {
         public string UserId { get; set; }
-        public UserException(string message, string userId = null) : base(message)
+        public UserException(string message, string userId = "") : base(message)
         {
             UserId = userId;
         }

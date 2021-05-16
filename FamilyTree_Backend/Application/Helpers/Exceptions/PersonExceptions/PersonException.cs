@@ -8,7 +8,7 @@ namespace FamilyTreeBackend.Core.Application.Helpers.Exceptions
 {
     public class PersonException : BaseServiceException
     {
-        public long PersonId { get; set; }
+        public long PersonId { get; }
         public PersonException(string message) : base(message) { }
 
         public PersonException(string message, long personId) : this(message) {

@@ -15,8 +15,8 @@ namespace FamilyTreeBackend.Core.Application.Helpers.Exceptions.AuthExceptions
 
         public RegisterUserFailException(string message, 
             List<IdentityError> identityErrors = null,
-            string username = null,
-            string email = null) : base(message, identityErrors)
+            string username = "",
+            string email = "") : base(message, identityErrors)
         {
             Username = username;
             Email = email;
