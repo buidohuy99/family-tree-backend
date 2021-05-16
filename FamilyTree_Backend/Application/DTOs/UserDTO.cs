@@ -1,4 +1,5 @@
 ﻿using FamilyTreeBackend.Core.Domain.Entities;
+using FamilyTreeBackend.Core.Domain.Enums;
 using System;
 
 namespace FamilyTreeBackend.Core.Application.DTOs
@@ -35,7 +36,7 @@ namespace FamilyTreeBackend.Core.Application.DTOs
         public string AvatarUrl { get; set; }
         public string Address { get; set; }
         public string Phone { get; set; }
-        public string Gender { get; set; }
+        public Gender? Gender { get; set; }
         public DateTime? DateOfBirth { get; set; }
         public byte Status { get; set; }
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
