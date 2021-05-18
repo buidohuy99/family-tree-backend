@@ -96,8 +96,8 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                     {
                         string accessToken = new JwtSecurityTokenHandler().WriteToken(generateAccessToken(token.User));
                         string newRefreshToken = null;
-                        // purgeeeee old stuff
-                        foreach (var foundToken in _unitOfWork.GetRefreshTokens().Where(t => t.UserId.Equals(token.User.Id) && DateTime.UtcNow.CompareTo(t.ExpiredDate) > 0))
+                        // purgeeeee old stuff or stuff that no longer has an owner
+                        foreach (var foundToken in _unitOfWork.GetRefreshTokens().Where(t => t.UserId == null || (t.UserId.Equals(token.User.Id) && DateTime.UtcNow.CompareTo(t.ExpiredDate) > 0)))
                         {
                             _unitOfWork.GetRefreshTokens().Attach(foundToken);
                             _unitOfWork.GetRefreshTokens().Remove(foundToken);
