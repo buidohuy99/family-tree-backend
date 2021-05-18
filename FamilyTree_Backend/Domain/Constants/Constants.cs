@@ -66,7 +66,7 @@ namespace FamilyTreeBackend.Core.Domain.Constants
         //FamilyNotFound
         public const string FamilyNotFound = "Family cannot be found for the person";
         public const string UserAlreadyExistedInTree = "User already existed as a person in the tree";
-        public const string FamilyAlreadyExist = "Family that this person is a child of already exist, cannot add parent";
+        public const string FamilyAlreadyFull = "Family that this person is a child of is already full, cannot add parent";
         
         //GenderNotValid
         public const string FatherGenderIsNotValid = "Father for the operation is not a male";

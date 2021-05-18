@@ -11,7 +11,7 @@ namespace FamilyTreeBackend.Core.Application.Helpers.Exceptions
     public class InvalidGenderException : PersonException
     {
         public Gender Gender { get; set; }
-        public InvalidGenderException(string message, long personId, Gender gender)
+        public InvalidGenderException(string message, long? personId, Gender gender)
             :base(message, personId)
         {
             Gender = gender;

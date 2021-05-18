@@ -19,7 +19,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers.Misc
                 [AuthExceptionMessages.EmailAlreadyExists] = 400,
 
                 [PersonExceptionMessages.FamilyNotFound] = 400,
-                [PersonExceptionMessages.FamilyAlreadyExist] = 400,
+                [PersonExceptionMessages.FamilyAlreadyFull] = 400,
                 [PersonExceptionMessages.UserAlreadyExistedInTree] = 403,
                 [PersonExceptionMessages.FatherGenderIsNotValid] = 400,
                 [PersonExceptionMessages.MotherGenderIsNotValid] = 400,
