@@ -10,15 +10,15 @@ namespace FamilyTreeBackend.Core.Domain.Constants
     {
         public const string AnExceptionOccuredInController = "A problem occurred when processing the content of your request";
 
-        public const string LoginSuccessful = "You have logged in";
-        public const string RegisterSuccessful = "You have successfully registered";
-
         public const string UploadImageSuccessful = "Image is successfully uploaded";
 
         public const string GenerateResetPasswordUrlSuccessful = "Reset password url has been generated successfully";
 
         // Auth related
         public const string Auth_UserIsNotValid = "Cannot find valid user from claims provided";
+        public const string LoginSuccessful = "You have logged in";
+        public const string RegisterSuccessful = "You have successfully registered";
+        public const string Auth_RefreshTokenSuccessful = "You have successfully obtained a new access token";
 
         // Person Controller
         public const string PersonController_AddParentToPersonSuccessful = "You have successfully added a parent to the person below, you can also find the family that the new parent belongs to below";
@@ -57,6 +57,10 @@ namespace FamilyTreeBackend.Core.Domain.Constants
         //LoginUserFail
         public const string CannotFindUser = "Valid user cannot be found from the specified infos";
         public const string InvalidPassword = "Provided password is wrong for the username/email";
+
+        //RefreshTokenFail
+        public const string InvalidRefreshToken = "Refresh token provided is either invalid or expired so please get a new one";
+        public const string RefreshTokenIsCorrupted = "Refresh token is found to be corrupted please get a new one";
     }
 
     public static class PersonExceptionMessages
