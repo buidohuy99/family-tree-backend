@@ -10,13 +10,14 @@ namespace FamilyTreeBackend.Core.Application.Helpers.Exceptions.UserExceptions
     [Serializable]
     public class ResetPasswordFailExcpetion : UserException
     {
-        public ResetPasswordFailExcpetion(string message, string userId = null, string email = null, IEnumerable<IdentityError> errors = null) : base(message, userId)
+        public ResetPasswordFailExcpetion(string message, string userId = "", string email = "", IEnumerable<IdentityError> errors = null) : base(message, userId)
         {
             Email = email;
             IdentityErrors = errors;
+
         }
 
-        public string Email { get; set; }
+        public string Email { get; }
         public IEnumerable<IdentityError> IdentityErrors { get; set; }
     }
 }

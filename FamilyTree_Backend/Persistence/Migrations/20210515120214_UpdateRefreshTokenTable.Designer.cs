@@ -4,14 +4,16 @@ using FamilyTreeBackend.Infrastructure.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(FamilyTreeDbContext))]
-    partial class FamilyTreeDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210515120214_UpdateRefreshTokenTable")]
+    partial class UpdateRefreshTokenTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -68,8 +70,8 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                     b.Property<string>("FirstName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("Gender")
-                        .HasColumnType("int");
+                    b.Property<string>("Gender")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LastName")
                         .HasColumnType("nvarchar(max)");
@@ -236,9 +238,6 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("HomeAddress")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("LastModified")

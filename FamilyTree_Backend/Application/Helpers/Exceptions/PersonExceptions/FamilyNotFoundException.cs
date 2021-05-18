@@ -9,7 +9,7 @@ namespace FamilyTreeBackend.Core.Application.Helpers.Exceptions
     [Serializable]
     public class FamilyNotFoundException : PersonException
     {
-        public long FamilyId { get; set; }
+        public long FamilyId { get; }
         public FamilyNotFoundException(string message, long familyId) 
             :base(message)
         {
