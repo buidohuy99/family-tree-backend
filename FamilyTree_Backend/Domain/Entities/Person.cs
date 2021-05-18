@@ -15,6 +15,7 @@ namespace FamilyTreeBackend.Core.Domain.Entities
         public string PhoneNumber { get; set; }
         public string HomeAddress { get; set; }
         public string Occupation { get; set; }
+        public string ImageUrl { get; set; }
         public long? ChildOf { get; set; }
         public long FamilyTreeId { get; set; }
         public string Note { get; set; }

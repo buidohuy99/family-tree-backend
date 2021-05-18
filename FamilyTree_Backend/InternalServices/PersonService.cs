@@ -73,7 +73,8 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                     Gender = newPersonValues.Gender,
                     Note = newPersonValues.Note,
                     UserId = newPersonValues.UserId,
-                    FamilyTreeId = operatingPerson.FamilyTreeId
+                    FamilyTreeId = operatingPerson.FamilyTreeId,
+                    ImageUrl = newPersonValues.ImageUrl
                 };
 
                 // Lastly, check if the operating person is in any family
@@ -183,7 +184,8 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                     Gender = newPersonValues.Gender,
                     Note = newPersonValues.Note,
                     UserId = newPersonValues.UserId,
-                    FamilyTreeId = operatingPerson.FamilyTreeId
+                    FamilyTreeId = operatingPerson.FamilyTreeId,
+                    ImageUrl = newPersonValues.ImageUrl
                 };
 
                 // if there is no previously existing family, we create a new family
@@ -297,6 +299,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                     Note = newPersonValues.Note,
                     UserId = newPersonValues.UserId,
                     FamilyTreeId = operatingFather != null ? operatingFather.FamilyTreeId : operatingMother.FamilyTreeId,
+                    ImageUrl = newPersonValues.ImageUrl,
                 };
 
                 // find family

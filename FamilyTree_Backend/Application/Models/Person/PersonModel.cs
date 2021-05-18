@@ -21,5 +21,6 @@ namespace FamilyTreeBackend.Core.Application.Models
         public IEnumerable<PersonModel> Spouses;
         public string Note { get; set; }
         public string UserId { get; set; }
+        public string ImageUrl { get; set; }
     }
 }
