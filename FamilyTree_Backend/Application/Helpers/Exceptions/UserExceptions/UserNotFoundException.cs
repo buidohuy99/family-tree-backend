@@ -7,10 +7,13 @@ using System.Threading.Tasks;
 
 namespace FamilyTreeBackend.Core.Application.Helpers.Exceptions
 {
+    [Serializable]
     public class UserNotFoundException : UserException
     {
-        public UserNotFoundException(string message, string userId = null) :base(message, userId) 
+        public string Email { get; }
+        public UserNotFoundException(string message, string userId = null, string email = null) :base(message, userId) 
         {
+            Email = email;
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace FamilyTreeBackend.Core.Application.Helpers
 {
+    [Serializable]
     public class HttpResponse<T>
     {
         public T Data { get; set; }

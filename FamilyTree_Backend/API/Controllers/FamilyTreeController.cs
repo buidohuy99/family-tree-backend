@@ -1,6 +1,7 @@
 ﻿using FamilyTreeBackend.Core.Application.Helpers.Exceptions;
 using FamilyTreeBackend.Core.Application.Interfaces;
 using FamilyTreeBackend.Core.Application.Models.FamilyTree;
+using FamilyTreeBackend.Core.Domain.Constants;
 using FamilyTreeBackend.Core.Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -13,6 +14,7 @@ using System.Threading.Tasks;
 using FamilyTreeBackend.Core.Application.Helpers;
 using FamilyTreeBackend.Presentation.API.Handlers;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace FamilyTreeBackend.Presentation.API.Controllers
 {
@@ -32,21 +34,22 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         }
 
         [HttpGet("tree/{treeId}")]
-        [SwaggerResponse(200, Type = typeof(FamilyTreeModel), 
+        [SwaggerResponse(200, Type = typeof(HttpResponse<FamilyTreeModel>), 
             Description = "Return the info of tree with given Id)")]
         public async Task<IActionResult> FindFamilyTree(long treeId)
         {
             FamilyTreeModel result = await _familyTreeService.FindFamilyTree(treeId);
-            return Ok(result);
+            return Ok(new HttpResponse<FamilyTreeModel>(result, GenericResponseStrings.TreeController_FindTreeSuccessful));
         }
 
         [HttpPut("tree/{treeId}")]
-        [SwaggerResponse(200, Type = typeof(FamilyTreeUpdateResponseModel),
-            Description = "Return the info of tree with given Id)")]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<FamilyTreeUpdateResponseModel>),
+            Description = "Update the info of tree with given Id and new info)")]
         public async Task<IActionResult> UpdateFamilyTree(long treeId, [FromBody] FamilyTreeInputModel model)
         {
             var result = await _familyTreeService.UpdateFamilyTree(treeId, model);
-            return Ok(result);
+            return Ok(new HttpResponse<FamilyTreeUpdateResponseModel>(
+                result, GenericResponseStrings.TreeController_UpdateTreeSuccessful));
         }
 
         [HttpDelete("tree/{treeId}")]
@@ -55,10 +58,12 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         public async Task<IActionResult> DeleteFamilyTree(long treeId)
         {
             await _familyTreeService.DeleteFamilyTree(treeId);
-            return Ok();
+            return Ok(GenericResponseStrings.TreeController_RemoveTreeSuccessful);
         }
 
         [HttpPost("tree")]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<FamilyTreeModel>),
+            Description = "Add a new tree with given new info")]
         public async Task<IActionResult> AddFamilyTree([FromBody] FamilyTreeInputModel model)
         {
             var claimManager = HttpContext.User;
@@ -69,7 +74,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
 
                 var result = await _familyTreeService.AddFamilyTree(model, user);
 
-                return Ok(result);
+                return Ok(new HttpResponse<FamilyTreeModel>(result, GenericResponseStrings.TreeController_AddTreeSuccessful));
             }
             catch (UserNotFoundException e)
             {
@@ -80,15 +85,18 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         }
 
         [HttpGet("tree")]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<IEnumerable<FamilyTreeListItemModel>>),
+            Description = "Add a new tree with given new info")]
         public async Task<IActionResult> FindAllTrees()
         {
             var result = await _familyTreeService.FindAllTree();
 
-            return Ok(result);
+            return Ok(new HttpResponse<IEnumerable<FamilyTreeListItemModel>>(
+                result, GenericResponseStrings.TreeController_FindAllTreeSuccessful));
         }
 
         [HttpPost("tree/{treeId}/AddUsersToEditor")]
-        [SwaggerResponse(200, Type = typeof(IEnumerable<string>),
+        [SwaggerResponse(200, Type = typeof(HttpResponse<IEnumerable<string>>),
             Description = "Add list of users to be tree's editor, return the added users)")]
         public async Task<IActionResult> AddUsersToEditor(long treeId, [FromBody] List<string> userNames)
         {
@@ -96,10 +104,10 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
 
             if (!authorizeResult.Succeeded)
             {
-                return Unauthorized();
+                return Unauthorized(GenericResponseStrings.TreeController_NoPermissionToEditTree);
             }
-            var result =  await _familyTreeService.AddUsersToEditor(userNames);
-            return Ok(result);
+            var result =  await _familyTreeService.AddUsersToEditor(treeId, userNames);
+            return Ok(new HttpResponse<IEnumerable<string>>(result, GenericResponseStrings.TreeController_AddEditorsToTreeSuccessful));
         }
     }
 }

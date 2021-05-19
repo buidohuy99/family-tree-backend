@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using FamilyTreeBackend.Core.Domain.Enums;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,10 +15,12 @@ namespace FamilyTreeBackend.Core.Domain.Entities
         public string LastName { get; set; }
         public string AvatarUrl { get; set; }
         public string Address { get; set; }
-        public string Gender { get; set; }
+        public Gender? Gender { get; set; }
         public DateTime? DateOfBirth { get; set; }
         public byte Status { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime? UpdatedDate { get; set; }
+
+        public ICollection<FamilyTree> EditorOfFamilyTrees { get; set; }
     }
 }

@@ -95,5 +95,14 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
                 return StatusCode(500, new HttpResponse<Exception>(ex, GenericResponseStrings.InternalServerError));
             }
         }
+
+        [HttpPost("refresh-access-token")]
+        [SwaggerOperation(Summary = "Refresh the access token with a refresh token")]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<RefreshTokenResponseModel>))]
+        public async Task<IActionResult> RefreshAccessToken([FromBody] string refreshToken)
+        {
+            RefreshTokenResponseModel response = await _authService.RefreshAccessToken(refreshToken);
+            return Ok(new HttpResponse<RefreshTokenResponseModel>(response, GenericResponseStrings.Auth_RefreshTokenSuccessful));
+        }
     }
 }

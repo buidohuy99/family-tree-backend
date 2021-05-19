@@ -7,9 +7,10 @@ using System.Threading.Tasks;
 
 namespace FamilyTreeBackend.Core.Application.Helpers.Exceptions
 {
+    [Serializable]
     public class InvalidGenderException : PersonException
     {
-        public Gender Gender { get; set; }
+        public Gender Gender { get; }
         public InvalidGenderException(string message, long personId, Gender gender)
             :base(message, personId)
         {

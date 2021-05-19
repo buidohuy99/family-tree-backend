@@ -10,7 +10,6 @@ namespace FamilyTreeBackend.Core.Application.Helpers.Exceptions
         public DeletePersonException(string message) : base(message) { }
         public DeletePersonException(string message, long personId) : base(message, personId)
         {
-            PersonId = personId;
         }
     }
 }

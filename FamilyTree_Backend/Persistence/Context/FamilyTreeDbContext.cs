@@ -32,6 +32,14 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
                 entity.ToTable("RefreshToken");
 
                 entity.HasKey(e => e.Token);
+
+                entity.Property(e => e.Token).ValueGeneratedNever();
+
+                entity.HasOne(e => e.User)
+                    .WithMany()
+                    .HasForeignKey(e => e.UserId)
+                    .HasConstraintName("FK_BelongsTo_User")
+                    .OnDelete(DeleteBehavior.SetNull);
             });
 
             modelBuilder.Entity<Family>((entity) => {
@@ -55,6 +63,9 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
                 entity.HasOne(e => e.Parent2)
                     .WithMany()
                     .HasForeignKey(e => e.Parent2Id);
+
+                entity.HasOne(e => e.Relationship)
+                    .WithOne(e => e.Family);
             });
 
             modelBuilder.Entity<Person>((entity) => {
@@ -96,17 +107,24 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
 
                 entity.Property(e => e.LastModified)
                     .HasDefaultValueSql("GETUTCDATE()")
-                   .ValueGeneratedOnAddOrUpdate();
+                    .ValueGeneratedOnAddOrUpdate();
 
                 entity.HasOne(e => e.Family)
                     .WithOne(f => f.Relationship)
                     .HasForeignKey<Relationship>(e => e.Id)
-                    .HasConstraintName("FK_Relationship_OfFamily");
+                    .HasConstraintName("FK_Relationship_OfFamily")
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<Marriage>((entity) =>
             {
                 entity.ToTable("Marriage");
+                entity.HasBaseType<Relationship>()
+                    .HasOne(e => e.ParentRelationship)
+                    .WithOne()
+                    .HasForeignKey<Marriage>(e => e.Id)
+                    .HasConstraintName("FK_ParentRelationship_OfMarriage")
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<FamilyTree>((entity) => {
@@ -132,99 +150,17 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
                     .WithOne(e => e.FamilyTree)
                     .HasForeignKey(e => e.FamilyTreeId)
                     .HasConstraintName("FK_FamilyOfTree");
+
+                entity.HasMany(e => e.Editors)
+                    .WithMany(e => e.EditorOfFamilyTrees);
+
+                entity.HasOne(e => e.Owner)
+                    .WithMany()
+                    .HasForeignKey(e => e.OwnerId)
+                    .HasConstraintName("FK_OwnerOfTree")
+                    .OnDelete(DeleteBehavior.SetNull);
             });
-
-
-            // Set asp net table to be compatible with mysql 8
-            //modelBuilder.Entity<ApplicationUser>(entity => entity.Property(m => m.Id).HasMaxLength(85));
-            //modelBuilder.Entity<ApplicationUser>(entity => entity.Property(m => m.NormalizedEmail).HasMaxLength(85));
-            //modelBuilder.Entity<ApplicationUser>(entity => entity.Property(m => m.NormalizedUserName).HasMaxLength(85));
-
-            //modelBuilder.Entity<IdentityRole>(entity => entity.Property(m => m.Id).HasMaxLength(85));
-            //modelBuilder.Entity<IdentityRole>(entity => entity.Property(m => m.NormalizedName).HasMaxLength(85));
-
-            //modelBuilder.Entity<IdentityUserLogin<string>>(entity => entity.Property(m => m.LoginProvider).HasMaxLength(85));
-            //modelBuilder.Entity<IdentityUserLogin<string>>(entity => entity.Property(m => m.ProviderKey).HasMaxLength(85));
-            //modelBuilder.Entity<IdentityUserLogin<string>>(entity => entity.Property(m => m.UserId).HasMaxLength(85));
-            //modelBuilder.Entity<IdentityUserRole<string>>(entity => entity.Property(m => m.UserId).HasMaxLength(85));
-
-            //modelBuilder.Entity<IdentityUserRole<string>>(entity => entity.Property(m => m.RoleId).HasMaxLength(85));
-
-            //modelBuilder.Entity<IdentityUserToken<string>>(entity => entity.Property(m => m.UserId).HasMaxLength(85));
-            //modelBuilder.Entity<IdentityUserToken<string>>(entity => entity.Property(m => m.LoginProvider).HasMaxLength(85));
-            //modelBuilder.Entity<IdentityUserToken<string>>(entity => entity.Property(m => m.Name).HasMaxLength(85));
-
-            //modelBuilder.Entity<IdentityUserClaim<string>>(entity => entity.Property(m => m.Id).HasMaxLength(85));
-            //modelBuilder.Entity<IdentityUserClaim<string>>(entity => entity.Property(m => m.UserId).HasMaxLength(85));
-            //modelBuilder.Entity<IdentityRoleClaim<string>>(entity => entity.Property(m => m.Id).HasMaxLength(85));
-            //modelBuilder.Entity<IdentityRoleClaim<string>>(entity => entity.Property(m => m.RoleId).HasMaxLength(85));
         }
-
-        //public void SeedData(ModelBuilder modelBuilder)
-        //{
-            
-        //    FamilyTree familyTree = new FamilyTree
-        //    {
-        //        Id = 1,
-        //        Name = "Hung Thi Family Tree",
-        //        Description = "Hung Thi Test Family Tree",
-        //    };
-            
-        //    //modelBuilder.Entity<FamilyTree>().HasData(familyTree);
-
-        //    //Person person = new Person
-        //    //{
-        //    //    Id = 1,
-        //    //    FirstName = "Hung",
-        //    //    LastName = "Thi",
-        //    //    DateOfBirth = DateTime.Today,
-        //    //    Gender = Gender.MALE,
-        //    //    FamilyTreeId = 1,
-        //    //    ChildOf = 1,
-
-        //    //};
-        //    //Person father = new Person
-        //    //{
-        //    //    Id = 2,
-        //    //    FirstName = "Senh",
-        //    //    LastName = "Thi",
-        //    //    DateOfBirth = new DateTime(1945, 07, 20),
-        //    //    Gender = Gender.MALE,
-        //    //    FamilyTreeId = 1,
-
-        //    //};
-        //    //Person mother = new Person
-        //    //{
-        //    //    Id = 3,
-        //    //    FirstName = "Phan",
-        //    //    LastName = "Luan",
-        //    //    DateOfBirth = new DateTime(1954, 10, 20),
-        //    //    Gender = Gender.MALE,
-        //    //    FamilyTreeId = 1,
-
-        //    //};
-
-        //    //Family family = new Family
-        //    //{
-        //    //    Id = 1,
-        //    //    Parent1Id = 2,
-        //    //    Parent2Id = 3,
-                
-        //    //};
-
-        //    //Marriage relationship = new Marriage
-        //    //{
-        //    //    Id = 1,
-        //    //    RelationshipType = RelationshipType.MARRIED,
-        //    //    DateOfMarriage = new DateTime(1985, 10, 11),
-        //    //};
-
-        //    //family.Relationship = relationship;
-        //    //modelBuilder.Entity<Person>().HasData(person, father, mother );
-        //    //modelBuilder.Entity<Family>().HasData(family);
-        //    //modelBuilder.Entity<Marriage>().HasData(relationship);
-        //    //modelBuilder.Entity<Relationship>().HasData(relationship as Relationship);
-        //}
 
         public void SeedData()
         {

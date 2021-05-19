@@ -10,17 +10,32 @@ namespace FamilyTreeBackend.Core.Domain.Constants
     {
         public const string AnExceptionOccuredInController = "A problem occurred when processing the content of your request";
 
+        public const string UploadImageSuccessful = "Image is successfully uploaded";
+
+        public const string GenerateResetPasswordUrlSuccessful = "Reset password url has been generated successfully";
+
+        // Auth related
+        public const string Auth_UserIsNotValid = "Cannot find valid user from claims provided";
         public const string LoginSuccessful = "You have logged in";
         public const string RegisterSuccessful = "You have successfully registered";
-
-        public const string UploadImageSuccessful = "Image is successfully uploaded";
+        public const string Auth_RefreshTokenSuccessful = "You have successfully obtained a new access token";
 
         // Person Controller
         public const string PersonController_AddParentToPersonSuccessful = "You have successfully added a parent to the person below, you can also find the family that the new parent belongs to below";
         public const string PersonController_AddSpouseToPersonSuccessful = "You have successfully added a spouse to the person and produced the below family";
         public const string PersonController_AddChildToPersonSuccessful = "You have successfully added a child to the person and the info of that child is below, along with the family he was added in";
-        public const string PersonController_UpdatePersonSuccessful = "Person updated successfully";
-        public const string PersonController_RemovePersonSuccessful = "Person removed successfully";
+        public const string PersonController_FindPersonSuccessful = "Person has been found successfully";
+        public const string PersonController_UpdatePersonSuccessful = "Person has been updated successfully";
+        public const string PersonController_RemovePersonSuccessful = "Person has been removed successfully";
+
+        //Family Tree Controller
+        public const string TreeController_FindTreeSuccessful = "Tree has been found successfully";
+        public const string TreeController_FindAllTreeSuccessful = "List of trees has been found successfully";
+        public const string TreeController_AddTreeSuccessful = "Tree has been added successfully";
+        public const string TreeController_UpdateTreeSuccessful = "Tree has been updated successfully";
+        public const string TreeController_RemoveTreeSuccessful = "Tree has been removed successful";
+        public const string TreeController_AddEditorsToTreeSuccessful = "Editors has been added to tree successfully";
+        public const string TreeController_NoPermissionToEditTree = "User doesn't have permission to edit tree";
 
         public const string InternalServerError = "Server encountered an exception";
     }
@@ -42,6 +57,10 @@ namespace FamilyTreeBackend.Core.Domain.Constants
         //LoginUserFail
         public const string CannotFindUser = "Valid user cannot be found from the specified infos";
         public const string InvalidPassword = "Provided password is wrong for the username/email";
+
+        //RefreshTokenFail
+        public const string InvalidRefreshToken = "Refresh token provided is either invalid or expired so please get a new one";
+        public const string RefreshTokenIsCorrupted = "Refresh token is found to be corrupted please get a new one";
     }
 
     public static class PersonExceptionMessages

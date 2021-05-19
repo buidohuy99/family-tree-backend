@@ -38,26 +38,6 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         [SwaggerResponse(200, Type = typeof(HttpResponse<AddNewParentToPersonResponseModel>), Description = "Return family with the new parent inside")]
         public async Task<IActionResult> AddNewParent(long personId, [FromBody] PersonInputModel input)
         {
-            //MOVE THIS TO FUTURE PART WHERE IT WILL HANDLE GENERAL PERMISSION
-            //Commented for testing
-
-            //// Check validity of the request
-            //var claimsManager = HttpContext.User;
-            //string uid = null;
-            //try
-            //{
-            //    uid = GetUserId(claimsManager);
-            //}
-            //catch (Exception e)
-            //{
-            //    return Unauthorized(e.Message);
-            //}
-
-            //if (uid == null)
-            //{
-            //    return Unauthorized("Unauthorized individuals cannot access this route");
-            //}
-
             // Carry on with the business logic
             var model = new AddNewParentToPersonModel()
             {
@@ -99,15 +79,18 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         }
 
         [HttpGet("person/{personId}")]
-        [SwaggerResponse(200, Type = typeof(PersonModel), Description = "Return the info of the person")]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<PersonModel>), 
+            Description = "Return the info of the person")]
         public async Task<IActionResult> FindPerson(long personId)
         {
             PersonModel personModel = await _personService.GetPerson(personId);
-            return Ok(personModel);
+            return Ok(new HttpResponse<PersonModel>(
+                personModel, GenericResponseStrings.PersonController_FindPersonSuccessful));
         }
 
         [HttpGet("person/{personId}/children")]
-        [SwaggerResponse(200, Type = typeof(HttpResponse<IEnumerable<PersonModel>>), Description = "Return the children of the person")]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<IEnumerable<PersonModel>>), 
+            Description = "Return the children of the person")]
         public async Task<IActionResult> FindChildren(long personId)
         {
             IEnumerable<PersonModel> result = await _personService.GetPersonChildren(personId);
@@ -115,6 +98,8 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         }
 
         [HttpDelete("person/{personId}")]
+        [SwaggerResponse(200, Type = typeof(string),
+            Description = "Remove the person with given Id")]
         public async Task<IActionResult> RemovePerson(long personId)
         {
             await _personService.RemovePerson(personId);
@@ -122,7 +107,8 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         }
 
         [HttpPut("person/{personId}")]
-        [SwaggerResponse(200, Type = typeof(HttpResponse<PersonModel>), Description = "Return the info of the person")]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<PersonModel>), 
+            Description = "Update the info of the person")]
         public async Task<IActionResult> UpdatePersonInfo(long personId, [FromBody] PersonInputModel updatedPersonModel)
         {
 
@@ -130,7 +116,5 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             var response = new HttpResponse<PersonModel>(personModel, GenericResponseStrings.PersonController_UpdatePersonSuccessful);
             return Ok(response);
         }
-        
-
     }
 }

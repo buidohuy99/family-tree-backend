@@ -7,9 +7,10 @@ using System.Threading.Tasks;
 
 namespace FamilyTreeBackend.Core.Application.Helpers.Exceptions
 {
+    [Serializable]
     public class UserExistsInTreeException : UserException
     {
-        public long TreeId { get; set; }
+        public long TreeId { get; }
         public UserExistsInTreeException(string message, string userId, long treeId)
             :base(message, userId)
         {

@@ -15,6 +15,7 @@ namespace FamilyTreeBackend.Core.Application.Models.Person
         public DateTime? DateOfBirth { get; set; }
         public DateTime? DateOfDeath { get; set; }
         public string UserId { get; set; }
+        public string ImageUrl { get; set; }
         public string Note { get; set; }
     }
 }
