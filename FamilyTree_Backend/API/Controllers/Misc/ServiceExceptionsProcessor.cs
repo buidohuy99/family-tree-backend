@@ -29,7 +29,11 @@ namespace FamilyTreeBackend.Presentation.API.Controllers.Misc
 
                 [TreeExceptionMessages.TreeNotFound] = 404,
 
-                [UserExceptionMessages.UserNotFound] = 400
+                [UserExceptionMessages.UserNotFound] = 400,
+
+                [SendEmailExceptionMessages.SendEmailFailed] = 500,
+
+                [UploadFileExceptionMessages.UploadFileLimitExceeded] = 400,
             };
         }
 

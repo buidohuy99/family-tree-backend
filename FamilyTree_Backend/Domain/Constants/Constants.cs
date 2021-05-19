@@ -71,5 +71,30 @@ namespace FamilyTreeBackend.Core.Domain.Constants
     public static class UserExceptionMessages
     {
         public const string UserNotFound = "Cannot find user with provided Id";
+        public const string ResetPasswordFail = "Reset password failed";
+    }
+
+    public static class SendEmailExceptionMessages
+    {
+        public const string SendEmailFailed = "Cannot send message to the provided email";
+    }
+
+    public static class UploadFileExceptionMessages
+    {
+        public const string UploadFileFailed = "File failed to be uploaded to the server";
+        public const string UploadFileLimitExceeded = "File limit exceeded, please upload a smaller file";
+    }
+
+    public static class PersonServiceExceptionMessages
+    {
+        public const string PersonService_CannotFindSpecifiedTreeFromId = "Tree cannot be found from the provided id";
+        public const string PersonService_CannotFindSpecifiedUserFromId = "User cannot be found from the provided id";
+        public const string PersonService_CannotFindSpecifiedPersonFromId = "Person cannot be found from the provided id";
+        public const string PersonService_CannotFindSpecifiedParentPersonFromId = "Parent person cannot be found from the provided id";
+        public const string PersonService_CannotFindSpecifiedFamilyFromId = "Family cannot be found from the provided id";
+        public const string PersonService_UserAlreadyExistedInTree = "User already existed as a person in the tree";
+        public const string PersonService_NoSlotForParentOfPerson = "No more parent slot for specified person";
+        public const string PersonService_PersonCannotBeParentTwiceInAFamily = "Cannot set both parents of the family to be the same person";
+        public const string PersonService_ParentCannotBeOneself = "Cannot set parent of the person to be himself";
     }
 }
