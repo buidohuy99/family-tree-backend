@@ -78,12 +78,48 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                 };
 
                 // Lastly, check if the operating person is in any family
-                var connectedFamily = await _unitOfWork.Repository<Family>().GetDbset().FirstOrDefaultAsync(e => e.Id == operatingPerson.ChildOf);
+                var connectedFamily = _unitOfWork.Repository<Family>().GetDbset().FirstOrDefault(e => e.Id == operatingPerson.ChildOf);
                 Family newFamily = null;
                 if(connectedFamily != null)
                 {
-                    // if he is already in family => cannot add parent
-                    throw new CannotAddParentException(PersonExceptionMessages.FamilyAlreadyExist, operatingPerson.Id);
+                    newFamily = connectedFamily;
+                    // Family is full
+                    if (newFamily.Parent1Id != null && newFamily.Parent2Id != null)
+                    {
+                        throw new CannotAddParentException(PersonExceptionMessages.FamilyAlreadyFull, operatingPerson.Id);
+                    }
+                    // Family is empty
+                    if (newFamily.Parent1Id == null && newFamily.Parent2Id == null)
+                    {
+                        switch (newPersonValues.Gender)
+                        {
+                            case Gender.MALE:
+                                newFamily.Parent1 = newParent;
+                                break;
+                            case Gender.FEMALE:
+                                newFamily.Parent2 = newParent;
+                                break;
+                        }
+                    }
+                    else // Family have one empty slot
+                    {
+                        if (newFamily.Parent1Id == null) // lacks a father
+                        {
+                            if (newPersonValues.Gender == Gender.FEMALE)
+                            {
+                                throw new InvalidGenderException(PersonExceptionMessages.FatherGenderIsNotValid, null, newPersonValues.Gender);
+                            }
+                            newFamily.Parent1 = newParent;
+                        }
+                        else if (newFamily.Parent2Id == null)
+                        {
+                            if (newPersonValues.Gender == Gender.MALE)
+                            {
+                                throw new InvalidGenderException(PersonExceptionMessages.MotherGenderIsNotValid, null, newPersonValues.Gender);
+                            }
+                            newFamily.Parent2 = newParent;
+                        }
+                    }
                 }
                 else
                 {
@@ -270,6 +306,12 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                             operatingMother.Id, 
                             operatingMother.Gender);
                     }
+                }
+
+                // invalid family to insert
+                if(operatingFather == null && operatingMother == null)
+                {
+                    throw new FamilyNotFoundException(PersonExceptionMessages.FamilyNotFound);
                 }
                 
                 // check if user connected to this new parent node is an existing tree node or not (we dont want the user to exist as a tree node)
@@ -474,15 +516,86 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
         public async Task RemovePerson(long id)
         {
-            bool anyChildren =  await _unitOfWork.Repository<Person>().GetDbset()
-                .Where(p => p.ChildOfFamily.Parent1Id == id || p.ChildOfFamily.Parent2Id == id)
-                .AnyAsync();
+            var operatingPerson = _unitOfWork.Repository<Person>().GetDbset().Where(e => e.Id == id)
+                                .Include(e => e.ChildOfFamily)
+                                .Include(e => e.ChildOfFamily.Children)
+                                .FirstOrDefault();
 
-            if (anyChildren)
+            if(operatingPerson == null)
             {
-                throw new DeletePersonException(PersonExceptionMessages.CannotDeletePerson, id);
+                throw new PersonNotFoundException(PersonExceptionMessages.PersonNotFound, id);
             }
-            Person deletedPerson = await _unitOfWork.Repository<Person>().DeleteAsync(id);
+
+            var parents = operatingPerson.ChildOfFamily;
+
+            var families = _unitOfWork.Repository<Family>().GetDbset().Where(e => e.Parent1Id == id || e.Parent2Id == id);
+
+            if(parents != null)
+            {
+                if(families.Count() > 0)
+                {
+                    throw new DeletePersonException(PersonExceptionMessages.TreeDivergenceAfterDeletion, id);
+                }
+                _unitOfWork.Repository<Person>().GetDbset().Attach(operatingPerson).State = EntityState.Deleted;
+                //Check if he is child of any single parent family with him as the only child left, if he is remove the family from db
+                if ((parents.Parent1Id == null || parents.Parent2Id == null) && parents.Children.Count <= 1)
+                {
+                    _unitOfWork.Repository<Family>().GetDbset().Attach(parents).State = EntityState.Deleted;
+                }
+            }
+            else
+            {
+                if(families.Count() <= 0)
+                {
+                    throw new DeletePersonException(PersonExceptionMessages.CannotDeleteOnlyPersonInTree, id);
+                }
+                else if(families.Count() == 1)
+                {
+                    var operatingFamily = families.Include(e => e.Children).FirstOrDefault();
+                    // if he she is a single parent of the family
+                    if((operatingFamily.Parent1Id == id && operatingFamily.Parent2Id == null) || (operatingFamily.Parent2Id == id && operatingFamily.Parent1Id == null))
+                    {
+                        if(operatingFamily.Children.Count <= 0) // single parent of a family with no children - this is to catch DB inconsistency
+                        {
+                            _unitOfWork.Repository<Family>().GetDbset().Attach(operatingFamily).State = EntityState.Deleted;
+                            await _unitOfWork.SaveChangesAsync();
+                            throw new DeletePersonException(PersonExceptionMessages.CannotDeleteOnlyPersonInTree, id);
+                        } else if (operatingFamily.Children.Count > 1){ 
+                            throw new DeletePersonException(PersonExceptionMessages.TreeDivergenceAfterDeletion, id);
+                        }
+
+                        var onlyChild = operatingFamily.Children.ToList()[0];
+                        onlyChild.ChildOfFamily = null;
+                        _unitOfWork.Repository<Person>().Update(onlyChild);
+
+                        _unitOfWork.Repository<Family>().GetDbset().Attach(operatingFamily).State = EntityState.Deleted;
+                        _unitOfWork.Repository<Person>().GetDbset().Attach(operatingPerson).State = EntityState.Deleted;
+
+                    }
+                    else // not a single parent
+                    {
+                        if(operatingFamily.Parent1Id == id)
+                        {
+                            operatingFamily.Parent1 = null;
+                        } else if (operatingFamily.Parent2Id == id)
+                        {
+                            operatingFamily.Parent2 = null;
+                        }
+                        _unitOfWork.Repository<Family>().Update(operatingFamily);
+                        _unitOfWork.Repository<Person>().GetDbset().Attach(operatingPerson).State = EntityState.Deleted;
+                        if(operatingFamily.Children.Count <= 0) // Family become
+                        {
+                            _unitOfWork.Repository<Family>().GetDbset().Attach(operatingFamily).State = EntityState.Deleted;
+                        }
+                    }
+                }
+                else
+                {
+                    throw new DeletePersonException(PersonExceptionMessages.TreeDivergenceAfterDeletion, id);
+                }
+            }
+            await _unitOfWork.SaveChangesAsync();
+
             return;
         }
 

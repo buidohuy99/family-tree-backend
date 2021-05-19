@@ -70,7 +70,7 @@ namespace FamilyTreeBackend.Core.Domain.Constants
         //FamilyNotFound
         public const string FamilyNotFound = "Family cannot be found for the person";
         public const string UserAlreadyExistedInTree = "User already existed as a person in the tree";
-        public const string FamilyAlreadyExist = "Family that this person is a child of already exist, cannot add parent";
+        public const string FamilyAlreadyFull = "Family that this person is a child of is already full, cannot add parent";
         
         //GenderNotValid
         public const string FatherGenderIsNotValid = "Father for the operation is not a male";
@@ -80,6 +80,8 @@ namespace FamilyTreeBackend.Core.Domain.Constants
         public const string PersonNotFound = "Cannot find person with provided Id";
         
         public const string CannotDeletePerson = "Cannot delete person, please remove all the person's personal relationships before deleting them";
+        public const string TreeDivergenceAfterDeletion = "Cannot delete person because the family diverges after this deletion";
+        public const string CannotDeleteOnlyPersonInTree = "This person has no associations and is therefore the only person in this family tree and cannot be deleted";
     }
 
     public static class TreeExceptionMessages

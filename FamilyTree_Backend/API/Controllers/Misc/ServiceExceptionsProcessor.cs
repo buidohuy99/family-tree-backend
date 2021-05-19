@@ -21,13 +21,15 @@ namespace FamilyTreeBackend.Presentation.API.Controllers.Misc
                 [AuthExceptionMessages.RefreshTokenIsCorrupted] = 401,
 
                 [PersonExceptionMessages.FamilyNotFound] = 400,
-                [PersonExceptionMessages.FamilyAlreadyExist] = 400,
+                [PersonExceptionMessages.FamilyAlreadyFull] = 400,
                 [PersonExceptionMessages.UserAlreadyExistedInTree] = 403,
                 [PersonExceptionMessages.FatherGenderIsNotValid] = 400,
                 [PersonExceptionMessages.MotherGenderIsNotValid] = 400,
                 [PersonExceptionMessages.SpouseGenderNotValid] = 400,
                 [PersonExceptionMessages.PersonNotFound] = 400,
                 [PersonExceptionMessages.CannotDeletePerson] = 400,
+                [PersonExceptionMessages.CannotDeleteOnlyPersonInTree] = 400,
+                [PersonExceptionMessages.TreeDivergenceAfterDeletion] = 403,
 
                 [TreeExceptionMessages.TreeNotFound] = 404,
 

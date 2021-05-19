@@ -9,7 +9,7 @@ namespace FamilyTreeBackend.Core.Application.Helpers.Exceptions
     [Serializable]
     public class CannotAddParentException : PersonException
     {
-        public CannotAddParentException(string message, long personId)
+        public CannotAddParentException(string message, long? personId)
             :base(message, personId)
         {
         }
