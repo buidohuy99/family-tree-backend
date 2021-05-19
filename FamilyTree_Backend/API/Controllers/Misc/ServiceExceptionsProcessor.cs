@@ -34,6 +34,8 @@ namespace FamilyTreeBackend.Presentation.API.Controllers.Misc
                 [UserExceptionMessages.UserNotFound] = 400,
 
                 [SendEmailExceptionMessages.SendEmailFailed] = 500,
+
+                [UploadFileExceptionMessages.UploadFileLimitExceeded] = 400,
             };
         }
 

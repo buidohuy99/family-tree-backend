@@ -98,6 +98,12 @@ namespace FamilyTreeBackend.Core.Domain.Constants
         public const string SendEmailFailed = "Cannot send message to the provided email";
     }
 
+    public static class UploadFileExceptionMessages
+    {
+        public const string UploadFileFailed = "File failed to be uploaded to the server";
+        public const string UploadFileLimitExceeded = "File limit exceeded, please upload a smaller file";
+    }
+
     public static class PersonServiceExceptionMessages
     {
         public const string PersonService_CannotFindSpecifiedTreeFromId = "Tree cannot be found from the provided id";

@@ -1,4 +1,5 @@
 ﻿using FamilyTreeBackend.Core.Application.Helpers.ConfigModels;
+using FamilyTreeBackend.Core.Application.Helpers.Exceptions.UploadExceptions;
 using FamilyTreeBackend.Core.Application.Interfaces;
 using FamilyTreeBackend.Core.Application.Models.FileUpload;
 using FamilyTreeBackend.Core.Domain.Constants;
@@ -34,9 +35,16 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
         public async Task<string> UploadImage(UploadSingleFileModel input)
         {
+            const long IMAGE_SIZE_LIMIT = 2097152; //2,000,000 bytes limit = 2MB
+
             try {
                 ServerImagekit imagekit = imagekitSources[0];
                 var file = input.File;
+
+                if (file.Length > IMAGE_SIZE_LIMIT)
+                {
+                    throw new FileSizeExceedLimitException(UploadFileExceptionMessages.UploadFileLimitExceeded, file.FileName, file.Length, IMAGE_SIZE_LIMIT);
+                }
 
                 using (var memoryStream = new MemoryStream())
                 {
