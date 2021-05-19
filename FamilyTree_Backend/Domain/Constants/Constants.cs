@@ -80,6 +80,8 @@ namespace FamilyTreeBackend.Core.Domain.Constants
         public const string PersonNotFound = "Cannot find person with provided Id";
         
         public const string CannotDeletePerson = "Cannot delete person, please remove all the person's personal relationships before deleting them";
+        public const string TreeDivergenceAfterDeletion = "Cannot delete person because the family diverges after this deletion";
+        public const string CannotDeleteOnlyPersonInTree = "This person has no associations and is therefore the only person in this family tree and cannot be deleted";
     }
 
     public static class TreeExceptionMessages

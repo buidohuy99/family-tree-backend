@@ -28,6 +28,8 @@ namespace FamilyTreeBackend.Presentation.API.Controllers.Misc
                 [PersonExceptionMessages.SpouseGenderNotValid] = 400,
                 [PersonExceptionMessages.PersonNotFound] = 400,
                 [PersonExceptionMessages.CannotDeletePerson] = 400,
+                [PersonExceptionMessages.CannotDeleteOnlyPersonInTree] = 400,
+                [PersonExceptionMessages.TreeDivergenceAfterDeletion] = 403,
 
                 [TreeExceptionMessages.TreeNotFound] = 404,
 
