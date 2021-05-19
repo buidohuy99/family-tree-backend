@@ -37,6 +37,11 @@ namespace FamilyTreeBackend.Core.Domain.Constants
         public const string TreeController_AddEditorsToTreeSuccessful = "Editors has been added to tree successfully";
         public const string TreeController_NoPermissionToEditTree = "User doesn't have permission to edit tree";
 
+        //Calendar Controller
+        public const string CalendarController_FindEventsSuccessful = "List of events has been found successfully";
+        public const string CalendarController_AddEventSuccessful = "Event has been added successfully";
+        public const string CalendarController_UpdateEventSuccessful = "Event has been updated successfully";
+        public const string CalendarController_RemoveEventSuccessful = "Event has been removed successfully";
         public const string InternalServerError = "Server encountered an exception";
     }
 
@@ -106,16 +111,8 @@ namespace FamilyTreeBackend.Core.Domain.Constants
         public const string UploadFileLimitExceeded = "File limit exceeded, please upload a smaller file";
     }
 
-    public static class PersonServiceExceptionMessages
+    public static class CalendarExceptionMessages
     {
-        public const string PersonService_CannotFindSpecifiedTreeFromId = "Tree cannot be found from the provided id";
-        public const string PersonService_CannotFindSpecifiedUserFromId = "User cannot be found from the provided id";
-        public const string PersonService_CannotFindSpecifiedPersonFromId = "Person cannot be found from the provided id";
-        public const string PersonService_CannotFindSpecifiedParentPersonFromId = "Parent person cannot be found from the provided id";
-        public const string PersonService_CannotFindSpecifiedFamilyFromId = "Family cannot be found from the provided id";
-        public const string PersonService_UserAlreadyExistedInTree = "User already existed as a person in the tree";
-        public const string PersonService_NoSlotForParentOfPerson = "No more parent slot for specified person";
-        public const string PersonService_PersonCannotBeParentTwiceInAFamily = "Cannot set both parents of the family to be the same person";
-        public const string PersonService_ParentCannotBeOneself = "Cannot set parent of the person to be himself";
+        public const string FamilyEventNotFound = "Cannot find event with provided id";
     }
 }

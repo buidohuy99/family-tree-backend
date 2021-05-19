@@ -20,24 +20,26 @@ namespace FamilyTreeBackend.Presentation.API.Controllers.Misc
                 [AuthExceptionMessages.InvalidRefreshToken] = 401,
                 [AuthExceptionMessages.RefreshTokenIsCorrupted] = 401,
 
-                [PersonExceptionMessages.FamilyNotFound] = 400,
+                [PersonExceptionMessages.FamilyNotFound] = 404,
                 [PersonExceptionMessages.FamilyAlreadyFull] = 400,
                 [PersonExceptionMessages.UserAlreadyExistedInTree] = 403,
                 [PersonExceptionMessages.FatherGenderIsNotValid] = 400,
                 [PersonExceptionMessages.MotherGenderIsNotValid] = 400,
                 [PersonExceptionMessages.SpouseGenderNotValid] = 400,
-                [PersonExceptionMessages.PersonNotFound] = 400,
+                [PersonExceptionMessages.PersonNotFound] = 404,
                 [PersonExceptionMessages.CannotDeletePerson] = 400,
                 [PersonExceptionMessages.CannotDeleteOnlyPersonInTree] = 400,
                 [PersonExceptionMessages.TreeDivergenceAfterDeletion] = 403,
 
                 [TreeExceptionMessages.TreeNotFound] = 404,
 
-                [UserExceptionMessages.UserNotFound] = 400,
+                [UserExceptionMessages.UserNotFound] = 404,
 
                 [SendEmailExceptionMessages.SendEmailFailed] = 500,
 
                 [UploadFileExceptionMessages.UploadFileLimitExceeded] = 400,
+
+                [CalendarExceptionMessages.FamilyEventNotFound] = 404,
             };
         }
 
