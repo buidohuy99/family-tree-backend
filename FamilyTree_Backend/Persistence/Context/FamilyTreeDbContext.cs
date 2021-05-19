@@ -20,6 +20,7 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
 
         public virtual DbSet<Family> Families { get; set; }
         public virtual DbSet<FamilyTree> FamilyTrees { get; set; }
+        public virtual DbSet<FamilyEvent> FamilyEvents { get; set; }
         public virtual DbSet<Person> People { get; set; }
         public virtual DbSet<Relationship> Relationships { get; set; }
         public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
@@ -159,6 +160,25 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
                     .HasForeignKey(e => e.OwnerId)
                     .HasConstraintName("FK_OwnerOfTree")
                     .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasMany(e => e.Calendar)
+                    .WithOne()
+                    .HasForeignKey(e => e.FamilyTreeId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<FamilyEvent>((entity) =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id);
+
+                entity.Property(e => e.DateCreated)
+                    .HasDefaultValueSql("GETUTCDATE()")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.LastModified)
+                    .HasDefaultValueSql("GETUTCDATE()")
+                    .ValueGeneratedOnAddOrUpdate();
             });
         }
 

@@ -14,5 +14,6 @@ namespace FamilyTreeBackend.Core.Domain.Entities
         public ICollection<Family> Families { get; set; }
         public ApplicationUser Owner { get; set; }
         public ICollection<ApplicationUser> Editors { get; set; }
+        public ICollection<FamilyEvent> Calendar { get; set; }
     }
 }
