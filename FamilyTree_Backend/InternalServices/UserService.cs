@@ -1,11 +1,17 @@
-﻿using FamilyTreeBackend.Core.Application.Helpers.Exceptions;
+﻿using FamilyTreeBackend.Core.Application.DTOs;
+using FamilyTreeBackend.Core.Application.Helpers.Exceptions;
+using FamilyTreeBackend.Core.Application.Helpers.Exceptions.UserExceptions;
 using FamilyTreeBackend.Core.Application.Interfaces;
 using FamilyTreeBackend.Core.Application.Models.User;
 using FamilyTreeBackend.Core.Domain.Constants;
 using FamilyTreeBackend.Core.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
+using StopWord;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
@@ -54,5 +60,104 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             return result;
         }
 
+        public IEnumerable<UserDTO> FindUser(UserFilterModel model)
+        {
+            var users = _userManager.Users;
+
+            if (model.UserName != null)
+            {
+                users = users.Where(e => e.UserName.Equals(model.UserName));
+            }
+            else if (model.Email != null)
+            {
+                users = users.Where(e => e.Email.Equals(model.Email));
+            }
+
+            if (model.UserName == null && model.Email == null)
+            {
+                if (model.Phone != null)
+                {
+                    users = users.Where(e => e.PhoneNumber.Contains(model.Phone));
+                }
+
+                if (model.BornBefore.HasValue)
+                {
+                    users = users.Where(e => (e.DateOfBirth.HasValue ? e.DateOfBirth.Value.CompareTo(model.BornBefore.Value) : int.MaxValue) < 0);
+                }
+
+                if (model.Gender.HasValue)
+                {
+                    users = users.Where(e => e.Gender == model.Gender);
+                }
+
+                if (model.Name != null)
+                {
+                    var nameWithoutStopwords = model.Name.RemoveStopWords().ToLower();
+
+                    MatchCollection matches = Regex.Matches(nameWithoutStopwords, "[a-z]([:'-]?[a-z])*",
+                                        RegexOptions.IgnoreCase);
+                    foreach (Match match in matches)
+                    {
+                        users = users.Where(e => e.FirstName.ToLower().Contains(match.Value)
+                                || e.LastName.ToLower().Contains(match.Value) || e.MidName.ToLower().Contains(match.Value));
+                    }
+                }
+            }
+
+            return users.Select(e => new UserDTO(e));
+        }
+
+        public async Task<UserDTO> UpdateUser(string updatedUserId, UpdateUserModel model)
+        {
+            var user = await _userManager.FindByIdAsync(updatedUserId);
+
+            if(user == null)
+            {
+                throw new UserNotFoundException(UserExceptionMessages.UserNotFound, updatedUserId);
+            }
+
+            if(model.FirstName != null)
+            {
+                user.FirstName = string.IsNullOrEmpty(model.FirstName) ? null : model.FirstName;
+            }
+
+            if(model.MidName != null)
+            {
+                user.MidName = string.IsNullOrEmpty(model.MidName) ? null : model.MidName;
+            }
+
+            if(model.LastName != null)
+            {
+                user.LastName = string.IsNullOrEmpty(model.LastName) ? null : model.LastName;
+            }
+
+            if(model.Address != null)
+            {
+                user.Address = string.IsNullOrEmpty(model.Address) ? null : model.Address;
+            }
+
+            if(model.AvatarUrl != null)
+            {
+                user.AvatarUrl = string.IsNullOrEmpty(model.AvatarUrl) ? null : model.AvatarUrl;
+            }
+
+            if(model.Gender != null)
+            {
+                user.Gender = model.Gender;
+            }
+
+            if(model.DateOfBirth != null)
+            {
+                user.DateOfBirth = model.DateOfBirth;
+            }
+
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+            {
+                throw new UserException(UserExceptionMessages.UpdateUserFail, updatedUserId);
+            }
+
+            return new UserDTO(user);
+        }
     }
 }

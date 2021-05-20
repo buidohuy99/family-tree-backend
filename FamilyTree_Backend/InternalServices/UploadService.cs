@@ -56,7 +56,6 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                     return uploadResult.URL;
                 }
             } catch (Exception e) {
-                _logger.LogWarning(e, LoggingMessages.UploadService_ErrorMessage);
                 throw;
             }
         }

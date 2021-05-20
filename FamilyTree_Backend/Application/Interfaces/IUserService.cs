@@ -1,4 +1,5 @@
-﻿using FamilyTreeBackend.Core.Application.Models.User;
+﻿using FamilyTreeBackend.Core.Application.DTOs;
+using FamilyTreeBackend.Core.Application.Models.User;
 using FamilyTreeBackend.Core.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using System;
@@ -13,5 +14,7 @@ namespace FamilyTreeBackend.Core.Application.Interfaces
     {
         public Task<string> GenerateResetPasswordUrl(string email);
         public Task<IdentityResult> ResetPasswordWithToken(ResetPasswordModel model);
+        public IEnumerable<UserDTO> FindUser(UserFilterModel model);
+        public Task<UserDTO> UpdateUser(string updatedUserId, UpdateUserModel model);
     }
 }

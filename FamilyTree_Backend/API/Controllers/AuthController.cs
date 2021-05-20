@@ -42,7 +42,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             }
             catch (Exception ex)
             {
-                string genericMessage = GenericResponseStrings.AnExceptionOccuredInController;
+                string genericMessage = GenericResponseStrings.RequestProcessingError;
                 if (ex is BaseServiceException exception)
                 {
                     uint? statusCode = ServiceExceptionsProcessor.GetStatusCode(exception.Message);
@@ -76,7 +76,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             }
             catch (Exception ex)
             {
-                string genericMessage = GenericResponseStrings.AnExceptionOccuredInController;
+                string genericMessage = GenericResponseStrings.RequestProcessingError;
                 if (ex is BaseServiceException exception)
                 {
                     uint? statusCode = ServiceExceptionsProcessor.GetStatusCode(exception.Message);

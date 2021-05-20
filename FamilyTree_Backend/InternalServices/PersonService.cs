@@ -171,7 +171,6 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                 {
                     await transaction.RollbackAsync();
                 }
-                _logger.LogInformation(ex, LoggingMessages.PersonService_ErrorMessage);
                 throw;
             }
         }
@@ -264,7 +263,6 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                 {
                     await transaction.RollbackAsync();
                 }
-                _logger.LogInformation(ex, LoggingMessages.PersonService_ErrorMessage);
                 throw;
             }
         }
@@ -437,7 +435,6 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                 {
                     await transaction.RollbackAsync();
                 }
-                _logger.LogInformation(ex, LoggingMessages.PersonService_ErrorMessage);
                 throw;
             }
         }
@@ -606,6 +603,11 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             if (person == null)
             {
                 throw new PersonNotFoundException(PersonExceptionMessages.PersonNotFound, personId);
+            }
+
+            if(updatedPersonModel.UserId != null && _userManager.FindByIdAsync(updatedPersonModel.UserId) == null)
+            {
+                throw new UserNotFoundException(UserExceptionMessages.UserNotFound, updatedPersonModel.UserId);
             }
 
             _mapper.Map(updatedPersonModel, person);

@@ -65,7 +65,6 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             }
             catch(Exception e)
             {
-                _logger.LogError(e, LoggingMessages.AuthService_ErrorMessage);
                 throw;
             }
         }
@@ -114,7 +113,6 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             } 
             catch(Exception e)
             {
-                _logger.LogError(e, LoggingMessages.AuthService_ErrorMessage);
                 throw;
             }
         }
@@ -167,7 +165,6 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, LoggingMessages.AuthService_ErrorMessage);
                 throw;
             }
         }
