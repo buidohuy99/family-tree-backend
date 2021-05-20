@@ -8,11 +8,8 @@ namespace FamilyTreeBackend.Core.Domain.Constants
 {
     public static class GenericResponseStrings
     {
-        public const string AnExceptionOccuredInController = "A problem occurred when processing the content of your request";
-
+        //Upload controller
         public const string UploadImageSuccessful = "Image is successfully uploaded";
-
-        public const string GenerateResetPasswordUrlSuccessful = "Reset password url has been generated successfully";
 
         // Auth related
         public const string Auth_UserIsNotValid = "Cannot find valid user from claims provided";
@@ -42,14 +39,14 @@ namespace FamilyTreeBackend.Core.Domain.Constants
         public const string CalendarController_AddEventSuccessful = "Event has been added successfully";
         public const string CalendarController_UpdateEventSuccessful = "Event has been updated successfully";
         public const string CalendarController_RemoveEventSuccessful = "Event has been removed successfully";
-        public const string InternalServerError = "Server encountered an exception";
-    }
 
-    public static class LoggingMessages
-    {
-        public const string AuthService_ErrorMessage = "An error occured while processing an auth service function";
-        public const string PersonService_ErrorMessage = "An error occured while processing a person service function";
-        public const string UploadService_ErrorMessage = "An error occured while processing an upload service function";
+        //User Controller
+        public const string UserController_FilterUsersSuccessful = "Users has been filtered successfully";
+        public const string UserController_UpdateUserSuccessful = "Update user infos successful";
+        public const string GenerateResetPasswordUrlSuccessful = "Reset password url has been generated successfully";
+
+        public const string RequestProcessingError = "Error occured while processing your request";
+        public const string InternalServerError = "Server encountered an exception";
     }
 
     public static class AuthExceptionMessages
@@ -98,6 +95,7 @@ namespace FamilyTreeBackend.Core.Domain.Constants
     {
         public const string UserNotFound = "Cannot find user with provided Id";
         public const string ResetPasswordFail = "Reset password failed";
+        public const string UpdateUserFail = "Cannot update specified user because server encountered an error while saving";
     }
 
     public static class SendEmailExceptionMessages

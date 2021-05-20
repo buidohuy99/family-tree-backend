@@ -20,6 +20,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             services.AddScoped<IFamilyTreeService, FamilyTreeService>();
             services.AddScoped<ITreeAuthorizationService, TreeAuthorizationSerivice>();
             services.AddScoped<ICalendarService, CalendarService>();
+            services.AddScoped<IUserService, UserService>();
             #endregion
 
             #region Register singleton
