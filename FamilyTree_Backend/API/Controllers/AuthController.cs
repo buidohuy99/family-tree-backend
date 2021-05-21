@@ -33,33 +33,10 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         [SwaggerResponse(200, Type = typeof(HttpResponse<AuthResponseModel>))]
         public async Task<IActionResult> Login([FromBody] AuthLoginModel model)
         {
-            try
-            {
-                // Carry on with the business logic
-                AuthResponseModel result = await _authService.Login(model);
+            // Carry on with the business logic
+            AuthResponseModel result = await _authService.Login(model);
 
-                return Ok(new HttpResponse<AuthResponseModel>(result, GenericResponseStrings.LoginSuccessful));
-            }
-            catch (Exception ex)
-            {
-                string genericMessage = GenericResponseStrings.RequestProcessingError;
-                if (ex is BaseServiceException exception)
-                {
-                    uint? statusCode = ServiceExceptionsProcessor.GetStatusCode(exception.Message);
-                    if (statusCode != null && statusCode.HasValue)
-                    {
-                        if (ex is AuthException authException)
-                        {
-                            return StatusCode((int)statusCode.Value, new HttpResponse<string>(exception.Message, genericMessage, authException.IdentityErrors));
-                        }
-                        else
-                        {
-                            return StatusCode((int)statusCode.Value, new HttpResponse<string>(exception.Message, genericMessage));
-                        }
-                    }
-                }
-                return StatusCode(500, new HttpResponse<Exception>(ex, GenericResponseStrings.InternalServerError));
-            }
+            return Ok(new HttpResponse<AuthResponseModel>(result, GenericResponseStrings.LoginSuccessful));
         }
 
         [HttpPost("register")]
@@ -67,33 +44,10 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         [SwaggerResponse(200, Type = typeof(HttpResponse<AuthResponseModel>))]
         public async Task<IActionResult> RegisterUser([FromBody] AuthRegisterModel model)
         {
-            try
-            {
-                // Carry on with the business logic
-                AuthResponseModel result = await _authService.RegisterUser(model);
+            // Carry on with the business logic
+            AuthResponseModel result = await _authService.RegisterUser(model);
 
-                return Ok(new HttpResponse<AuthResponseModel>(result, GenericResponseStrings.RegisterSuccessful));
-            }
-            catch (Exception ex)
-            {
-                string genericMessage = GenericResponseStrings.RequestProcessingError;
-                if (ex is BaseServiceException exception)
-                {
-                    uint? statusCode = ServiceExceptionsProcessor.GetStatusCode(exception.Message);
-                    if (statusCode != null && statusCode.HasValue)
-                    {
-                        if (ex is AuthException authException)
-                        {
-                            return StatusCode((int)statusCode.Value, new HttpResponse<string>(exception.Message, genericMessage, authException.IdentityErrors));
-                        }
-                        else
-                        {
-                            return StatusCode((int)statusCode.Value, new HttpResponse<string>(exception.Message, genericMessage));
-                        }
-                    }
-                }
-                return StatusCode(500, new HttpResponse<Exception>(ex, GenericResponseStrings.InternalServerError));
-            }
+            return Ok(new HttpResponse<AuthResponseModel>(result, GenericResponseStrings.RegisterSuccessful));
         }
 
         [HttpPost("refresh-access-token")]
