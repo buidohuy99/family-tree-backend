@@ -41,19 +41,45 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             return result;
         }
 
-        //public Task<AuthorizationResult> AuthorizeWithPersonAsync(ClaimsPrincipal user, long personId, IAuthorizationRequirement requirements)
-        //{
-        //    var person = _unitOfWork.Repository<Person>().GetDbset().Find(personId);
+        public Task<AuthorizationResult> AuthorizeWithPersonAsync(ClaimsPrincipal user, long treeId, long personId, IAuthorizationRequirement requirements)
+        {
+            var person = _unitOfWork.Repository<Person>().GetDbset().Find(personId);
+            FamilyTree tree = null;
+            if (treeId == person.FamilyTreeId)
+            {
+                tree = GetTreeFromPerson(person);
+            }
 
-        //    if (person == null)
-        //    {
-        //        throw new TreeNotFoundException(TreeExceptionMessages.TreeNotFound);
-        //    }
+            if (person == null)
+            {
+                throw new TreeNotFoundException(TreeExceptionMessages.TreeNotFound);
+            }
 
-        //    var result = _authorizationService.AuthorizeAsync(user, resource, requirements);
-        //    return result;
-        //}
+            var result = _authorizationService.AuthorizeAsync(user, tree, requirements);
+            return result;
+        }
 
+        private FamilyTree GetTreeFromPerson(Person person)
+        {
+            var entry = _unitOfWork.Entry(person);
+
+            if (person.FamilyTree == null)
+            {
+                entry.Reference(p => p.FamilyTree);
+            }
+
+            FamilyTree tree = person.FamilyTree;
+
+            if (tree.Owner == null || tree.Editors == null)
+            {
+                var treeEntry = _unitOfWork.Entry(tree);
+                treeEntry.Reference(tr => tr.Owner).Load();
+                treeEntry.Collection(tr => tr.Editors).Load();
+            }
+
+            return tree;
+
+        }
 
     }
 }

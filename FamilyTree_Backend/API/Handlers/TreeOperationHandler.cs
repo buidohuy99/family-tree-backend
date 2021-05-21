@@ -12,49 +12,44 @@ namespace FamilyTreeBackend.Presentation.API.Handlers
 {
     public class TreeOperationHandler : AuthorizationHandler<OperationAuthorizationRequirement, FamilyTree>
     {
-        private readonly IUnitOfWork _unitOfWork;
-        public TreeOperationHandler(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, OperationAuthorizationRequirement requirement, FamilyTree resource)
         {
             var user = context.User;
-
-            var entry = _unitOfWork.Entry(resource);
-
+            
+            //check if user is owner
             if (resource.Owner == null)
             {
-                entry.Reference(tr => tr.Owner).Load();
+                context.Fail();
+                return Task.CompletedTask;
             }
 
             if (user?.FindFirst(ClaimTypes.NameIdentifier)?.Value.Equals(resource.Owner.Id) == true)
             {
                 context.Succeed(requirement);
-                return Task.CompletedTask; ;
+                return Task.CompletedTask;
             }
-            else
+
+            //check if user is one of the editors
+            if (resource.Editors == null)
             {
-                if (resource.Editors == null)
-                {
-                    entry.Collection(tr => tr.Editors).Load();
-                }
+                context.Fail();
+                return Task.CompletedTask;
+            }
 
-                foreach (var editor in resource.Editors)
+            foreach (var editor in resource.Editors)
+            {
+                if (user?.FindFirst(ClaimTypes.NameIdentifier)?.Value.Equals(editor.Id) == true)
                 {
-                    if (user?.FindFirst(ClaimTypes.NameIdentifier)?.Value.Equals(editor.Id) == true)
+                    if (requirement.Name == TreeCRUDOperations.Delete.Name)
                     {
-                        if (requirement.Name == TreeCRUDOperations.Update.Name || requirement.Name == TreeCRUDOperations.Create.Name)
-                        {
-                            context.Succeed(requirement);
-                        }
-                        else
-                        {
-                            context.Fail();
-                        }
-                        return Task.CompletedTask; ;
-
+                        context.Fail();
                     }
+                    else
+                    {
+                        context.Succeed(requirement);
+                    }
+                    return Task.CompletedTask;
+
                 }
             }
 
