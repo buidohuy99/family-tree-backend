@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Storage;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace FamilyTreeBackend.Infrastructure.Persistence.UnitOfWork
@@ -57,6 +58,7 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.UnitOfWork
         {
             return _dbContext.RefreshTokens;
         }
+
     }
 
 }

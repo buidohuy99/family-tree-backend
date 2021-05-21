@@ -39,7 +39,21 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
             var result = _authorizationService.AuthorizeAsync(user, tree, requirements);
             return result;
-   
         }
+
+        //public Task<AuthorizationResult> AuthorizeWithPersonAsync(ClaimsPrincipal user, long personId, IAuthorizationRequirement requirements)
+        //{
+        //    var person = _unitOfWork.Repository<Person>().GetDbset().Find(personId);
+
+        //    if (person == null)
+        //    {
+        //        throw new TreeNotFoundException(TreeExceptionMessages.TreeNotFound);
+        //    }
+
+        //    var result = _authorizationService.AuthorizeAsync(user, resource, requirements);
+        //    return result;
+        //}
+
+
     }
 }

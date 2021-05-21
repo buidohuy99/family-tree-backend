@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -79,25 +80,22 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public async Task<FamilyTreeModel> AddFamilyTree(FamilyTreeInputModel model, ApplicationUser user)
+        public async Task<FamilyTreeModel> AddFamilyTree(FamilyTreeInputModel model, ClaimsPrincipal claimsPrincipal)
         {
-            /*if (user == null)
+            var user = await _userManager.GetUserAsync(claimsPrincipal);
+            if (user == null)
             {
                 throw new UserNotFoundException(UserExceptionMessages.UserNotFound);
-            }*/
+            }
 
             var tree = await createDefaultTree(model);
-
             tree.Owner = user;
 
             _unitOfWork.Repository<FamilyTree>().Update(tree);
-
             await _unitOfWork.SaveChangesAsync();
 
             var responseModel = ManualMapTreeToModel(tree);
-
             return responseModel;
-
         }
 
         public async Task<IEnumerable<FamilyTreeListItemModel>> FindAllTree()
@@ -144,7 +142,38 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             return addedUser;
         }
 
+        public async Task<IEnumerable<FamilyTreeListItemModel>> FindAllTreeAccessibleToUser(ClaimsPrincipal user)
+        {
+            var applicationUser = await _userManager.GetUserAsync(user);
+
+            if (applicationUser == null)
+            {
+                throw new UserNotFoundException(UserExceptionMessages.UserNotFound);
+            }
+
+            var accessibleTrees = await FindAccessibleTrees(applicationUser);
+
+            List<FamilyTreeListItemModel> models = new List<FamilyTreeListItemModel>();
+            foreach (var tree in accessibleTrees)
+            {
+                models.Add(_mapper.Map<FamilyTreeListItemModel>(tree));
+            }
+
+            return models;
+        }
+
         #region Helper methods
+
+        private async Task<IEnumerable<FamilyTree>> FindAccessibleTrees(ApplicationUser applicationUser)
+        {
+            var query = _unitOfWork.Repository<FamilyTree>().GetDbset()
+                .FromSqlRaw(Sql_FindUserAllTrees, applicationUser.Id);
+
+            var hello =  query.ToQueryString();
+
+            return await query.ToListAsync();
+        }
+
         private async Task<FamilyTree> createDefaultTree(FamilyTreeInputModel model)
         {
             FamilyTree familyTree = _mapper.Map<FamilyTree>(model);
@@ -244,6 +273,13 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
             return people;
         }
+
+
         #endregion
+
+        private const string Sql_FindUserAllTrees = @"
+        SELECT tree.*
+        FROM FamilyTree tree LEFT JOIN ApplicationUserFamilyTree editors ON tree.Id = editors.EditorOfFamilyTreesId
+        WHERE tree.OwnerId = {0} OR editors.EditorsId = {0}";
     }
 }
