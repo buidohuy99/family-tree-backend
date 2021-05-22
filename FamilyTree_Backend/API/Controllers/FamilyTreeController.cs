@@ -40,13 +40,12 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             Description = "Return the info of tree with given Id)")]
         public async Task<IActionResult> FindFamilyTree(long treeId)
         {
-            var authorizeResult = await _authorizationService.AuthorizeAsync(User, treeId, TreeCRUDOperations.Read);
+            var authorizeResult = await _authorizationService.AuthorizeAsync(User, treeId, TreeOperations.Read);
 
             if (!authorizeResult.Succeeded)
             {
-                return Unauthorized(
-                    new HttpResponse<AuthorizationFailure>(
-                        authorizeResult.Failure,
+                return Unauthorized(new HttpResponse<AuthorizationFailure>(
+                    authorizeResult.Failure,
                     GenericResponseStrings.Tree_NoPermissionRead));
             }
             FamilyTreeModel result = await _familyTreeService.FindFamilyTree(treeId);
@@ -58,13 +57,12 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             Description = "Update the info of tree with given Id and new info)")]
         public async Task<IActionResult> UpdateFamilyTree(long treeId, [FromBody] FamilyTreeInputModel model)
         {
-            var authorizeResult = await _authorizationService.AuthorizeAsync(User, treeId, TreeCRUDOperations.Update);
+            var authorizeResult = await _authorizationService.AuthorizeAsync(User, treeId, TreeOperations.Update);
 
             if (!authorizeResult.Succeeded)
             {
-                return Unauthorized(
-                    new HttpResponse<AuthorizationFailure>(
-                        authorizeResult.Failure,
+                return Unauthorized(new HttpResponse<AuthorizationFailure>(
+                    authorizeResult.Failure,
                     GenericResponseStrings.Tree_NoPermissionEdit));
             }
 
@@ -78,13 +76,12 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             Description = "Delete tree with given Id)")]
         public async Task<IActionResult> DeleteFamilyTree(long treeId)
         {
-            var authorizeResult = await _authorizationService.AuthorizeAsync(User, treeId, TreeCRUDOperations.Delete);
+            var authorizeResult = await _authorizationService.AuthorizeAsync(User, treeId, TreeOperations.Delete);
 
             if (!authorizeResult.Succeeded)
             {
-                return Unauthorized(
-                    new HttpResponse<AuthorizationFailure>(
-                        authorizeResult.Failure,
+                return Unauthorized(new HttpResponse<AuthorizationFailure>(
+                    authorizeResult.Failure,
                     GenericResponseStrings.Tree_NoPermissionDelete));
             }
 
@@ -130,13 +127,12 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             Description = "Add list of users to be tree's editor, return the added users)")]
         public async Task<IActionResult> AddUsersToEditor(long treeId, [FromBody] List<string> userNames)
         {
-            var authorizeResult = await _authorizationService.AuthorizeAsync(User, treeId, TreeCRUDOperations.Update);
+            var authorizeResult = await _authorizationService.AuthorizeAsync(User, treeId, TreeOperations.Update);
 
             if (!authorizeResult.Succeeded)
             {
-                return Unauthorized(
-                    new HttpResponse<AuthorizationFailure>(
-                        authorizeResult.Failure,
+                return Unauthorized(new HttpResponse<AuthorizationFailure>(
+                    authorizeResult.Failure,
                     GenericResponseStrings.Tree_NoPermissionEdit));
             }
             var result =  await _familyTreeService.AddUsersToEditor(treeId, userNames);

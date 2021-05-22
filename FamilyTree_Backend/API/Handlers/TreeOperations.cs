@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FamilyTreeBackend.Presentation.API.Handlers
 {
-    public static class TreeCRUDOperations
+    public static class TreeOperations
     {
         public static OperationAuthorizationRequirement Create =
         new OperationAuthorizationRequirement { Name = nameof(Create) };

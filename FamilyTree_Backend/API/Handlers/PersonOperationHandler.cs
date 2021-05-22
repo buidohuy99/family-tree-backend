@@ -23,8 +23,8 @@ namespace FamilyTreeBackend.Presentation.API.Handlers
         {
             var user = context.User;
 
-            var tree = GetTreeFromPerson(resource);
-            
+            var tree = resource.FamilyTree;
+
             if (user?.FindFirst(ClaimTypes.NameIdentifier)?.Value.Equals(tree.Owner.Id) == true)
             {
                 context.Succeed(requirement);
@@ -40,40 +40,24 @@ namespace FamilyTreeBackend.Presentation.API.Handlers
                     return Task.CompletedTask;
                 }
             }
-            
 
-            //if not none of the above, user can still update their own node if they are attached to it
+
+            //if not none of the above, 
+            //user can still update their own node if they are attached to it
             if (user?.FindFirst(ClaimTypes.NameIdentifier)?.Value.Equals(resource.UserId) == true)
             {
-                context.Succeed(requirement);
-                return Task.CompletedTask;
+                if (requirement == PersonOperations.Update || requirement == PersonOperations.Read)
+                {
+                    context.Succeed(requirement);
+                    return Task.CompletedTask;
+                }
             }
 
             //if all of them are not qualified
             context.Fail();
             return Task.CompletedTask;
-        }
-
-        private FamilyTree GetTreeFromPerson(Person person)
-        {
-            var entry = _unitOfWork.Entry(person);
-            
-            if (person.FamilyTree == null)
-            {
-                entry.Reference(p => p.FamilyTree);
-            }
-
-            FamilyTree tree = person.FamilyTree;
-
-            if (tree.Owner == null || tree.Editors == null)
-            {
-                var treeEntry = _unitOfWork.Entry(tree);
-                treeEntry.Reference(tr => tr.Owner).Load();
-                treeEntry.Collection(tr => tr.Editors).Load();
-            }
-
-            return tree;
 
         }
+
     }
 }

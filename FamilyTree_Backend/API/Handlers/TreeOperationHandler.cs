@@ -16,43 +16,52 @@ namespace FamilyTreeBackend.Presentation.API.Handlers
         {
             var user = context.User;
             
-            //check if user is owner
-            if (resource.Owner == null)
+            try
             {
-                context.Fail();
-                return Task.CompletedTask;
-            }
-
-            if (user?.FindFirst(ClaimTypes.NameIdentifier)?.Value.Equals(resource.Owner.Id) == true)
-            {
-                context.Succeed(requirement);
-                return Task.CompletedTask;
-            }
-
-            //check if user is one of the editors
-            if (resource.Editors == null)
-            {
-                context.Fail();
-                return Task.CompletedTask;
-            }
-
-            foreach (var editor in resource.Editors)
-            {
-                if (user?.FindFirst(ClaimTypes.NameIdentifier)?.Value.Equals(editor.Id) == true)
+                //check if user is owner
+                if (user?.FindFirst(ClaimTypes.NameIdentifier)?.Value.Equals(resource.Owner.Id) == true)
                 {
-                    if (requirement.Name == TreeCRUDOperations.Delete.Name)
-                    {
-                        context.Fail();
-                    }
-                    else
-                    {
-                        context.Succeed(requirement);
-                    }
+                    context.Succeed(requirement);
                     return Task.CompletedTask;
-
                 }
-            }
 
+                //check if user is one of the editors
+                foreach (var editor in resource.Editors)
+                {
+                    if (user?.FindFirst(ClaimTypes.NameIdentifier)?.Value.Equals(editor.Id) == true)
+                    {
+                        if (requirement.Name == TreeOperations.Delete.Name)
+                        {
+                            context.Fail();
+                        }
+                        else
+                        {
+                            context.Succeed(requirement);
+                        }
+                        return Task.CompletedTask;
+
+                    }
+                }
+
+                //check if user is tagged in one of the nodes
+                foreach (var person in resource.People)
+                {
+                    if (user?.FindFirst(ClaimTypes.NameIdentifier)?.Value.Equals(person.UserId) == true)
+                    {
+                        if (requirement.Name == TreeOperations.Read.Name)
+                        {
+                            context.Succeed(requirement);
+                            return Task.CompletedTask;
+                        }
+                    }
+                }
+            } catch(NullReferenceException)
+            {
+                context.Fail();
+                return Task.CompletedTask;
+            }
+            
+            context.Fail();
             return Task.CompletedTask;
         }
     }
