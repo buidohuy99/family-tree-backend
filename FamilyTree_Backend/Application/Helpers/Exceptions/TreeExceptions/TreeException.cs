@@ -8,7 +8,7 @@ namespace FamilyTreeBackend.Core.Application.Helpers.Exceptions.TreeExceptions
 {
     public class TreeException : BaseServiceException
     {
-        public long TreeId { get; set; }
+        public long TreeId { get; }
         public TreeException(string message, long treeId)
             : base(message)
         {

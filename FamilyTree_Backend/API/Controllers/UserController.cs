@@ -1,4 +1,5 @@
-﻿using FamilyTreeBackend.Core.Application.Helpers;
+﻿using FamilyTreeBackend.Core.Application.DTOs;
+using FamilyTreeBackend.Core.Application.Helpers;
 using FamilyTreeBackend.Core.Application.Helpers.Exceptions;
 using FamilyTreeBackend.Core.Application.Helpers.Exceptions.UserExceptions;
 using FamilyTreeBackend.Core.Application.Interfaces;
@@ -67,6 +68,24 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             }
         }
 
+        [HttpPost("users")]
+        [SwaggerOperation(Summary = "Filter users based on params, set params to null to not use that filter")]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<IEnumerable<UserDTO>>), Description = "Returns list of users")]
+        public async Task<IActionResult> FilterUsers([FromBody] UserFilterModel model)
+        {
+            var result = await Task.Run(() => { return _userService.FindUser(model); });
 
+            return Ok(new HttpResponse<IEnumerable<UserDTO>>(result, GenericResponseStrings.UserController_FilterUsersSuccessful));
+        }
+
+        [HttpPut("user/{userId}")]
+        [SwaggerOperation(Summary = "Update info of a user")]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<UserDTO>), Description = "Returns user info after update")]
+        public async Task<IActionResult> UpdateUsers(string userId, [FromBody] UpdateUserModel model)
+        {
+            var result = await _userService.UpdateUser(userId, model);
+
+            return Ok(new HttpResponse<UserDTO>(result, GenericResponseStrings.UserController_UpdateUserSuccessful));
+        }
     }
 }

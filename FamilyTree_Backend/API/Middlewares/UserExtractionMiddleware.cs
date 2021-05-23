@@ -1,5 +1,7 @@
 ﻿using FamilyTreeBackend.Core.Application.Helpers.ConfigModels;
+using FamilyTreeBackend.Core.Application.Helpers.Exceptions;
 using FamilyTreeBackend.Core.Application.Interfaces;
+using FamilyTreeBackend.Core.Domain.Constants;
 using FamilyTreeBackend.Core.Domain.Entities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -10,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -26,17 +29,33 @@ namespace FamilyTreeBackend.Presentation.API.Middlewares
 
         public async Task Invoke(HttpContext httpContext, UserManager<ApplicationUser> userManager)
         {
-            var accessToken = httpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+            var token = httpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
 
-            if (accessToken != null)
-                await extractUserFromToken(httpContext, userManager, accessToken);
-
-            await _next(httpContext);
+            if (token != null)
+            {
+                await extractUserFromToken(httpContext, userManager);
+            }
+            else
+            {
+                await _next(httpContext);
+            }
         }
 
-        private async Task extractUserFromToken(HttpContext context, UserManager<ApplicationUser> userManager, string token)
+        private async Task extractUserFromToken(HttpContext context, UserManager<ApplicationUser> userManager)
         {
-            context.Items["User"] = await userManager.GetUserAsync(context.User);
+            var foundUser = await userManager.GetUserAsync(context.User);
+
+            if(foundUser == null)
+            {
+                context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                context.Response.ContentType = "application/json";
+                await context.Response.WriteAsync(GenericResponseStrings.Auth_UserIsNotValid);
+                await context.Response.StartAsync();
+                return;
+            }
+
+            context.Items["User"] = foundUser;
+            await _next(context);
         }
     }
 

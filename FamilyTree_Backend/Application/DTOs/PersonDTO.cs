@@ -21,6 +21,7 @@ namespace FamilyTreeBackend.Core.Application.DTOs
         public string HomeAddress { get; set; }
         public string Occupation { get; set; }
         public string Note { get; set; }
+        public string ImageUrl { get; set; }
 
         public FamilyDTO ChildOfFamily { get; set; }
         public FamilyTreeDTO FamilyTree { get; set; }
@@ -38,6 +39,7 @@ namespace FamilyTreeBackend.Core.Application.DTOs
             PhoneNumber = person.PhoneNumber;
             Occupation = person.Occupation;
             HomeAddress = person.HomeAddress;
+            ImageUrl = person.ImageUrl;
             if (person.ChildOfFamily != null) 
             {
                 ChildOfFamily = new FamilyDTO(person.ChildOfFamily);

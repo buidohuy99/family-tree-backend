@@ -19,6 +19,11 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             services.AddScoped<IPersonService, PersonService>();
             services.AddScoped<IFamilyTreeService, FamilyTreeService>();
             services.AddScoped<ITreeAuthorizationService, TreeAuthorizationSerivice>();
+            services.AddScoped<ICalendarService, CalendarService>();
+            services.AddScoped<IUserService, UserService>();
+            #endregion
+
+            #region Register singleton
             services.AddSingleton<IUploadService, UploadService>();
             services.AddSingleton<IEmailService, EmailService>();
             #endregion

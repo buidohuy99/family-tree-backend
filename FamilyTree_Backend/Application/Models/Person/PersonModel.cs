@@ -15,11 +15,12 @@ namespace FamilyTreeBackend.Core.Application.Models
         public string LastName { get; set; }
         public DateTime? DateOfBirth { get; set; }
         public DateTime? DateOfDeath { get; set; }
-        public long Parent1Id { get; set; }
-        public long Parent2Id { get; set; }
+        public long? Parent1Id { get; set; }
+        public long? Parent2Id { get; set; }
         public Gender Gender { get; set; }
         public IEnumerable<PersonModel> Spouses;
         public string Note { get; set; }
         public string UserId { get; set; }
+        public string ImageUrl { get; set; }
     }
 }

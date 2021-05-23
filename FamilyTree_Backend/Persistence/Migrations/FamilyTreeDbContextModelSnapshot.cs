@@ -68,8 +68,8 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                     b.Property<string>("FirstName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Gender")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("Gender")
+                        .HasColumnType("int");
 
                     b.Property<string>("LastName")
                         .HasColumnType("nvarchar(max)");
@@ -172,6 +172,48 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                     b.ToTable("Family");
                 });
 
+            modelBuilder.Entity("FamilyTreeBackend.Core.Domain.Entities.FamilyEvent", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime?>("DateCreated")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("FamilyTreeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("LastModified")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ReminderOffest")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Repeat")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FamilyTreeId");
+
+                    b.ToTable("FamilyEvents");
+                });
+
             modelBuilder.Entity("FamilyTreeBackend.Core.Domain.Entities.FamilyTree", b =>
                 {
                     b.Property<long>("Id")
@@ -238,6 +280,9 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                     b.Property<string>("HomeAddress")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("LastModified")
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
@@ -277,7 +322,12 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                     b.Property<DateTime>("ExpiredDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Token");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("RefreshToken");
                 });
@@ -488,6 +538,15 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                     b.Navigation("Parent2");
                 });
 
+            modelBuilder.Entity("FamilyTreeBackend.Core.Domain.Entities.FamilyEvent", b =>
+                {
+                    b.HasOne("FamilyTreeBackend.Core.Domain.Entities.FamilyTree", null)
+                        .WithMany("Calendar")
+                        .HasForeignKey("FamilyTreeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("FamilyTreeBackend.Core.Domain.Entities.FamilyTree", b =>
                 {
                     b.HasOne("FamilyTreeBackend.Core.Domain.Entities.ApplicationUser", "Owner")
@@ -525,6 +584,17 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                     b.Navigation("ConnectedUser");
 
                     b.Navigation("FamilyTree");
+                });
+
+            modelBuilder.Entity("FamilyTreeBackend.Core.Domain.Entities.RefreshToken", b =>
+                {
+                    b.HasOne("FamilyTreeBackend.Core.Domain.Entities.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .HasConstraintName("FK_BelongsTo_User")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("FamilyTreeBackend.Core.Domain.Entities.Relationship", b =>
@@ -611,6 +681,8 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("FamilyTreeBackend.Core.Domain.Entities.FamilyTree", b =>
                 {
+                    b.Navigation("Calendar");
+
                     b.Navigation("Families");
 
                     b.Navigation("People");

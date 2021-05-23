@@ -8,14 +8,14 @@ namespace FamilyTreeBackend.Core.Domain.Constants
 {
     public static class GenericResponseStrings
     {
-        public const string AnExceptionOccuredInController = "A problem occurred when processing the content of your request";
-
-        public const string LoginSuccessful = "You have logged in";
-        public const string RegisterSuccessful = "You have successfully registered";
-
+        //Upload controller
         public const string UploadImageSuccessful = "Image is successfully uploaded";
 
-        public const string GenerateResetPasswordUrlSuccessful = "Reset password url has been generated successfully";
+        // Auth related
+        public const string Auth_UserIsNotValid = "Cannot find valid user from claims provided";
+        public const string LoginSuccessful = "You have logged in";
+        public const string RegisterSuccessful = "You have successfully registered";
+        public const string Auth_RefreshTokenSuccessful = "You have successfully obtained a new access token";
 
         // Person Controller
         public const string PersonController_AddParentToPersonSuccessful = "You have successfully added a parent to the person below, you can also find the family that the new parent belongs to below";
@@ -34,14 +34,19 @@ namespace FamilyTreeBackend.Core.Domain.Constants
         public const string TreeController_AddEditorsToTreeSuccessful = "Editors has been added to tree successfully";
         public const string TreeController_NoPermissionToEditTree = "User doesn't have permission to edit tree";
 
-        public const string InternalServerError = "Server encountered an exception";
-    }
+        //Calendar Controller
+        public const string CalendarController_FindEventsSuccessful = "List of events has been found successfully";
+        public const string CalendarController_AddEventSuccessful = "Event has been added successfully";
+        public const string CalendarController_UpdateEventSuccessful = "Event has been updated successfully";
+        public const string CalendarController_RemoveEventSuccessful = "Event has been removed successfully";
 
-    public static class LoggingMessages
-    {
-        public const string AuthService_ErrorMessage = "An error occured while processing an auth service function";
-        public const string PersonService_ErrorMessage = "An error occured while processing a person service function";
-        public const string UploadService_ErrorMessage = "An error occured while processing an upload service function";
+        //User Controller
+        public const string UserController_FilterUsersSuccessful = "Users has been filtered successfully";
+        public const string UserController_UpdateUserSuccessful = "Update user infos successful";
+        public const string GenerateResetPasswordUrlSuccessful = "Reset password url has been generated successfully";
+
+        public const string RequestProcessingError = "Error occured while processing your request";
+        public const string InternalServerError = "Server encountered an exception";
     }
 
     public static class AuthExceptionMessages
@@ -54,6 +59,10 @@ namespace FamilyTreeBackend.Core.Domain.Constants
         //LoginUserFail
         public const string CannotFindUser = "Valid user cannot be found from the specified infos";
         public const string InvalidPassword = "Provided password is wrong for the username/email";
+
+        //RefreshTokenFail
+        public const string InvalidRefreshToken = "Refresh token provided is either invalid or expired so please get a new one";
+        public const string RefreshTokenIsCorrupted = "Refresh token is found to be corrupted please get a new one";
     }
 
     public static class PersonExceptionMessages
@@ -63,7 +72,7 @@ namespace FamilyTreeBackend.Core.Domain.Constants
         //FamilyNotFound
         public const string FamilyNotFound = "Family cannot be found for the person";
         public const string UserAlreadyExistedInTree = "User already existed as a person in the tree";
-        public const string FamilyAlreadyExist = "Family that this person is a child of already exist, cannot add parent";
+        public const string FamilyAlreadyFull = "Family that this person is a child of is already full, cannot add parent";
         
         //GenderNotValid
         public const string FatherGenderIsNotValid = "Father for the operation is not a male";
@@ -73,6 +82,8 @@ namespace FamilyTreeBackend.Core.Domain.Constants
         public const string PersonNotFound = "Cannot find person with provided Id";
         
         public const string CannotDeletePerson = "Cannot delete person, please remove all the person's personal relationships before deleting them";
+        public const string TreeDivergenceAfterDeletion = "Cannot delete person because the family diverges after this deletion";
+        public const string CannotDeleteOnlyPersonInTree = "This person has no associations and is therefore the only person in this family tree and cannot be deleted";
     }
 
     public static class TreeExceptionMessages
@@ -84,6 +95,7 @@ namespace FamilyTreeBackend.Core.Domain.Constants
     {
         public const string UserNotFound = "Cannot find user with provided Id";
         public const string ResetPasswordFail = "Reset password failed";
+        public const string UpdateUserFail = "Cannot update specified user because server encountered an error while saving";
     }
 
     public static class SendEmailExceptionMessages
@@ -91,16 +103,14 @@ namespace FamilyTreeBackend.Core.Domain.Constants
         public const string SendEmailFailed = "Cannot send message to the provided email";
     }
 
-    public static class PersonServiceExceptionMessages
+    public static class UploadFileExceptionMessages
     {
-        public const string PersonService_CannotFindSpecifiedTreeFromId = "Tree cannot be found from the provided id";
-        public const string PersonService_CannotFindSpecifiedUserFromId = "User cannot be found from the provided id";
-        public const string PersonService_CannotFindSpecifiedPersonFromId = "Person cannot be found from the provided id";
-        public const string PersonService_CannotFindSpecifiedParentPersonFromId = "Parent person cannot be found from the provided id";
-        public const string PersonService_CannotFindSpecifiedFamilyFromId = "Family cannot be found from the provided id";
-        public const string PersonService_UserAlreadyExistedInTree = "User already existed as a person in the tree";
-        public const string PersonService_NoSlotForParentOfPerson = "No more parent slot for specified person";
-        public const string PersonService_PersonCannotBeParentTwiceInAFamily = "Cannot set both parents of the family to be the same person";
-        public const string PersonService_ParentCannotBeOneself = "Cannot set parent of the person to be himself";
+        public const string UploadFileFailed = "File failed to be uploaded to the server";
+        public const string UploadFileLimitExceeded = "File limit exceeded, please upload a smaller file";
+    }
+
+    public static class CalendarExceptionMessages
+    {
+        public const string FamilyEventNotFound = "Cannot find event with provided id";
     }
 }

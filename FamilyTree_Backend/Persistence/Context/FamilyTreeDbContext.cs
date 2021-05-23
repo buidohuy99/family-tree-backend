@@ -20,6 +20,7 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
 
         public virtual DbSet<Family> Families { get; set; }
         public virtual DbSet<FamilyTree> FamilyTrees { get; set; }
+        public virtual DbSet<FamilyEvent> FamilyEvents { get; set; }
         public virtual DbSet<Person> People { get; set; }
         public virtual DbSet<Relationship> Relationships { get; set; }
         public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
@@ -32,6 +33,14 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
                 entity.ToTable("RefreshToken");
 
                 entity.HasKey(e => e.Token);
+
+                entity.Property(e => e.Token).ValueGeneratedNever();
+
+                entity.HasOne(e => e.User)
+                    .WithMany()
+                    .HasForeignKey(e => e.UserId)
+                    .HasConstraintName("FK_BelongsTo_User")
+                    .OnDelete(DeleteBehavior.SetNull);
             });
 
             modelBuilder.Entity<Family>((entity) => {
@@ -151,74 +160,27 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
                     .HasForeignKey(e => e.OwnerId)
                     .HasConstraintName("FK_OwnerOfTree")
                     .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasMany(e => e.Calendar)
+                    .WithOne()
+                    .HasForeignKey(e => e.FamilyTreeId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<FamilyEvent>((entity) =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id);
+
+                entity.Property(e => e.DateCreated)
+                    .HasDefaultValueSql("GETUTCDATE()")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.LastModified)
+                    .HasDefaultValueSql("GETUTCDATE()")
+                    .ValueGeneratedOnAddOrUpdate();
             });
         }
-
-        //public void SeedData(ModelBuilder modelBuilder)
-        //{
-            
-        //    FamilyTree familyTree = new FamilyTree
-        //    {
-        //        Id = 1,
-        //        Name = "Hung Thi Family Tree",
-        //        Description = "Hung Thi Test Family Tree",
-        //    };
-            
-        //    //modelBuilder.Entity<FamilyTree>().HasData(familyTree);
-
-        //    //Person person = new Person
-        //    //{
-        //    //    Id = 1,
-        //    //    FirstName = "Hung",
-        //    //    LastName = "Thi",
-        //    //    DateOfBirth = DateTime.Today,
-        //    //    Gender = Gender.MALE,
-        //    //    FamilyTreeId = 1,
-        //    //    ChildOf = 1,
-
-        //    //};
-        //    //Person father = new Person
-        //    //{
-        //    //    Id = 2,
-        //    //    FirstName = "Senh",
-        //    //    LastName = "Thi",
-        //    //    DateOfBirth = new DateTime(1945, 07, 20),
-        //    //    Gender = Gender.MALE,
-        //    //    FamilyTreeId = 1,
-
-        //    //};
-        //    //Person mother = new Person
-        //    //{
-        //    //    Id = 3,
-        //    //    FirstName = "Phan",
-        //    //    LastName = "Luan",
-        //    //    DateOfBirth = new DateTime(1954, 10, 20),
-        //    //    Gender = Gender.MALE,
-        //    //    FamilyTreeId = 1,
-
-        //    //};
-
-        //    //Family family = new Family
-        //    //{
-        //    //    Id = 1,
-        //    //    Parent1Id = 2,
-        //    //    Parent2Id = 3,
-                
-        //    //};
-
-        //    //Marriage relationship = new Marriage
-        //    //{
-        //    //    Id = 1,
-        //    //    RelationshipType = RelationshipType.MARRIED,
-        //    //    DateOfMarriage = new DateTime(1985, 10, 11),
-        //    //};
-
-        //    //family.Relationship = relationship;
-        //    //modelBuilder.Entity<Person>().HasData(person, father, mother );
-        //    //modelBuilder.Entity<Family>().HasData(family);
-        //    //modelBuilder.Entity<Marriage>().HasData(relationship);
-        //    //modelBuilder.Entity<Relationship>().HasData(relationship as Relationship);
-        //}
 
         public void SeedData()
         {

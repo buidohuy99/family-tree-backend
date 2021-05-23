@@ -10,5 +10,8 @@ namespace FamilyTreeBackend.Core.Domain.Entities
     {
         public string Token { get; set; }
         public DateTime ExpiredDate { get; set; }
+        public string UserId { get; set; }
+
+        public ApplicationUser User { get; set; }
     }
 }

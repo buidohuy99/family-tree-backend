@@ -46,7 +46,6 @@ namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices
                     In = ParameterLocation.Header
                 });
                 c.OperationFilter<AuthorizationHeader_Param_OperationFilter>();
-                c.OperationFilter<DefaultForMostRequests_OperationFilter>();
                 c.EnableAnnotations();
             });
 
@@ -78,6 +77,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices
             {
                 mc.AddProfile(new PersonProfile());
                 mc.AddProfile(new FamilyTreeProfile());
+                mc.AddProfile(new FamilyEventProfile());
             });
 
             IMapper mapper = mapperConfig.CreateMapper();

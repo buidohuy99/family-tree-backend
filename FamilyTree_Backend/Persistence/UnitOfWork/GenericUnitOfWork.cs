@@ -1,5 +1,6 @@
 ﻿using FamilyTreeBackend.Core.Application.Interfaces;
 using FamilyTreeBackend.Core.Domain.Entities;
+using FamilyTreeBackend.Infrastructure.Persistence.Context;
 using FamilyTreeBackend.Infrastructure.Persistence.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace FamilyTreeBackend.Infrastructure.Persistence.UnitOfWork
 {
-    public class GenericUnitOfWork<TContext> : IUnitOfWork where TContext : DbContext
+    public class GenericUnitOfWork<TContext> : IUnitOfWork where TContext : FamilyTreeDbContext
     {
         private readonly TContext _dbContext;
         private Dictionary<string, dynamic> repositoriesPrototypes = new Dictionary<string, dynamic>();
@@ -50,6 +51,11 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.UnitOfWork
         public EntityEntry<T> Entry<T>(T obj) where T : BaseEntity
         {
             return _dbContext.Entry(obj);
+        }
+
+        public DbSet<RefreshToken> GetRefreshTokens()
+        {
+            return _dbContext.RefreshTokens;
         }
     }
 
