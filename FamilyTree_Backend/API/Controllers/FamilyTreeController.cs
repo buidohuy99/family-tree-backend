@@ -100,6 +100,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
 
         }
 
+        [AllowAnonymous]
         [HttpGet("tree")]
         [SwaggerResponse(200, Type = typeof(HttpResponse<IEnumerable<FamilyTreeListItemModel>>),
             Description = "Add a new tree with given new info")]

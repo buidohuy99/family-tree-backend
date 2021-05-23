@@ -102,6 +102,8 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
         public async Task<IEnumerable<FamilyTreeListItemModel>> FindAllTree()
         {
             IEnumerable<FamilyTree> trees = await _unitOfWork.Repository<FamilyTree>().GetDbset()
+                .Include(tr => tr.Owner)
+                .Include(tr => tr.Editors)
                 .ToListAsync();
 
             List<FamilyTreeListItemModel> models = new List<FamilyTreeListItemModel>();
@@ -224,11 +226,15 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
         private async Task<IEnumerable<FamilyTree>> FindAccessibleTrees(ApplicationUser applicationUser)
         {
             var query = _unitOfWork.Repository<FamilyTree>().GetDbset()
-                .FromSqlRaw(Sql_FindUserAllTrees, applicationUser.Id);
+                .FromSqlRaw(Sql_FindUserAllTrees, applicationUser.Id)
+                .Include(tr => tr.Owner)
+                .Include(tr => tr.Editors);
 
-            var hello =  query.ToQueryString();
+            //var hello =  query.ToQueryString();
 
-            return await query.ToListAsync();
+            return await query
+                
+                .ToListAsync();
         }
 
         private async Task<FamilyTree> createDefaultTree(FamilyTreeInputModel model)

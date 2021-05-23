@@ -78,6 +78,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices
                 mc.AddProfile(new PersonProfile());
                 mc.AddProfile(new FamilyTreeProfile());
                 mc.AddProfile(new FamilyEventProfile());
+                mc.AddProfile(new UserProfile());
             });
 
             IMapper mapper = mapperConfig.CreateMapper();
