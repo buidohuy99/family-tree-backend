@@ -159,5 +159,17 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
             return new UserDTO(user);
         }
+
+        public async Task<UserDTO> GetUser(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user == null)
+            {
+                throw new UserNotFoundException(UserExceptionMessages.UserNotFound, userId);
+            }
+
+            return new UserDTO(user);
+        }
     }
 }

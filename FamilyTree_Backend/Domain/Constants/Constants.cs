@@ -44,6 +44,7 @@ namespace FamilyTreeBackend.Core.Domain.Constants
         //User Controller
         public const string UserController_FilterUsersSuccessful = "Users has been filtered successfully";
         public const string UserController_UpdateUserSuccessful = "Update user infos successful";
+        public const string UserController_FetchUserSuccessful = "Fetched the user's info successfully";
         public const string GenerateResetPasswordUrlSuccessful = "Reset password url has been generated successfully";
 
         public const string RequestProcessingError = "Error occured while processing your request";

@@ -16,5 +16,6 @@ namespace FamilyTreeBackend.Core.Application.Interfaces
         public Task<IdentityResult> ResetPasswordWithToken(ResetPasswordModel model);
         public IEnumerable<UserDTO> FindUser(UserFilterModel model);
         public Task<UserDTO> UpdateUser(string updatedUserId, UpdateUserModel model);
+        public Task<UserDTO> GetUser(string userId);
     }
 }
