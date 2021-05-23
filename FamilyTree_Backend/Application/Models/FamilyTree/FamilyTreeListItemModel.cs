@@ -14,5 +14,7 @@ namespace FamilyTreeBackend.Core.Application.Models.FamilyTree
         public string Description { get; set; }
         public UserIconDTO Owner { get; set; }
         public ICollection<UserIconDTO> Editors { get; set; }
+        public DateTime DateCreated { get; set; }
+        public DateTime LastModified { get; set; }
     }
 }

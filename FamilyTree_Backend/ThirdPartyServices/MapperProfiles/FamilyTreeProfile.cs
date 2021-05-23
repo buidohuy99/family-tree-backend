@@ -14,9 +14,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices.MapperProf
         public FamilyTreeProfile()
         {
             CreateMap<FamilyTree, FamilyTreeModel>()
-                .ForMember(dest => dest.People, opt => opt.MapFrom(src => src.People))
-                .ForMember(dest => dest.Owner, opt => opt.MapFrom(src => src.Owner))
-                .ForMember(dest => dest.Editors, opt => opt.MapFrom(src => src.Editors));
+                .ForMember(dest => dest.People, opt => opt.MapFrom(src => src.People));
 
             CreateMap<FamilyTreeInputModel, FamilyTree>();
             CreateMap<FamilyTree, FamilyTreeUpdateResponseModel>();
