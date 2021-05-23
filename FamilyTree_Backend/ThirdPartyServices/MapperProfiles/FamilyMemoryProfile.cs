@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using FamilyTreeBackend.Core.Application.Models.FamilyEvents;
+using FamilyTreeBackend.Core.Application.Models.FamilyMemory;
 using FamilyTreeBackend.Core.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 
 namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices.MapperProfiles
 {
-    public class FamilyEventProfile : Profile
+    public class FamilyMemoryProfile : Profile
     {
-        public FamilyEventProfile()
+        public FamilyMemoryProfile()
         {
-            CreateMap<FamilyEvent, FamilyEventModel>().ReverseMap();
-            CreateMap<FamilyEventInputModel, FamilyEvent>().ReverseMap();
+            CreateMap<FamilyMemory, FamilyMemoryModel>();
+            CreateMap<FamilyMemoryInputModel, FamilyMemory>();
         }
     }
 }

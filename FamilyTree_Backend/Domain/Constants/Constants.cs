@@ -50,6 +50,9 @@ namespace FamilyTreeBackend.Core.Domain.Constants
         public const string RequestProcessingError = "Error occured while processing your request";
         public const string InternalServerError = "Server encountered an exception";
 
+        //Memory Controller
+        public const string MemoryControoler_AddMemorySuccesful = "Memory has been created successfully";
+        public const string MemoryControoler_DeleteMemorySuccesful = "Memory has been deleted successfully";
         //Permission
         public const string Tree_NoPermissionEdit = "User does not have permission to edit this tree";
         public const string Tree_NoPermissionDelete = "User does not have permission delete this tree";
@@ -122,5 +125,10 @@ namespace FamilyTreeBackend.Core.Domain.Constants
     public static class CalendarExceptionMessages
     {
         public const string FamilyEventNotFound = "Cannot find event with provided id";
+    }
+
+    public static class MemoryExceptionMessages
+    {
+        public const string FamilyMemoryNotFound = "Cannot find memory with provided id";
     }
 }

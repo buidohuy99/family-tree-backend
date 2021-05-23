@@ -19,7 +19,6 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
     public class UploadService : IUploadService
     {
         private List<ServerImagekit> imagekitSources;
-        private ILogger<UploadService> _logger;
 
         public UploadService(IOptions<ImageKitAccounts> imagekit, ILogger<UploadService> logger)
         {
@@ -30,18 +29,17 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                 imagekitSources.Add(imagekitAccount);
             }
 
-            _logger = logger;
         }
 
-        public async Task<string> UploadImage(UploadSingleFileModel input)
+        public async Task<string> UploadImage(UploadSingleFileModel input, long imageSizeLimit = 2097152)
         {
-            const long IMAGE_SIZE_LIMIT = 2097152; //2,000,000 bytes limit = 2MB
+            long IMAGE_SIZE_LIMIT = imageSizeLimit; //2,000,000 bytes limit = 2MB
 
             try {
                 ServerImagekit imagekit = imagekitSources[0];
                 var file = input.File;
 
-                if (file.Length > IMAGE_SIZE_LIMIT)
+                if (file.Length > imageSizeLimit)
                 {
                     throw new FileSizeExceedLimitException(UploadFileExceptionMessages.UploadFileLimitExceeded, file.FileName, file.Length, IMAGE_SIZE_LIMIT);
                 }
@@ -55,9 +53,30 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                     memoryStream.Close();
                     return uploadResult.URL;
                 }
-            } catch (Exception e) {
+            } catch (Exception) {
                 throw;
             }
+        }
+
+        public async Task<IEnumerable<string>> UploadMutipleImages(
+            IEnumerable<UploadSingleFileModel> input, 
+            long imageSizeLimit = 2097152) 
+        {
+            List<string> result = new List<string>();
+            List<Task> tasks = new List<Task>();
+            foreach (var model in input)
+            {
+                var task = UploadImage(model, imageSizeLimit);
+                tasks.Add(task);
+            }
+            await Task.WhenAll(tasks);
+
+            foreach(var task in tasks)
+            {
+                var returnedUrl = ((Task<string>)task).Result;
+                result.Add(returnedUrl);
+            }
+            return result;
         }
     }
 }

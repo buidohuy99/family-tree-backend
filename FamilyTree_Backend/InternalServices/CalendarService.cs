@@ -3,7 +3,7 @@ using FamilyTreeBackend.Core.Application.Helpers.Exceptions;
 using FamilyTreeBackend.Core.Application.Helpers.Exceptions.CalendarExceptions;
 using FamilyTreeBackend.Core.Application.Helpers.Exceptions.TreeExceptions;
 using FamilyTreeBackend.Core.Application.Interfaces;
-using FamilyTreeBackend.Core.Application.Models.FamilyTree;
+using FamilyTreeBackend.Core.Application.Models.FamilyEvents;
 using FamilyTreeBackend.Core.Domain.Constants;
 using FamilyTreeBackend.Core.Domain.Entities;
 using Microsoft.EntityFrameworkCore;

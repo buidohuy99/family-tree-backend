@@ -1,4 +1,4 @@
-﻿using FamilyTreeBackend.Core.Application.Models.FamilyTree;
+﻿using FamilyTreeBackend.Core.Application.Models.FamilyEvents;
 using System;
 using System.Collections.Generic;
 using System.Linq;
