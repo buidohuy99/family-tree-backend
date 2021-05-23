@@ -15,11 +15,13 @@ using FamilyTreeBackend.Core.Application.Helpers;
 using FamilyTreeBackend.Presentation.API.Handlers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization.Infrastructure;
 
 namespace FamilyTreeBackend.Presentation.API.Controllers
 {
     [Area("tree-management")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class FamilyTreeController : BaseController
     {
         private readonly IFamilyTreeService _familyTreeService;
@@ -38,6 +40,14 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             Description = "Return the info of tree with given Id)")]
         public async Task<IActionResult> FindFamilyTree(long treeId)
         {
+            var authorizeResult = await _authorizationService.AuthorizeAsync(User, treeId, TreeOperations.Read);
+
+            if (!authorizeResult.Succeeded)
+            {
+                return Unauthorized(new HttpResponse<AuthorizationFailure>(
+                    authorizeResult.Failure,
+                    GenericResponseStrings.Tree_NoPermissionRead));
+            }
             FamilyTreeModel result = await _familyTreeService.FindFamilyTree(treeId);
             return Ok(new HttpResponse<FamilyTreeModel>(result, GenericResponseStrings.TreeController_FindTreeSuccessful));
         }
@@ -47,6 +57,15 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             Description = "Update the info of tree with given Id and new info)")]
         public async Task<IActionResult> UpdateFamilyTree(long treeId, [FromBody] FamilyTreeInputModel model)
         {
+            var authorizeResult = await _authorizationService.AuthorizeAsync(User, treeId, TreeOperations.Update);
+
+            if (!authorizeResult.Succeeded)
+            {
+                return Unauthorized(new HttpResponse<AuthorizationFailure>(
+                    authorizeResult.Failure,
+                    GenericResponseStrings.Tree_NoPermissionEdit));
+            }
+
             var result = await _familyTreeService.UpdateFamilyTree(treeId, model);
             return Ok(new HttpResponse<FamilyTreeUpdateResponseModel>(
                 result, GenericResponseStrings.TreeController_UpdateTreeSuccessful));
@@ -57,6 +76,15 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             Description = "Delete tree with given Id)")]
         public async Task<IActionResult> DeleteFamilyTree(long treeId)
         {
+            var authorizeResult = await _authorizationService.AuthorizeAsync(User, treeId, TreeOperations.Delete);
+
+            if (!authorizeResult.Succeeded)
+            {
+                return Unauthorized(new HttpResponse<AuthorizationFailure>(
+                    authorizeResult.Failure,
+                    GenericResponseStrings.Tree_NoPermissionDelete));
+            }
+
             await _familyTreeService.DeleteFamilyTree(treeId);
             return Ok(GenericResponseStrings.TreeController_RemoveTreeSuccessful);
         }
@@ -66,22 +94,10 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             Description = "Add a new tree with given new info")]
         public async Task<IActionResult> AddFamilyTree([FromBody] FamilyTreeInputModel model)
         {
-            var claimManager = HttpContext.User;
+            var result = await _familyTreeService.AddFamilyTree(model, HttpContext.User);
 
-            try
-            {
-                var user = await _userManager.GetUserAsync(claimManager);
+            return Ok(new HttpResponse<FamilyTreeModel>(result, GenericResponseStrings.TreeController_AddTreeSuccessful));
 
-                var result = await _familyTreeService.AddFamilyTree(model, user);
-
-                return Ok(new HttpResponse<FamilyTreeModel>(result, GenericResponseStrings.TreeController_AddTreeSuccessful));
-            }
-            catch (UserNotFoundException e)
-            {
-                //not implemented yet
-                return StatusCode(401, new HttpResponse<Exception>(e, "User not found"));
-            }
-            
         }
 
         [HttpGet("tree")]
@@ -95,19 +111,34 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
                 result, GenericResponseStrings.TreeController_FindAllTreeSuccessful));
         }
 
+        [HttpGet("tree/list")]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<IEnumerable<FamilyTreeListItemModel>>),
+            Description = "Add a new tree with given new info")]
+        public async Task<IActionResult> FindAllTreeAccessibleToUser()
+        {
+            var result = await _familyTreeService.FindAllTreeAccessibleToUser(User);
+
+            return Ok(new HttpResponse<IEnumerable<FamilyTreeListItemModel>>(
+                result, GenericResponseStrings.TreeController_FindAllTreeSuccessful));
+        }
+
         [HttpPost("tree/{treeId}/AddUsersToEditor")]
         [SwaggerResponse(200, Type = typeof(HttpResponse<IEnumerable<string>>),
             Description = "Add list of users to be tree's editor, return the added users)")]
         public async Task<IActionResult> AddUsersToEditor(long treeId, [FromBody] List<string> userNames)
         {
-            var authorizeResult = await _authorizationService.AuthorizeAsync(User, treeId, TreeCRUDOperations.Update);
+            var authorizeResult = await _authorizationService.AuthorizeAsync(User, treeId, TreeOperations.Update);
 
             if (!authorizeResult.Succeeded)
             {
-                return Unauthorized(GenericResponseStrings.TreeController_NoPermissionToEditTree);
+                return Unauthorized(new HttpResponse<AuthorizationFailure>(
+                    authorizeResult.Failure,
+                    GenericResponseStrings.Tree_NoPermissionEdit));
             }
             var result =  await _familyTreeService.AddUsersToEditor(treeId, userNames);
             return Ok(new HttpResponse<IEnumerable<string>>(result, GenericResponseStrings.TreeController_AddEditorsToTreeSuccessful));
         }
+
+        
     }
 }

@@ -32,8 +32,7 @@ namespace FamilyTreeBackend.Core.Domain.Constants
         public const string TreeController_UpdateTreeSuccessful = "Tree has been updated successfully";
         public const string TreeController_RemoveTreeSuccessful = "Tree has been removed successful";
         public const string TreeController_AddEditorsToTreeSuccessful = "Editors has been added to tree successfully";
-        public const string TreeController_NoPermissionToEditTree = "User doesn't have permission to edit tree";
-
+        
         //Calendar Controller
         public const string CalendarController_FindEventsSuccessful = "List of events has been found successfully";
         public const string CalendarController_AddEventSuccessful = "Event has been added successfully";
@@ -47,6 +46,14 @@ namespace FamilyTreeBackend.Core.Domain.Constants
 
         public const string RequestProcessingError = "Error occured while processing your request";
         public const string InternalServerError = "Server encountered an exception";
+
+        //Permission
+        public const string Tree_NoPermissionEdit = "User does not have permission to edit this tree";
+        public const string Tree_NoPermissionDelete = "User does not have permission delete this tree";
+        public const string Tree_NoPermissionRead = "User does not have permission to see this tree";
+        public const string Person_NoPermissionEdit = "User does not have permission to edit this person";
+        public const string Person_NoPermissionDelete = "User does not have permission to delete this person";
+        public const string Person_NoPermissionRead = "User does not have permission to see this person";
     }
 
     public static class AuthExceptionMessages

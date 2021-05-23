@@ -11,5 +11,6 @@ namespace FamilyTreeBackend.Core.Application.Interfaces
     public interface ITreeAuthorizationService
     {
         public Task<AuthorizationResult> AuthorizeAsync(ClaimsPrincipal user, long treeId, IAuthorizationRequirement requirements);
+        public Task<AuthorizationResult> AuthorizeWithPersonAsync(ClaimsPrincipal user, long personId, IAuthorizationRequirement requirements);
     }
 }

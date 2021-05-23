@@ -11,7 +11,7 @@ namespace FamilyTreeBackend.Core.Application.Helpers.Exceptions
     [Serializable]
     public class TreeNotFoundException : TreeException
     {
-        public TreeNotFoundException(string message, long treeId)
+        public TreeNotFoundException(string message, long treeId = 0)
             : base(message, treeId)
         {
         }

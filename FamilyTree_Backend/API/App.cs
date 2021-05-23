@@ -70,6 +70,7 @@ namespace FamilyTreeBackend.Presentation.API
             #endregion
 
             services.AddScoped<IAuthorizationHandler, TreeOperationHandler>();
+            services.AddScoped<IAuthorizationHandler, PersonOperationHandler>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

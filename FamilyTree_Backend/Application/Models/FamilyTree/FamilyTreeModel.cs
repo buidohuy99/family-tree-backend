@@ -11,6 +11,7 @@ namespace FamilyTreeBackend.Core.Application.Models.FamilyTree
         public long Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
+        public bool PublicMode { get; set; }
 
         public ICollection<PersonModel> People { get; set; }
     }

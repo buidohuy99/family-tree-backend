@@ -3,6 +3,7 @@ using FamilyTreeBackend.Core.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,9 +18,10 @@ namespace FamilyTreeBackend.Core.Application.Interfaces
 
         public Task DeleteFamilyTree(long treeId);
 
-        public Task<FamilyTreeModel> AddFamilyTree(FamilyTreeInputModel model, ApplicationUser user);
+        public Task<FamilyTreeModel> AddFamilyTree(FamilyTreeInputModel model, ClaimsPrincipal user);
 
         public Task<IEnumerable<FamilyTreeListItemModel>> FindAllTree();
         public Task<IEnumerable<string>> AddUsersToEditor(long treeId, IList<string> userNames);
+        public Task<IEnumerable<FamilyTreeListItemModel>> FindAllTreeAccessibleToUser(ClaimsPrincipal user);
     }
 }
