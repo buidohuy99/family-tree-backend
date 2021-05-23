@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FamilyTreeBackend.Core.Application.DTOs;
 using FamilyTreeBackend.Core.Application.Helpers.Exceptions;
 using FamilyTreeBackend.Core.Application.Interfaces;
 using FamilyTreeBackend.Core.Application.Models;
@@ -162,6 +163,62 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             return models;
         }
 
+        public async Task<IEnumerable<string>> RemoveUsersFromEditor(long treeId, IList<string> userNames)
+        {
+            var tree = _unitOfWork.Repository<FamilyTree>().GetDbset()
+                .Include(tr => tr.Owner)
+                .Include(tr => tr.Editors)
+                .SingleOrDefault(tr => tr.Id == treeId);
+
+            if (tree == null)
+            {
+                throw new TreeNotFoundException(TreeExceptionMessages.TreeNotFound, treeId);
+            }
+
+            var removedUser = new List<string>();
+
+            foreach (var username in userNames)
+            {
+                var user = await _userManager.FindByNameAsync(username);
+
+                if (user != null)
+                {
+                    tree.Editors.Remove(user);
+                    removedUser.Add(username);
+                }
+            }
+
+            await _unitOfWork.SaveChangesAsync();
+
+            return removedUser;
+        }
+
+        public FamilyTreeContributorsModel GetTreeEditors(long treeId)
+        {
+            var tree = _unitOfWork.Repository<FamilyTree>().GetDbset()
+                .Include(tr => tr.Owner)
+                .Include(tr => tr.Editors)
+                .SingleOrDefault(tr => tr.Id == treeId);
+
+            if (tree == null)
+            {
+                throw new TreeNotFoundException(TreeExceptionMessages.TreeNotFound, treeId);
+            }
+
+            FamilyTreeContributorsModel contributors = new FamilyTreeContributorsModel()
+            {
+                Editors = new List<UserDTO>(),
+            };
+            contributors.Owner = new UserDTO(tree.Owner);
+
+            foreach(var editor in tree.Editors)
+            {
+                contributors.Editors.Add(new UserDTO(editor));
+            }
+
+            return contributors;
+        }
+
         #region Helper methods
 
         private async Task<IEnumerable<FamilyTree>> FindAccessibleTrees(ApplicationUser applicationUser)
@@ -273,8 +330,6 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
             return people;
         }
-
-
         #endregion
 
         private const string Sql_FindUserAllTrees = @"

@@ -6,6 +6,7 @@ using FamilyTreeBackend.Core.Application.Interfaces;
 using FamilyTreeBackend.Core.Application.Models.User;
 using FamilyTreeBackend.Core.Domain.Constants;
 using FamilyTreeBackend.Core.Domain.Entities;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -30,7 +31,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             _userService = userService;
         }
 
-        [HttpPost("sendTestEmail")]
+        [HttpPost("send-test-email")]
         [SwaggerOperation(Summary = "This is used to test sending email")]
         public async Task<IActionResult> TestSendEmail([FromBody] string email)
         {
@@ -41,7 +42,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("retrieveResetPasswordUrl")]
+        [HttpPost("retrieve-reset-password-url")]
         [SwaggerOperation(Summary = "Generate and return a token required for resetting password")]
         [SwaggerResponse(200, Type = typeof(HttpResponse<string>), Description = "Returns token")]
         public async Task<IActionResult> SendResetPassword([FromBody] string email)
@@ -51,7 +52,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("resetPassword")]
+        [HttpPost("reset-password")]
         [SwaggerOperation(Summary = "Reset password for the user with provided email, require reset password token")]
         [SwaggerResponse(200, Description = "Pasword changed successfully")]
         public  async Task<IActionResult> ResetPassword([FromBody] ResetPasswordModel model)
@@ -78,12 +79,20 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             return Ok(new HttpResponse<IEnumerable<UserDTO>>(result, GenericResponseStrings.UserController_FilterUsersSuccessful));
         }
 
-        [HttpPut("user/{userId}")]
+        [HttpPut("user")]
         [SwaggerOperation(Summary = "Update info of a user")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [SwaggerResponse(200, Type = typeof(HttpResponse<UserDTO>), Description = "Returns user info after update")]
-        public async Task<IActionResult> UpdateUsers(string userId, [FromBody] UpdateUserModel model)
+        public async Task<IActionResult> UpdateUsers([FromBody] UpdateUserModel model)
         {
-            var result = await _userService.UpdateUser(userId, model);
+            var user = (ApplicationUser) HttpContext.Items["User"];
+
+            if(user == null)
+            {
+                throw new UserNotFoundException(UserExceptionMessages.UserNotFound);
+            }
+
+            var result = await _userService.UpdateUser(user.Id, model);
 
             return Ok(new HttpResponse<UserDTO>(result, GenericResponseStrings.UserController_UpdateUserSuccessful));
         }

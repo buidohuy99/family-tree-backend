@@ -19,5 +19,11 @@ namespace FamilyTreeBackend.Presentation.API.Handlers
 
         public static OperationAuthorizationRequirement Delete =
             new OperationAuthorizationRequirement { Name = nameof(Delete) };
+
+        public static OperationAuthorizationRequirement AddEditor =
+            new OperationAuthorizationRequirement { Name = nameof(AddEditor) };
+
+        public static OperationAuthorizationRequirement RemoveEditor =
+            new OperationAuthorizationRequirement { Name = nameof(RemoveEditor) };
     }
 }
