@@ -96,5 +96,29 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
 
             return Ok(new HttpResponse<UserDTO>(result, GenericResponseStrings.UserController_UpdateUserSuccessful));
         }
+
+        [HttpGet("user/{userId}")]
+        [SwaggerOperation(Summary = "Get info of a specific user")]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<UserDTO>), Description = "Returns a user's info")]
+        public async Task<IActionResult> GetUserById(string userId)
+        {
+            var result = await _userService.GetUser(userId);
+
+            return Ok(new HttpResponse<UserDTO>(result, GenericResponseStrings.UserController_FetchUserSuccessful));
+        }
+
+        [HttpGet("user-by-token")]
+        [SwaggerOperation(Summary = "Get user info from a token")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<UserDTO>), Description = "Returns a user's info")]
+        public async Task<IActionResult> GetUserFromToke()
+        {
+            var user = await Task.Run(() =>
+            {
+                return (ApplicationUser)HttpContext.Items["User"];
+            });
+
+            return Ok(new HttpResponse<UserDTO>(new UserDTO(user), GenericResponseStrings.UserController_FetchUserSuccessful));
+        }
     }
 }
