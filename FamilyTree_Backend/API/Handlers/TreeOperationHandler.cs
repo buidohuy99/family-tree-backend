@@ -12,52 +12,56 @@ namespace FamilyTreeBackend.Presentation.API.Handlers
 {
     public class TreeOperationHandler : AuthorizationHandler<OperationAuthorizationRequirement, FamilyTree>
     {
-        private readonly IUnitOfWork _unitOfWork;
-        public TreeOperationHandler(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, OperationAuthorizationRequirement requirement, FamilyTree resource)
         {
             var user = context.User;
-
-            var entry = _unitOfWork.Entry(resource);
-
-            if (resource.Owner == null)
+            
+            try
             {
-                entry.Reference(tr => tr.Owner).Load();
-            }
-
-            if (user?.FindFirst(ClaimTypes.NameIdentifier)?.Value.Equals(resource.Owner.Id) == true)
-            {
-                context.Succeed(requirement);
-                return Task.CompletedTask; ;
-            }
-            else
-            {
-                if (resource.Editors == null)
+                //check if user is owner
+                if (user?.FindFirst(ClaimTypes.NameIdentifier)?.Value.Equals(resource.Owner.Id) == true)
                 {
-                    entry.Collection(tr => tr.Editors).Load();
+                    context.Succeed(requirement);
+                    return Task.CompletedTask;
                 }
 
+                //check if user is one of the editors
                 foreach (var editor in resource.Editors)
                 {
                     if (user?.FindFirst(ClaimTypes.NameIdentifier)?.Value.Equals(editor.Id) == true)
                     {
-                        if (requirement.Name == TreeCRUDOperations.Update.Name || requirement.Name == TreeCRUDOperations.Create.Name)
-                        {
-                            context.Succeed(requirement);
-                        }
-                        else
+                        if (requirement.Name == TreeOperations.Delete.Name)
                         {
                             context.Fail();
                         }
-                        return Task.CompletedTask; ;
+                        else
+                        {
+                            context.Succeed(requirement);
+                        }
+                        return Task.CompletedTask;
 
                     }
                 }
-            }
 
+                //check if user is tagged in one of the nodes
+                foreach (var person in resource.People)
+                {
+                    if (user?.FindFirst(ClaimTypes.NameIdentifier)?.Value.Equals(person.UserId) == true)
+                    {
+                        if (requirement.Name == TreeOperations.Read.Name)
+                        {
+                            context.Succeed(requirement);
+                            return Task.CompletedTask;
+                        }
+                    }
+                }
+            } catch(NullReferenceException)
+            {
+                context.Fail();
+                return Task.CompletedTask;
+            }
+            
+            context.Fail();
             return Task.CompletedTask;
         }
     }

@@ -28,18 +28,44 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
         public Task<AuthorizationResult> AuthorizeAsync(ClaimsPrincipal user, long treeId, IAuthorizationRequirement requirements)
         {
             var tree = _unitOfWork.Repository<FamilyTree>().GetDbset()
-                .Include(tr => tr.Owner)
-                .Include(tr => tr.Editors)
                 .SingleOrDefault(tr => tr.Id == treeId);
-
             if(tree == null)
             {
                 throw new TreeNotFoundException(TreeExceptionMessages.TreeNotFound, treeId);
             }
 
+            var entry = _unitOfWork.Entry(tree);
+            entry.Collection(tr => tr.Editors).Load();
+            entry.Collection(tr => tr.People).Load();
+
             var result = _authorizationService.AuthorizeAsync(user, tree, requirements);
             return result;
-   
         }
+
+        public Task<AuthorizationResult> AuthorizeWithPersonAsync(ClaimsPrincipal user, long personId, IAuthorizationRequirement requirements)
+        {
+            var person = _unitOfWork.Repository<Person>().GetDbset().Find(personId);
+            if (person == null)
+            {
+                throw new TreeNotFoundException(TreeExceptionMessages.TreeNotFound);
+            }
+
+            LoadTreeToPerson(person);
+            
+            var result = _authorizationService.AuthorizeAsync(user, person, requirements);
+            return result;
+        }
+
+        private void LoadTreeToPerson(Person person)
+        {
+            var entry = _unitOfWork.Entry(person);
+            entry.Reference(p => p.FamilyTree).Load();
+
+            FamilyTree tree = person.FamilyTree;
+            var treeEntry = _unitOfWork.Entry(tree);
+            treeEntry.Reference(tr => tr.Owner).Load();
+            treeEntry.Collection(tr => tr.Editors).Load();
+        }
+
     }
 }

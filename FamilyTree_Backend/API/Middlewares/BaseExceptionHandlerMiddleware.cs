@@ -17,8 +17,10 @@ namespace FamilyTreeBackend.Presentation.API.Middlewares
     {
         public class ExceptionResponse
         {
+            [JsonProperty("message")]
             public string Message { get; set; }
-            public Dictionary<string, string> Data;
+            [JsonProperty("data")]
+            public Dictionary<string, dynamic> Data;
         }
         private readonly RequestDelegate _next;
         private readonly ILogger _logger;
@@ -40,7 +42,7 @@ namespace FamilyTreeBackend.Presentation.API.Middlewares
                 _logger.LogInformation(exception, GenericResponseStrings.RequestProcessingError);
                 await HandleBaseExceptionAsync(httpContext, exception);
             }
-            catch (Exception exception)
+            catch (Exception )
             {
                 throw;
             }
@@ -61,7 +63,7 @@ namespace FamilyTreeBackend.Presentation.API.Middlewares
 
                 var responseStr = JsonConvert.SerializeObject(response);
 
-                await BuildResponseAsync(httpContext, (int)statusCode, responseStr); ;
+                await BuildResponseAsync(httpContext, (int)statusCode, responseStr);
                 return;
             }
 
@@ -75,22 +77,22 @@ namespace FamilyTreeBackend.Presentation.API.Middlewares
             await httpContext.Response.WriteAsync(bodyResponse);
         }
 
-        private Dictionary<string, string> GetDataFromException(BaseServiceException exception)
+        private Dictionary<string, dynamic> GetDataFromException(BaseServiceException exception)
         {
-            Dictionary<string, string> result = new Dictionary<string, string>();
+            Dictionary<string, dynamic> result = new Dictionary<string, dynamic>();
 
             var properties = exception.GetType().GetProperties();
 
             foreach (var prop in properties)
             {
-                result[prop.Name] = prop.GetValue(exception) != null ? prop.GetValue(exception).ToString() : "";
+                result[prop.Name.ToLower()] = prop.GetValue(exception);
 
             }
 
             var excludedProps = typeof(Exception).GetProperties();
             foreach (var prop in excludedProps)
             {
-                result.Remove(prop.Name);
+                result.Remove(prop.Name.ToLower());
             }
             return result;
 
