@@ -56,6 +56,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             return result;
         }
 
+        #region Private methods
         private void LoadTreeToPerson(Person person)
         {
             var entry = _unitOfWork.Entry(person);
@@ -66,6 +67,6 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             treeEntry.Reference(tr => tr.Owner).Load();
             treeEntry.Collection(tr => tr.Editors).Load();
         }
-
+        #endregion
     }
 }

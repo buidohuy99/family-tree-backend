@@ -30,7 +30,9 @@ namespace FamilyTreeBackend.Presentation.API.Handlers
                 {
                     if (user?.FindFirst(ClaimTypes.NameIdentifier)?.Value.Equals(editor.Id) == true)
                     {
-                        if (requirement.Name == TreeOperations.Delete.Name)
+                        if (requirement.Name == TreeOperations.Delete.Name
+                            || requirement.Name == TreeOperations.AddEditor.Name
+                            || requirement.Name == TreeOperations.RemoveEditor.Name)
                         {
                             context.Fail();
                         }
