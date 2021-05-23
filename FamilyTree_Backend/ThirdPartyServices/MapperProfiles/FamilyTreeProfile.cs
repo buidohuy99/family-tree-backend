@@ -14,12 +14,16 @@ namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices.MapperProf
         public FamilyTreeProfile()
         {
             CreateMap<FamilyTree, FamilyTreeModel>()
-                .ForMember(dest => dest.People, opt => opt.MapFrom(src => src.People));
+                .ForMember(dest => dest.People, opt => opt.MapFrom(src => src.People))
+                .ForMember(dest => dest.Owner, opt => opt.MapFrom(src => src.Owner))
+                .ForMember(dest => dest.Editors, opt => opt.MapFrom(src => src.Editors));
 
             CreateMap<FamilyTreeInputModel, FamilyTree>();
             CreateMap<FamilyTree, FamilyTreeUpdateResponseModel>();
 
-            CreateMap<FamilyTree, FamilyTreeListItemModel>();
+            CreateMap<FamilyTree, FamilyTreeListItemModel>()
+                .ForMember(dest => dest.Owner, opt => opt.MapFrom(src => src.Owner))
+                .ForMember(dest => dest.Editors, opt => opt.MapFrom(src => src.Editors)); ;
         }
     }
 }
