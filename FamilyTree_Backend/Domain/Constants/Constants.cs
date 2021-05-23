@@ -32,7 +32,9 @@ namespace FamilyTreeBackend.Core.Domain.Constants
         public const string TreeController_UpdateTreeSuccessful = "Tree has been updated successfully";
         public const string TreeController_RemoveTreeSuccessful = "Tree has been removed successful";
         public const string TreeController_AddEditorsToTreeSuccessful = "Editors has been added to tree successfully";
-        
+        public const string TreeController_RemoveEditorsFromTreeSuccessful = "Editors has been removed from tree successfully";
+        public const string TreeController_GetEditorsOfTreeSuccessful = "Editors of this tree has been fetched successfully";
+
         //Calendar Controller
         public const string CalendarController_FindEventsSuccessful = "List of events has been found successfully";
         public const string CalendarController_AddEventSuccessful = "Event has been added successfully";

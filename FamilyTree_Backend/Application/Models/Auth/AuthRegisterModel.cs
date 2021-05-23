@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
@@ -20,6 +21,7 @@ namespace FamilyTreeBackend.Core.Application.Models.Auth
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string MidName { get; set; }
+        [DefaultValue(false)]
         public bool GetRefreshToken { get; set; }
     }
 }
