@@ -108,7 +108,7 @@ namespace FamilyTreeBackend.Presentation.API
             #endregion
 
             #region Extract user from token middleware
-            app.UseUserExtractionMiddleware();
+            //app.UseUserExtractionMiddleware();
             #endregion
 
             app.UseEndpoints(endpoints =>
