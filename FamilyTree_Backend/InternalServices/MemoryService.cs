@@ -16,7 +16,11 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
     {
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
-
+        public MemoryService(IMapper mapper, IUnitOfWork unitOfWork)
+        {
+            _mapper = mapper;
+            _unitOfWork = unitOfWork;
+        }
         public async Task<FamilyMemoryModel> AddMemory(FamilyMemoryInputModel model)
         {
             var newMemory = _mapper.Map<FamilyMemory>(model);

@@ -29,8 +29,17 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         [SwaggerResponse(200, Type = typeof(HttpResponse<string>), Description = "Returns image url")]
         public async Task<IActionResult> UploadImage([FromForm] UploadSingleFileModel input)
         {
-            var result = await _uploadService.UploadImage(input);
+            var result = await _uploadService.UploadSingleImage(input);
             return Ok(new HttpResponse<string>(result, GenericResponseStrings.UploadImageSuccessful));
+        }
+
+        [HttpPost("images")]
+        [SwaggerOperation(Summary = "Upload a single image (request must be type form-data)")]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<string>), Description = "Returns image url")]
+        public async Task<IActionResult> UploadImages([FromForm] UploadMutipleFilesModel input)
+        {
+            var result = await _uploadService.UploadMutipleImages(input);
+            return Ok(new HttpResponse<IEnumerable<string>>(result, GenericResponseStrings.UploadImageSuccessful));
         }
     }
 }

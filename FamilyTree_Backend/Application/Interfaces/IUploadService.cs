@@ -9,9 +9,7 @@ namespace FamilyTreeBackend.Core.Application.Interfaces
 {
     public interface IUploadService
     {
-        public Task<string> UploadImage(UploadSingleFileModel input, long imageSizeLimit = 2097152);
-        public Task<IEnumerable<string>> UploadMutipleImages(
-            IEnumerable<UploadSingleFileModel> input,
-            long imageSizeLimit = 2097152);
+        public Task<string> UploadSingleImage(UploadSingleFileModel input);
+        public Task<IEnumerable<string>> UploadMutipleImages(UploadMutipleFilesModel input);
     }
 }

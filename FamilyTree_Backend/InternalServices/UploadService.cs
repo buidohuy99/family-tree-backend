@@ -5,6 +5,7 @@ using FamilyTreeBackend.Core.Application.Models.FileUpload;
 using FamilyTreeBackend.Core.Domain.Constants;
 using FamilyTreeBackend.Core.Domain.Enums;
 using Imagekit;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
@@ -31,52 +32,65 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
         }
 
-        public async Task<string> UploadImage(UploadSingleFileModel input, long imageSizeLimit = 2097152)
+        public async Task<string> UploadSingleImage(UploadSingleFileModel input)
         {
-            long IMAGE_SIZE_LIMIT = imageSizeLimit; //2,000,000 bytes limit = 2MB
+            const long IMAGE_SIZE_LIMIT = 2097152; //2,000,000 bytes limit = 2MB
 
             try {
-                ServerImagekit imagekit = imagekitSources[0];
-                var file = input.File;
-
-                if (file.Length > imageSizeLimit)
-                {
-                    throw new FileSizeExceedLimitException(UploadFileExceptionMessages.UploadFileLimitExceeded, file.FileName, file.Length, IMAGE_SIZE_LIMIT);
-                }
-
-                using (var memoryStream = new MemoryStream())
-                {
-                    var fileStream = file.OpenReadStream();
-                    await fileStream.CopyToAsync(memoryStream);
-                    fileStream.Close();
-                    ImagekitResponse uploadResult = await imagekit.FileName(file.FileName).UploadAsync(memoryStream.ToArray());
-                    memoryStream.Close();
-                    return uploadResult.URL;
-                }
+                return await UploadImage(input.File, IMAGE_SIZE_LIMIT);
             } catch (Exception) {
                 throw;
             }
         }
 
         public async Task<IEnumerable<string>> UploadMutipleImages(
-            IEnumerable<UploadSingleFileModel> input, 
-            long imageSizeLimit = 2097152) 
+            UploadMutipleFilesModel input) 
         {
+            //allow maybe 10MB?
+            const long IMAGE_SIZE_LIMIT = 10485760;
+
             List<string> result = new List<string>();
             List<Task> tasks = new List<Task>();
-            foreach (var model in input)
+            try
             {
-                var task = UploadImage(model, imageSizeLimit);
-                tasks.Add(task);
-            }
-            await Task.WhenAll(tasks);
+                foreach (var file in input.Files)
+                {
+                    var task = UploadImage(file, IMAGE_SIZE_LIMIT);
+                    tasks.Add(task);
+                }
+                await Task.WhenAll(tasks);
 
-            foreach(var task in tasks)
-            {
-                var returnedUrl = ((Task<string>)task).Result;
-                result.Add(returnedUrl);
+                foreach (var task in tasks)
+                {
+                    var returnedUrl = ((Task<string>)task).Result;
+                    result.Add(returnedUrl);
+                }
+                return result;
             }
-            return result;
+            catch(Exception)
+            {
+                throw;
+            }
+            
+        }
+
+        private async Task<string> UploadImage(IFormFile file, long sizeLimit)
+        {
+            ServerImagekit imagekit = imagekitSources[0];
+            if (file.Length > sizeLimit)
+            {
+                throw new FileSizeExceedLimitException(UploadFileExceptionMessages.UploadFileLimitExceeded, file.FileName, file.Length, sizeLimit);
+            }
+
+            using (var memoryStream = new MemoryStream())
+            {
+                var fileStream = file.OpenReadStream();
+                await fileStream.CopyToAsync(memoryStream);
+                fileStream.Close();
+                ImagekitResponse uploadResult = await imagekit.FileName(file.FileName).UploadAsync(memoryStream.ToArray());
+                memoryStream.Close();
+                return uploadResult.URL;
+            }
         }
     }
 }
