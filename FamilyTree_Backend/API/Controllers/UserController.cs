@@ -85,9 +85,9 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         [SwaggerResponse(200, Type = typeof(HttpResponse<UserDTO>), Description = "Returns user info after update")]
         public async Task<IActionResult> UpdateUsers([FromBody] UpdateUserModel model)
         {
-            var user = (ApplicationUser) HttpContext.Items["User"];
+            var user = await _userManager.GetUserAsync(HttpContext.User);
 
-            if(user == null)
+            if (user == null)
             {
                 throw new UserNotFoundException(UserExceptionMessages.UserNotFound);
             }
@@ -111,12 +111,14 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         [SwaggerOperation(Summary = "Get user info from a token")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [SwaggerResponse(200, Type = typeof(HttpResponse<UserDTO>), Description = "Returns a user's info")]
-        public async Task<IActionResult> GetUserFromToke()
+        public async Task<IActionResult> GetUserFromToken()
         {
-            var user = await Task.Run(() =>
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+
+            if (user == null)
             {
-                return (ApplicationUser)HttpContext.Items["User"];
-            });
+                throw new UserNotFoundException(UserExceptionMessages.UserNotFound);
+            }
 
             return Ok(new HttpResponse<UserDTO>(new UserDTO(user), GenericResponseStrings.UserController_FetchUserSuccessful));
         }
