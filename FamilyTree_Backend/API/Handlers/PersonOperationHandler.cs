@@ -25,7 +25,7 @@ namespace FamilyTreeBackend.Presentation.API.Handlers
 
             var tree = resource.FamilyTree;
 
-            if (user?.FindFirst(ClaimTypes.NameIdentifier)?.Value.Equals(tree.Owner.Id) == true)
+            if (user?.FindFirst(ClaimTypes.NameIdentifier)?.Value.Equals(tree.OwnerId) == true)
             {
                 context.Succeed(requirement);
                 return Task.CompletedTask;
