@@ -37,7 +37,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             return Ok(response);
         }
 
-        [HttpPost("memory/{memoryId}")]
+        [HttpDelete("memory/{memoryId}")]
         [SwaggerOperation(Summary = "Delete the memory with provided Id")]
         [SwaggerResponse(200, Type = typeof(string))]
         public async Task<IActionResult> AddMemory(long memoryId)
