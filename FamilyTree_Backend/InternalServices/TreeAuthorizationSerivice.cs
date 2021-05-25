@@ -64,7 +64,6 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
             FamilyTree tree = person.FamilyTree;
             var treeEntry = _unitOfWork.Entry(tree);
-            treeEntry.Reference(tr => tr.Owner).Load();
             treeEntry.Collection(tr => tr.Editors).Load();
         }
         #endregion
