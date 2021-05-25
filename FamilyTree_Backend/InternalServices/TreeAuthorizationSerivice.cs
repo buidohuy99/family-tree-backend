@@ -47,7 +47,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             var person = _unitOfWork.Repository<Person>().GetDbset().Find(personId);
             if (person == null)
             {
-                throw new TreeNotFoundException(TreeExceptionMessages.TreeNotFound);
+                throw new PersonNotFoundException(PersonExceptionMessages.PersonNotFound, personId);
             }
 
             LoadTreeToPerson(person);

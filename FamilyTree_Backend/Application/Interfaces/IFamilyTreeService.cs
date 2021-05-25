@@ -22,6 +22,10 @@ namespace FamilyTreeBackend.Core.Application.Interfaces
 
         public Task<IEnumerable<FamilyTreeListItemModel>> FindAllTree();
         public Task<IEnumerable<FamilyTreeListItemModel>> FindAllTreeAccessibleToUser(ClaimsPrincipal user);
+
+        public Task<IEnumerable<FamilyTreeListItemModel>> FindTreesFromKeyword(string keyword);
+        public Task<IEnumerable<FamilyTreeListItemModel>> FindTreesFromKeywordAccessibleToUser(ClaimsPrincipal user, string keyword);
+
         public Task<IEnumerable<string>> AddUsersToEditor(long treeId, IList<string> userNames);
         public Task<IEnumerable<string>> RemoveUsersFromEditor(long treeId, IList<string> userNames);
         public FamilyTreeContributorsModel GetTreeEditors(long treeId);

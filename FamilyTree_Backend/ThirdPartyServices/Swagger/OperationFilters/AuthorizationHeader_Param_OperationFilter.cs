@@ -13,13 +13,12 @@ namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices.Swagger.Op
         // that needs to be authorized)
         public void Apply(OpenApiOperation operation, OperationFilterContext context)
         {
-            var isMethodAuthorized = context.MethodInfo.GetCustomAttributes(true).OfType<AuthorizeAttribute>().Any()
-                && !context.MethodInfo.GetCustomAttributes(true).OfType<AllowAnonymousAttribute>().Any();
             var isParentControllerAuthorized = context.MethodInfo.DeclaringType.GetCustomAttributes(true).OfType<AuthorizeAttribute>().Any()
                 && !context.MethodInfo.DeclaringType.GetCustomAttributes(true).OfType<AllowAnonymousAttribute>().Any();
 
             // If there is no authorize attribute or there is allow anonymous attribute, we skip adding authorization header scheme
-            if (isMethodAuthorized || isParentControllerAuthorized)
+            if ((!context.MethodInfo.GetCustomAttributes(true).OfType<AllowAnonymousAttribute>().Any() && isParentControllerAuthorized) ||
+                (!isParentControllerAuthorized && context.MethodInfo.GetCustomAttributes(true).OfType<AuthorizeAttribute>().Any()))
             {
                 // Add possible responses for these routes that needs authorization
                 operation.Responses.TryAdd("401", new OpenApiResponse { Description = "Unauthorized"});
