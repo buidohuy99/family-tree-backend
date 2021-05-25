@@ -40,6 +40,9 @@ namespace FamilyTreeBackend.Core.Domain.Constants
         public const string CalendarController_AddEventSuccessful = "Event has been added successfully";
         public const string CalendarController_UpdateEventSuccessful = "Event has been updated successfully";
         public const string CalendarController_RemoveEventSuccessful = "Event has been removed successfully";
+        public const string CalendarController_AddEventHistorySuccessful = "Event history has been added successfully";
+        public const string CalendarController_UpdateEventHistorySuccessful = "Event history has been updated successfully";
+        public const string CalendarController_RemoveEventHistorySuccessful = "Event history has been removed successfully";
 
         //User Controller
         public const string UserController_FilterUsersSuccessful = "Users has been filtered successfully";
@@ -125,6 +128,7 @@ namespace FamilyTreeBackend.Core.Domain.Constants
     public static class CalendarExceptionMessages
     {
         public const string FamilyEventNotFound = "Cannot find event with provided id";
+        public const string CustomEventHistoryNotFound = "Cannot find custom event history with provided id";
     }
 
     public static class MemoryExceptionMessages

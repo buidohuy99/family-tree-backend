@@ -165,7 +165,7 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
                     .OnDelete(DeleteBehavior.SetNull);
 
                 entity.HasMany(e => e.Calendar)
-                    .WithOne()
+                    .WithOne(e => e.FamilyTree)
                     .HasForeignKey(e => e.FamilyTreeId)
                     .OnDelete(DeleteBehavior.Cascade);
 
@@ -181,6 +181,28 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
 
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Id).ValueGeneratedOnAdd();
+
+                entity.HasMany(e => e.EventHistories)
+                    .WithOne(e => e.BaseFamilyEvent)
+                    .HasForeignKey(e => e.FamilyEventId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.Property(e => e.DateCreated)
+                    .HasDefaultValueSql("GETUTCDATE()")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.LastModified)
+                    .HasDefaultValueSql("GETUTCDATE()")
+                    .ValueGeneratedOnAddOrUpdate();
+            });
+
+            modelBuilder.Entity<FamilyEventHistory>((entity) => {
+                entity.ToTable("FamilyEventHistory");
+
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+
+                entity.Property(e => e.ApplyToFollowingEvents).HasDefaultValue(false);
 
                 entity.Property(e => e.DateCreated)
                     .HasDefaultValueSql("GETUTCDATE()")

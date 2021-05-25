@@ -154,7 +154,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             var authorizationResult = await _authorizationService.AuthorizeWithPersonAsync(
                 User,
                 personId,
-                PersonOperations.Create
+                PersonOperations.Read
                 );
             if (!authorizationResult.Succeeded)
             {

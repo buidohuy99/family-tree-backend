@@ -15,8 +15,11 @@ namespace FamilyTreeBackend.Core.Application.Interfaces
 
         public Task<FamilyEventModel> RemoveEventFromTree(long eventId);
 
-        public Task<FamilyEventModel> UpdateFamilyEvent(long eventId, FamilyEventInputModel model);
+        public Task<FamilyEventModel> UpdateFamilyEvent(long eventId, FamilyEventUpdateModel model);
         public Task<FamilyEventModel> FindEventById(long eventId);
 
+        public Task<FamilyEventModel> AddCustomHistoryToEvent(long eventId, FamilyEventHistoryInputModel model);
+        public Task<FamilyEventModel> UpdateCustomHistoryOfEvent(long customHistoryId, FamilyEventHistoryInputModel model);
+        public Task<FamilyEventModel> RemoveCustomHistoryFromEvent(long customHistoryId);
     }
 }
