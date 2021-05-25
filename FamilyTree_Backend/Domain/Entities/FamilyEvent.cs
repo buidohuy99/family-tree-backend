@@ -15,5 +15,8 @@ namespace FamilyTreeBackend.Core.Domain.Entities
         public DateTime EndDate { get; set; }
         public RepeatEvent Repeat { get; set; }
         public int ReminderOffest { get; set; }
+
+        public FamilyTree FamilyTree { get; set; }
+        public IEnumerable<FamilyEventHistory> EventHistories { get; set; }
     }
 }

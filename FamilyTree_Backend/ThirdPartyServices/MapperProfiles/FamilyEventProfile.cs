@@ -13,8 +13,12 @@ namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices.MapperProf
     {
         public FamilyEventProfile()
         {
-            CreateMap<FamilyEvent, FamilyEventModel>().ReverseMap();
+            CreateMap<FamilyEvent, FamilyEventModel>().ForMember(e => e.EventHistories, opt => opt.MapFrom(src => src.EventHistories)).ReverseMap();
             CreateMap<FamilyEventInputModel, FamilyEvent>().ReverseMap();
+            CreateMap<FamilyEventHistory, FamilyEventHistoryModel>().ReverseMap();
+            CreateMap<FamilyEventUpdateModel, FamilyEvent>();
+
+            CreateMap<FamilyEventHistoryInputModel, FamilyEventHistory>().ReverseMap();
         }
     }
 }
