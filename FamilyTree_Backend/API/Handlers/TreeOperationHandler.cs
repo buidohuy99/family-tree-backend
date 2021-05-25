@@ -19,7 +19,7 @@ namespace FamilyTreeBackend.Presentation.API.Handlers
             try
             {
                 //check if user is owner
-                if (user?.FindFirst(ClaimTypes.NameIdentifier)?.Value.Equals(resource.Owner.Id) == true)
+                if (user?.FindFirst(ClaimTypes.NameIdentifier)?.Value.Equals(resource.OwnerId) == true)
                 {
                     context.Succeed(requirement);
                     return Task.CompletedTask;
