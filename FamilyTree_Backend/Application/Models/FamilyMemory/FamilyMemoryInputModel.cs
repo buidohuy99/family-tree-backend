@@ -10,7 +10,6 @@ namespace FamilyTreeBackend.Core.Application.Models.FamilyMemory
 {
     public class FamilyMemoryInputModel
     {
-        public long Id { get; set; }
         public long FamilyTreeId { get; set; }
         public string Description { get; set; }
         public DateTime MemoryDate { get; set; }

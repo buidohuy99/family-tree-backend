@@ -36,8 +36,14 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
         {
             const long IMAGE_SIZE_LIMIT = 2097152; //2,000,000 bytes limit = 2MB
 
+            var file = input.File;
+            if (file.Length > IMAGE_SIZE_LIMIT)
+            {
+                throw new FileSizeExceedLimitException(UploadFileExceptionMessages.UploadFileLimitExceeded, file.FileName, file.Length, 
+                    IMAGE_SIZE_LIMIT);
+            }
             try {
-                return await UploadImage(input.File, IMAGE_SIZE_LIMIT);
+                return await UploadImage(input.File);
             } catch (Exception) {
                 throw;
             }
@@ -48,14 +54,25 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
         {
             //allow maybe 10MB?
             const long IMAGE_SIZE_LIMIT = 10485760;
-
             List<string> result = new List<string>();
+            
+            //check if the list has any picture that is oversized
+            foreach (var file in input.Files)
+            {
+                if (file.Length > IMAGE_SIZE_LIMIT)
+                {
+                    throw new FileSizeExceedLimitException(
+                        UploadFileExceptionMessages.UploadFileLimitExceeded, 
+                        file.FileName, file.Length, IMAGE_SIZE_LIMIT);
+                }
+            }
+
             List<Task> tasks = new List<Task>();
             try
             {
                 foreach (var file in input.Files)
                 {
-                    var task = UploadImage(file, IMAGE_SIZE_LIMIT);
+                    var task = UploadImage(file);
                     tasks.Add(task);
                 }
                 await Task.WhenAll(tasks);
@@ -74,14 +91,9 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             
         }
 
-        private async Task<string> UploadImage(IFormFile file, long sizeLimit)
+        private async Task<string> UploadImage(IFormFile file)
         {
             ServerImagekit imagekit = imagekitSources[0];
-            if (file.Length > sizeLimit)
-            {
-                throw new FileSizeExceedLimitException(UploadFileExceptionMessages.UploadFileLimitExceeded, file.FileName, file.Length, sizeLimit);
-            }
-
             using (var memoryStream = new MemoryStream())
             {
                 var fileStream = file.OpenReadStream();

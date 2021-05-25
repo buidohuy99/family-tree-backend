@@ -23,6 +23,7 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
         public virtual DbSet<Family> Families { get; set; }
         public virtual DbSet<FamilyTree> FamilyTrees { get; set; }
         public virtual DbSet<FamilyEvent> FamilyEvents { get; set; }
+        public virtual DbSet<FamilyMemory> FamilyMemories { get; set; }
         public virtual DbSet<Person> People { get; set; }
         public virtual DbSet<Relationship> Relationships { get; set; }
         public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
@@ -200,10 +201,11 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
                 var valueComparer = new ValueComparer<ICollection<string>>(
                     (c1, c2) => c1.SequenceEqual(c2),
                     c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
-                    c => c.ToHashSet());
+                    c => (ICollection<string>)c.ToHashSet());
+
                 entity.Property(p => p.ImageUrls)
                 .HasConversion(
-                    v => JsonSerializer.Serialize(v,typeof(ICollection<string>), null),
+                    v => JsonSerializer.Serialize(v, null),
                     v => JsonSerializer.Deserialize<ICollection<string>>(v, null))
                 .Metadata.SetValueComparer(valueComparer);
 
