@@ -10,11 +10,14 @@ using FamilyTreeBackend.Core.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using StopWord;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
@@ -221,6 +224,54 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             return contributors;
         }
 
+        public async Task<IEnumerable<FamilyTreeListItemModel>> FindTreesFromKeywordAccessibleToUser(ClaimsPrincipal user, string keyword)
+        {
+            var applicationUser = await _userManager.GetUserAsync(user);
+
+            if (applicationUser == null)
+            {
+                throw new UserNotFoundException(UserExceptionMessages.UserNotFound);
+            }
+
+            var query = FindTreesUsingKeyword(keyword);
+
+            if (query == null)
+            {
+                return new List<FamilyTreeListItemModel>();
+            }
+
+            query = query.Include(e => e.Owner).Include(e => e.Editors)
+                .Where(e => e.OwnerId == applicationUser.Id || e.Editors.Any(editor => editor.Id == applicationUser.Id));
+
+            List<FamilyTreeListItemModel> trees = new List<FamilyTreeListItemModel>();
+            foreach (var tree in (await query.ToListAsync()))
+            {
+                trees.Add(_mapper.Map<FamilyTreeListItemModel>(tree));
+            }
+
+            return trees;
+        }
+
+        public async Task<IEnumerable<FamilyTreeListItemModel>> FindTreesFromKeyword(string keyword)
+        {
+            var query = FindTreesUsingKeyword(keyword);
+
+            if(query == null)
+            {
+                return new List<FamilyTreeListItemModel>();
+            }
+
+            query = query.Include(e => e.Owner).Include(e => e.Editors);
+
+            List<FamilyTreeListItemModel> trees = new List<FamilyTreeListItemModel>();
+            foreach (var tree in (await query.ToListAsync()))
+            {
+                trees.Add(_mapper.Map<FamilyTreeListItemModel>(tree));
+            }
+
+            return trees;
+        }
+
         #region Helper methods
 
         private async Task<IEnumerable<FamilyTree>> FindAccessibleTrees(ApplicationUser applicationUser)
@@ -235,6 +286,34 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             return await query
                 
                 .ToListAsync();
+        }
+
+        private IQueryable<FamilyTree> FindTreesUsingKeyword(string keyword)
+        {
+            var keywordWithoutStopwords = keyword.RemoveStopWords("en").RemoveStopWords("vi").ToLower();
+
+            MatchCollection matches = Regex.Matches(keywordWithoutStopwords, "[a-z]([:'-]?[a-z])*",
+                                        RegexOptions.IgnoreCase);
+
+            var treeQuery = _unitOfWork.Repository<FamilyTree>().GetDbset()
+                    .AsQueryable();
+
+            bool atLeastOneMatchFound = false;
+            foreach (Match match in matches)
+            {
+                if (!atLeastOneMatchFound && treeQuery.Any(e => e.Name.ToLower().Contains(match.Value) || e.Description.ToLower().Contains(match.Value)))
+                {
+                    atLeastOneMatchFound = true;
+                }
+                treeQuery = treeQuery.Where(e => e.Name.ToLower().Contains(match.Value) || e.Description.ToLower().Contains(match.Value));
+            }
+
+            if (!atLeastOneMatchFound && keyword != string.Empty)
+            {
+                return null;
+            }
+
+            return treeQuery;
         }
 
         private async Task<FamilyTree> createDefaultTree(FamilyTreeInputModel model)

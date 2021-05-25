@@ -101,9 +101,9 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet("tree")]
+        [HttpGet("trees")]
         [SwaggerResponse(200, Type = typeof(HttpResponse<IEnumerable<FamilyTreeListItemModel>>),
-            Description = "Add a new tree with given new info")]
+            Description = "Find all trees")]
         public async Task<IActionResult> FindAllTrees()
         {
             var result = await _familyTreeService.FindAllTree();
@@ -112,12 +112,35 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
                 result, GenericResponseStrings.TreeController_FindAllTreeSuccessful));
         }
 
-        [HttpGet("tree/list")]
+        [AllowAnonymous]
+        [HttpGet("trees-from-keyword")]
         [SwaggerResponse(200, Type = typeof(HttpResponse<IEnumerable<FamilyTreeListItemModel>>),
-            Description = "Add a new tree with given new info")]
+            Description = "Find all trees with Name/Description fitting a query string")]
+        public async Task<IActionResult> FindAllTreesFromKeyword([FromQuery] string q)
+        {
+            var result = await _familyTreeService.FindTreesFromKeyword(q != null ? q : string.Empty);
+
+            return Ok(new HttpResponse<IEnumerable<FamilyTreeListItemModel>>(
+                result, GenericResponseStrings.TreeController_FindAllTreeSuccessful));
+        }
+
+        [HttpGet("trees/list")]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<IEnumerable<FamilyTreeListItemModel>>),
+            Description = "Find all trees accessible to user")]
         public async Task<IActionResult> FindAllTreeAccessibleToUser()
         {
             var result = await _familyTreeService.FindAllTreeAccessibleToUser(User);
+
+            return Ok(new HttpResponse<IEnumerable<FamilyTreeListItemModel>>(
+                result, GenericResponseStrings.TreeController_FindAllTreeSuccessful));
+        }
+
+        [HttpGet("trees-from-keyword/list")]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<IEnumerable<FamilyTreeListItemModel>>),
+            Description = "Find all trees accessible to user with Name/Description fitting a query string")]
+        public async Task<IActionResult> FindAllTreesFromKeywordAccessibleToUser([FromQuery] string q)
+        {
+            var result = await _familyTreeService.FindTreesFromKeywordAccessibleToUser(User, q != null ? q : string.Empty);
 
             return Ok(new HttpResponse<IEnumerable<FamilyTreeListItemModel>>(
                 result, GenericResponseStrings.TreeController_FindAllTreeSuccessful));

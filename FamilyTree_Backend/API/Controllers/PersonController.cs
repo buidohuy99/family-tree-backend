@@ -175,7 +175,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             var authorizationResult = await _authorizationService.AuthorizeWithPersonAsync(
                 User,
                 personId,
-                PersonOperations.Create
+                PersonOperations.Delete
                 );
             if (!authorizationResult.Succeeded)
             {
@@ -196,7 +196,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             var authorizationResult = await _authorizationService.AuthorizeWithPersonAsync(
                 User,
                 personId,
-                PersonOperations.Create
+                PersonOperations.Update
                 );
             if (!authorizationResult.Succeeded)
             {
