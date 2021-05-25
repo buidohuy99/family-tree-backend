@@ -5,6 +5,7 @@ using FamilyTreeBackend.Core.Application.Models.FileUpload;
 using FamilyTreeBackend.Core.Domain.Constants;
 using FamilyTreeBackend.Core.Domain.Enums;
 using Imagekit;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
@@ -19,7 +20,6 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
     public class UploadService : IUploadService
     {
         private List<ServerImagekit> imagekitSources;
-        private ILogger<UploadService> _logger;
 
         public UploadService(IOptions<ImageKitAccounts> imagekit, ILogger<UploadService> logger)
         {
@@ -30,33 +30,78 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                 imagekitSources.Add(imagekitAccount);
             }
 
-            _logger = logger;
         }
 
-        public async Task<string> UploadImage(UploadSingleFileModel input)
+        public async Task<string> UploadSingleImage(UploadSingleFileModel input)
         {
             const long IMAGE_SIZE_LIMIT = 2097152; //2,000,000 bytes limit = 2MB
 
+            var file = input.File;
+            if (file.Length > IMAGE_SIZE_LIMIT)
+            {
+                throw new FileSizeExceedLimitException(UploadFileExceptionMessages.UploadFileLimitExceeded, file.FileName, file.Length, 
+                    IMAGE_SIZE_LIMIT);
+            }
             try {
-                ServerImagekit imagekit = imagekitSources[0];
-                var file = input.File;
+                return await UploadImage(input.File);
+            } catch (Exception) {
+                throw;
+            }
+        }
 
+        public async Task<IEnumerable<string>> UploadMutipleImages(
+            UploadMutipleFilesModel input) 
+        {
+            //allow maybe 10MB?
+            const long IMAGE_SIZE_LIMIT = 10485760;
+            List<string> result = new List<string>();
+            
+            //check if the list has any picture that is oversized
+            foreach (var file in input.Files)
+            {
                 if (file.Length > IMAGE_SIZE_LIMIT)
                 {
-                    throw new FileSizeExceedLimitException(UploadFileExceptionMessages.UploadFileLimitExceeded, file.FileName, file.Length, IMAGE_SIZE_LIMIT);
+                    throw new FileSizeExceedLimitException(
+                        UploadFileExceptionMessages.UploadFileLimitExceeded, 
+                        file.FileName, file.Length, IMAGE_SIZE_LIMIT);
                 }
+            }
 
-                using (var memoryStream = new MemoryStream())
+            List<Task> tasks = new List<Task>();
+            try
+            {
+                foreach (var file in input.Files)
                 {
-                    var fileStream = file.OpenReadStream();
-                    await fileStream.CopyToAsync(memoryStream);
-                    fileStream.Close();
-                    ImagekitResponse uploadResult = await imagekit.FileName(file.FileName).UploadAsync(memoryStream.ToArray());
-                    memoryStream.Close();
-                    return uploadResult.URL;
+                    var task = UploadImage(file);
+                    tasks.Add(task);
                 }
-            } catch (Exception e) {
+                await Task.WhenAll(tasks);
+
+                foreach (var task in tasks)
+                {
+                    var returnedUrl = ((Task<string>)task).Result;
+                    result.Add(returnedUrl);
+                }
+                return result;
+            }
+            catch(Exception)
+            {
                 throw;
+            }
+            
+        }
+
+        private async Task<string> UploadImage(IFormFile file)
+        {
+            ServerImagekit imagekit = imagekitSources[0];
+            using (var memoryStream = new MemoryStream())
+            {
+                var fileStream = file.OpenReadStream();
+                await fileStream.CopyToAsync(memoryStream);
+                fileStream.Close();
+                ImagekitResponse uploadResult = await imagekit.FileName(file.FileName).UploadAsync(memoryStream.ToArray());
+                memoryStream.Close();
+                return uploadResult.URL;
             }
         }
     }

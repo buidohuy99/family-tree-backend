@@ -3,10 +3,12 @@ using FamilyTreeBackend.Core.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace FamilyTreeBackend.Infrastructure.Persistence.Context
@@ -21,6 +23,7 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
         public virtual DbSet<Family> Families { get; set; }
         public virtual DbSet<FamilyTree> FamilyTrees { get; set; }
         public virtual DbSet<FamilyEvent> FamilyEvents { get; set; }
+        public virtual DbSet<FamilyMemory> FamilyMemories { get; set; }
         public virtual DbSet<Person> People { get; set; }
         public virtual DbSet<Relationship> Relationships { get; set; }
         public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
@@ -165,12 +168,46 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
                     .WithOne()
                     .HasForeignKey(e => e.FamilyTreeId)
                     .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasMany(e => e.Memories)
+                    .WithOne()
+                    .HasForeignKey(e => e.FamilyTreeId)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<FamilyEvent>((entity) =>
             {
+                entity.ToTable("FamilyEvent");
+
                 entity.HasKey(e => e.Id);
-                entity.Property(e => e.Id);
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+
+                entity.Property(e => e.DateCreated)
+                    .HasDefaultValueSql("GETUTCDATE()")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.LastModified)
+                    .HasDefaultValueSql("GETUTCDATE()")
+                    .ValueGeneratedOnAddOrUpdate();
+            });
+
+            modelBuilder.Entity<FamilyMemory>((entity) =>
+            {
+                entity.ToTable("FamilyMemory");
+
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+
+                var valueComparer = new ValueComparer<ICollection<string>>(
+                    (c1, c2) => c1.SequenceEqual(c2),
+                    c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                    c => (ICollection<string>)c.ToHashSet());
+
+                entity.Property(p => p.ImageUrls)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, null),
+                    v => JsonSerializer.Deserialize<ICollection<string>>(v, null))
+                .Metadata.SetValueComparer(valueComparer);
 
                 entity.Property(e => e.DateCreated)
                     .HasDefaultValueSql("GETUTCDATE()")

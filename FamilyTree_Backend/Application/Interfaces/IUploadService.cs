@@ -9,6 +9,7 @@ namespace FamilyTreeBackend.Core.Application.Interfaces
 {
     public interface IUploadService
     {
-        public Task<string> UploadImage(UploadSingleFileModel input);
+        public Task<string> UploadSingleImage(UploadSingleFileModel input);
+        public Task<IEnumerable<string>> UploadMutipleImages(UploadMutipleFilesModel input);
     }
 }

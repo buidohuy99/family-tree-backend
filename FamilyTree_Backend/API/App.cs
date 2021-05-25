@@ -107,6 +107,10 @@ namespace FamilyTreeBackend.Presentation.API
             app.UseBaseExceptionHandlerMiddleware();
             #endregion
 
+            #region Extract user from token middleware
+            //app.UseUserExtractionMiddleware();
+            #endregion
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

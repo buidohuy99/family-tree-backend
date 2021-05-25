@@ -41,6 +41,8 @@ namespace FamilyTreeBackend.Presentation.API.Controllers.Misc
                 [UploadFileExceptionMessages.UploadFileLimitExceeded] = 400,
 
                 [CalendarExceptionMessages.FamilyEventNotFound] = 404,
+
+                [MemoryExceptionMessages.FamilyMemoryNotFound] = 404,
             };
         }
 
