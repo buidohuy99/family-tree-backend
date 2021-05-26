@@ -4,14 +4,16 @@ using FamilyTreeBackend.Infrastructure.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(FamilyTreeDbContext))]
-    partial class FamilyTreeDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210526044503_ChangeToEventExceptionModel")]
+    partial class ChangeToEventExceptionModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -248,6 +250,12 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
 
                     b.Property<string>("Note")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ReminderOffest")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Repeat")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");

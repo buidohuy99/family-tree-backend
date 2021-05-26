@@ -9,17 +9,13 @@ namespace FamilyTreeBackend.Core.Application.Interfaces
 {
     public interface ICalendarService
     {
-        public Task<IEnumerable<FamilyEventModel>> FindAllEventsOfTree(long treeId);
+        public Task<IEnumerable<FamilyEventOutputModel>> FindAllEventsOfTree(long treeId);
 
-        public Task<FamilyEventModel> AddEventToTree(FamilyEventInputModel model);
+        public Task<FamilyEventOutputModel> AddEventToTree(FamilyEventInputModel model);
 
-        public Task<FamilyEventModel> RemoveEventFromTree(long eventId);
+        public Task<FamilyEventOutputModel> RemoveEventFromTree(long eventId);
 
-        public Task<FamilyEventModel> UpdateFamilyEvent(long eventId, FamilyEventUpdateModel model);
-        public Task<FamilyEventModel> FindEventById(long eventId);
-
-        public Task<FamilyEventModel> AddCustomHistoryToEvent(long eventId, FamilyEventHistoryInputModel model);
-        public Task<FamilyEventModel> UpdateCustomHistoryOfEvent(long customHistoryId, FamilyEventHistoryInputModel model);
-        public Task<FamilyEventModel> RemoveCustomHistoryFromEvent(long customHistoryId);
+        public Task<FamilyEventOutputModel> UpdateFamilyEvent(long eventId, FamilyEventUpdateModel model);
+        public Task<FamilyEventOutputModel> FindEventById(long eventId);
     }
 }

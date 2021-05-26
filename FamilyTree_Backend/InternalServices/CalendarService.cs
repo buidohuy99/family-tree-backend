@@ -6,6 +6,7 @@ using FamilyTreeBackend.Core.Application.Interfaces;
 using FamilyTreeBackend.Core.Application.Models.FamilyEvents;
 using FamilyTreeBackend.Core.Domain.Constants;
 using FamilyTreeBackend.Core.Domain.Entities;
+using FamilyTreeBackend.Core.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -25,25 +26,42 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<FamilyEventModel>> FindAllEventsOfTree(long treeId)
+        public async Task<IEnumerable<FamilyEventOutputModel>> FindAllEventsOfTree(long treeId)
         {
-            var events = await _unitOfWork.Repository<FamilyEvent>().GetDbset()
-                .Where(e => e.FamilyTreeId == treeId)
-                .Include(e => e.EventHistories)
-                .ToListAsync();
-
-            List<FamilyEventModel> models = new List<FamilyEventModel>();
-            foreach (var familyEvent in events)
+            FamilyTree tree = await _unitOfWork.Repository<FamilyTree>().FindAsync(treeId);
+            if (tree == null)
             {
-                models.Add(_mapper.Map<FamilyEventModel>(familyEvent));
+                throw new TreeNotFoundException(TreeExceptionMessages.TreeNotFound, treeId);
             }
 
+            var events = await _unitOfWork.Repository<FamilyEvent>().GetDbset()
+                .Where(e => e.FamilyTreeId == treeId)
+                .Include(e => e.EventExceptions)
+                .ToListAsync();
+
+            List<FamilyEventOutputModel> models = new List<FamilyEventOutputModel>();
+
+            foreach (var familyEvent in events)
+            {
+                List<FamilyEventModel> followingEvents = new List<FamilyEventModel>();
+                await recursivelyFetchFollowingEvents(familyEvent, followingEvents);
+                var outputEvent = new FamilyEventOutputModel()
+                {
+                    FollowingEvents = followingEvents
+                };
+                _mapper.Map(familyEvent, outputEvent);
+                models.Add(outputEvent);
+            }
+            
             return models;
         }
 
-        public async Task<FamilyEventModel> FindEventById(long eventId)
+        public async Task<FamilyEventOutputModel> FindEventById(long eventId)
         {
-            var familyEvent = await _unitOfWork.Repository<FamilyEvent>().GetDbset().Include(e => e.EventHistories).FirstOrDefaultAsync(e => e.Id == eventId);
+            var familyEvent = await _unitOfWork.Repository<FamilyEvent>().GetDbset()
+                .Include(e => e.EventExceptions)
+                .Include(e => e.FollowingEvent)
+                .FirstOrDefaultAsync(e => e.Id == eventId);
 
             if (familyEvent == null)
             {
@@ -52,28 +70,46 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                     eventId: eventId
                     );
             }
-            var model = _mapper.Map<FamilyEventModel>(familyEvent);
-            return model;
+
+            // Get following events
+            List<FamilyEventModel> followingEvents = new List<FamilyEventModel>();
+            await recursivelyFetchFollowingEvents(familyEvent, followingEvents);
+            var outputEvent = new FamilyEventOutputModel()
+            {
+                FollowingEvents = followingEvents
+            };
+            _mapper.Map(familyEvent, outputEvent);
+
+            return outputEvent;
         }
 
-        public async Task<FamilyEventModel> AddEventToTree(FamilyEventInputModel model)
+        public async Task<FamilyEventOutputModel> AddEventToTree(FamilyEventInputModel model)
         {
             if (!_unitOfWork.Repository<FamilyTree>().GetDbset().Any(tr => tr.Id == model.FamilyTreeId))
             {
                 throw new TreeNotFoundException(TreeExceptionMessages.TreeNotFound, model.FamilyTreeId);
             }
 
+            checkTimeSpanOfInputValid(model.Repeat, model.StartDate, model.EndDate);
+
             var familyEvent = _mapper.Map<FamilyEvent>(model);
             await _unitOfWork.Repository<FamilyEvent>().GetDbset().AddAsync(familyEvent);
 
             await _unitOfWork.SaveChangesAsync();
 
-            var resultModel = _mapper.Map<FamilyEventModel>(familyEvent);
+            // Get following events
+            List<FamilyEventModel> followingEvents = new List<FamilyEventModel>();
+            await recursivelyFetchFollowingEvents(familyEvent, followingEvents);
+            var outputEvent = new FamilyEventOutputModel()
+            {
+                FollowingEvents = followingEvents
+            };
+            _mapper.Map(familyEvent, outputEvent);
 
-            return resultModel;
+            return outputEvent;
         }
 
-        public async Task<FamilyEventModel> RemoveEventFromTree(long eventId)
+        public async Task<FamilyEventOutputModel> RemoveEventFromTree(long eventId)
         {
             var familyEvent = await _unitOfWork.Repository<FamilyEvent>().DeleteAsync(eventId);
 
@@ -84,13 +120,13 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                     eventId:eventId);
             }
             await _unitOfWork.SaveChangesAsync();
-            var deletedModel = _mapper.Map<FamilyEventModel>(familyEvent);
+            var deletedModel = _mapper.Map<FamilyEventOutputModel>(familyEvent);
             return deletedModel;
         }
 
-        public async Task<FamilyEventModel> UpdateFamilyEvent(long eventId, FamilyEventUpdateModel model)
+        public async Task<FamilyEventOutputModel> UpdateFamilyEvent(long eventId, FamilyEventUpdateModel model)
         {
-            var familyEvent = await _unitOfWork.Repository<FamilyEvent>().FindAsync(eventId);
+            var familyEvent = await _unitOfWork.Repository<FamilyEvent>().GetDbset().Include(e => e.FollowingEvent).FirstOrDefaultAsync(e => e.Id == eventId);
 
             if (familyEvent == null)
             {
@@ -99,84 +135,137 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                     eventId: eventId);
             }
 
+            if (model.StartDate != null && model.EndDate != null)
+            {
+                checkTimeSpanOfInputValid(model.Repeat == null ? familyEvent.Repeat : model.Repeat.Value, model.StartDate.Value, model.EndDate.Value);
+
+                // Updating schedule
+                if (!model.ApplyToFollowingEvents)
+                {
+                    var exceptionCase = _mapper.Map<FamilyEventExceptionCase>(model);
+                    exceptionCase.BaseFamilyEvent = familyEvent;
+                    await _unitOfWork.Repository<FamilyEventExceptionCase>().AddAsync(exceptionCase);
+                }
+                else
+                {
+                    if (familyEvent.FollowingEvent != null)
+                    {
+                        throw new InvalidOperationOnFamilyEventException(CalendarExceptionMessages.CannotAddMultipleFollowingEventsToEvent, familyEvent.Id);
+                    }
+                    var newEvent = _mapper.Map<FamilyEvent>(model);
+                    newEvent.FamilyTreeId = familyEvent.FamilyTreeId;
+                    newEvent.ParentEvent = familyEvent;
+                    if (model.Repeat == null)
+                    {
+                        newEvent.Repeat = familyEvent.Repeat;
+                    }
+                    if (model.ReminderOffest == null)
+                    {
+                        newEvent.ReminderOffest = familyEvent.ReminderOffest;
+                    }
+                    if (model.Note == null)
+                    {
+                        newEvent.Note = familyEvent.Note;
+                    }
+                    await _unitOfWork.Repository<FamilyEvent>().AddAsync(newEvent);
+                }
+            } else if (!(model.StartDate == null && model.EndDate == null)) // missing input 
+            {
+                throw new FamilyEventDateException(CalendarExceptionMessages.MissingDateOnInput, model.StartDate, model.EndDate);    
+            } else // Update non-schedule related attribs
+            {
+                if (model.ReminderOffest != null)
+                {
+                    familyEvent.ReminderOffest = model.ReminderOffest.Value;
+                }
+                if (model.Note != null)
+                {
+                    familyEvent.Note = model.Note;
+                }
+            }
+            
+            await _unitOfWork.SaveChangesAsync();
+
+            // Get following events
             var entry = _unitOfWork.Entry(familyEvent);
-            if(entry != null)
+            if (entry != null)
             {
-                await entry.Collection(e => e.EventHistories).LoadAsync();
+                await entry.Collection(e => e.EventExceptions).LoadAsync();
             }
+            List<FamilyEventModel> followingEvents = new List<FamilyEventModel>();
+            await recursivelyFetchFollowingEvents(familyEvent, followingEvents);
+            var outputEvent = new FamilyEventOutputModel()
+            {
+                FollowingEvents = followingEvents
+            };
+            _mapper.Map(familyEvent, outputEvent);
 
-            _mapper.Map(model, familyEvent);
-
-            await _unitOfWork.SaveChangesAsync();
-
-            var returnedModel = _mapper.Map<FamilyEventModel>(familyEvent);
-            return returnedModel;
+            return outputEvent;
         }
 
-        public async Task<FamilyEventModel> AddCustomHistoryToEvent(long eventId, FamilyEventHistoryInputModel model)
+        #region Private methods
+        private async Task recursivelyFetchFollowingEvents(FamilyEvent familyEvent, List<FamilyEventModel> followingEvents)
         {
-            var familyEvent = await _unitOfWork.Repository<FamilyEvent>().GetDbset().Include(e => e.EventHistories).FirstOrDefaultAsync(e => e.Id == eventId);
-
-            if (familyEvent == null)
+            if (followingEvents == null) return;
+            var entry = _unitOfWork.Entry(familyEvent);
+            if (entry != null)
             {
-                throw new FamilyEventNotFoundException(
-                    message: CalendarExceptionMessages.FamilyEventNotFound,
-                    eventId: eventId);
+                await entry.Reference(e => e.FollowingEvent).LoadAsync();
+                await entry.Collection(e => e.EventExceptions).LoadAsync();
+                if (familyEvent.FollowingEvent == null) return;
+                followingEvents.Add(_mapper.Map<FamilyEventModel>(familyEvent.FollowingEvent));
+                await recursivelyFetchFollowingEvents(familyEvent.FollowingEvent, followingEvents);
             }
-
-            var newEventHistory = _mapper.Map<FamilyEventHistory>(model);
-            newEventHistory.BaseFamilyEvent = familyEvent;
-
-            await _unitOfWork.Repository<FamilyEventHistory>().AddAsync(newEventHistory);
-            await _unitOfWork.SaveChangesAsync();
-
-            var result = _mapper.Map<FamilyEventModel>(familyEvent);
-
-            return result;
         }
 
-        public async Task<FamilyEventModel> UpdateCustomHistoryOfEvent(long customHistoryId, FamilyEventHistoryInputModel model)
+        private void checkTimeSpanOfInputValid(RepeatEvent? repeatEvent, DateTime startDate, DateTime endDate)
         {
-            var familyEventHistory = await _unitOfWork.Repository<FamilyEventHistory>().FindAsync(customHistoryId);
-
-            if (familyEventHistory == null)
+            if (endDate.CompareTo(startDate) <= 0)
             {
-                throw new FamilyEventHistoryNotFoundException(
-                    message: CalendarExceptionMessages.CustomEventHistoryNotFound,
-                    eventHistoryId: customHistoryId);
+                throw new FamilyEventDateException(CalendarExceptionMessages.StartDateIsAfterEndDate, startDate, endDate);
             }
 
-            _mapper.Map(model, familyEventHistory);
-
-            await _unitOfWork.SaveChangesAsync();
-
-            var familyEvent = await _unitOfWork.Repository<FamilyEvent>().GetDbset().Include(e => e.EventHistories).FirstOrDefaultAsync(e => e.Id == familyEventHistory.FamilyEventId);
-            var result = _mapper.Map<FamilyEventModel>(familyEvent);
-
-            return result;
-        }
-
-        public async Task<FamilyEventModel> RemoveCustomHistoryFromEvent(long customHistoryId)
-        {
-            var familyEventHistory = await _unitOfWork.Repository<FamilyEventHistory>().FindAsync(customHistoryId);
-
-            if (familyEventHistory == null)
+            bool DatesAreInTheSameWeek(DateTime date1, DateTime date2)
             {
-                throw new FamilyEventHistoryNotFoundException(
-                    message: CalendarExceptionMessages.CustomEventHistoryNotFound,
-                    eventHistoryId: customHistoryId);
+                var cal = System.Globalization.DateTimeFormatInfo.CurrentInfo.Calendar;
+                var d1 = date1.Date.AddDays(-1 * (int)cal.GetDayOfWeek(date1));
+                var d2 = date2.Date.AddDays(-1 * (int)cal.GetDayOfWeek(date2));
+
+                return d1 == d2;
             }
 
-            _unitOfWork.Repository<FamilyEventHistory>().GetDbset().Attach(familyEventHistory).State = EntityState.Deleted;
-
-            var familyEventId = familyEventHistory.FamilyEventId;
-
-            await _unitOfWork.SaveChangesAsync();
-
-            var familyEvent = await _unitOfWork.Repository<FamilyEvent>().GetDbset().Include(e => e.EventHistories).FirstOrDefaultAsync(e => e.Id == familyEventId);
-            var result = _mapper.Map<FamilyEventModel>(familyEvent);
-
-            return result;
+            switch (repeatEvent)
+            {
+                case RepeatEvent.DAILY:
+                    if (startDate.Date.CompareTo(endDate.Date) != 0)
+                    {
+                        throw new FamilyEventRecurringDateException(CalendarExceptionMessages.StartDateAndEndDateIsNotWithinSameRepeatCycle
+                            , RepeatEvent.DAILY, startDate, endDate);
+                    }// different days
+                    break;
+                case RepeatEvent.WEEKLY:
+                    if(!DatesAreInTheSameWeek(startDate, endDate))
+                    {
+                        throw new FamilyEventRecurringDateException(CalendarExceptionMessages.StartDateAndEndDateIsNotWithinSameRepeatCycle
+                            , RepeatEvent.WEEKLY, startDate, endDate);
+                    }
+                    break;
+                case RepeatEvent.MONTHLY:
+                    if(startDate.Month != endDate.Month || startDate.Year != endDate.Year)
+                    {
+                        throw new FamilyEventRecurringDateException(CalendarExceptionMessages.StartDateAndEndDateIsNotWithinSameRepeatCycle
+                            , RepeatEvent.MONTHLY, startDate, endDate);
+                    }
+                    break;
+                case RepeatEvent.ANNUALLY:
+                    if (startDate.Year != endDate.Year)
+                    {
+                        throw new FamilyEventRecurringDateException(CalendarExceptionMessages.StartDateAndEndDateIsNotWithinSameRepeatCycle
+                            , RepeatEvent.ANNUALLY, startDate, endDate);
+                    }
+                    break;
+            }
         }
+        #endregion Private methods
     }
 }

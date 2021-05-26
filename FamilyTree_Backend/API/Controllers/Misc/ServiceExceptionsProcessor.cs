@@ -41,7 +41,10 @@ namespace FamilyTreeBackend.Presentation.API.Controllers.Misc
                 [UploadFileExceptionMessages.UploadFileLimitExceeded] = 400,
 
                 [CalendarExceptionMessages.FamilyEventNotFound] = 404,
-                [CalendarExceptionMessages.CustomEventHistoryNotFound] = 404,
+                [CalendarExceptionMessages.StartDateIsAfterEndDate] = 400,
+                [CalendarExceptionMessages.StartDateAndEndDateIsNotWithinSameRepeatCycle] = 400,
+                [CalendarExceptionMessages.CannotAddMultipleFollowingEventsToEvent] = 403,
+                [CalendarExceptionMessages.MissingDateOnInput] = 400,
 
                 [MemoryExceptionMessages.FamilyMemoryNotFound] = 404,
             };
