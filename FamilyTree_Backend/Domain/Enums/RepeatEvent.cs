@@ -8,6 +8,8 @@ namespace FamilyTreeBackend.Core.Domain.Enums
 {
     public enum RepeatEvent
     {
+        NONE,
+        DAILY,
         WEEKLY,
         MONTHLY,
         ANNUALLY

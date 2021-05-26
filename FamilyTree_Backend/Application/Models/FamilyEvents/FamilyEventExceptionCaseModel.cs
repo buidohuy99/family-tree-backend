@@ -7,16 +7,12 @@ using System.Threading.Tasks;
 
 namespace FamilyTreeBackend.Core.Application.Models.FamilyEvents
 {
-    public class FamilyEventHistoryModel
+    public class FamilyEventExceptionCaseModel
     {
         public long Id { get; set; }
         public long FamilyEventId { get; set; }
-        public DateTime PointInTime { get; set; }
         public string Note { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
-        public RepeatEvent Repeat { get; set; }
-        public int ReminderOffest { get; set; }
-        public bool ApplyToFollowingEvents { get; set; }
     }
 }

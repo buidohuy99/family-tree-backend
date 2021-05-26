@@ -182,7 +182,13 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Id).ValueGeneratedOnAdd();
 
-                entity.HasMany(e => e.EventHistories)
+                entity.Property(e => e.Repeat).HasDefaultValue(RepeatEvent.NONE);
+
+                entity.HasOne(e => e.ParentEvent)
+                    .WithOne(e => e.FollowingEvent)
+                    .HasForeignKey<FamilyEvent>(e => e.ParentEventId);
+
+                entity.HasMany(e => e.EventExceptions)
                     .WithOne(e => e.BaseFamilyEvent)
                     .HasForeignKey(e => e.FamilyEventId)
                     .OnDelete(DeleteBehavior.Cascade);
@@ -196,13 +202,11 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
                     .ValueGeneratedOnAddOrUpdate();
             });
 
-            modelBuilder.Entity<FamilyEventHistory>((entity) => {
-                entity.ToTable("FamilyEventHistory");
+            modelBuilder.Entity<FamilyEventExceptionCase>((entity) => {
+                entity.ToTable("FamilyEventExceptionCases");
 
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Id).ValueGeneratedOnAdd();
-
-                entity.Property(e => e.ApplyToFollowingEvents).HasDefaultValue(false);
 
                 entity.Property(e => e.DateCreated)
                     .HasDefaultValueSql("GETUTCDATE()")

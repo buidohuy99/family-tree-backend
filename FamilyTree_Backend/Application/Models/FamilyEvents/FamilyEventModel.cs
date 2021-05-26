@@ -10,6 +10,7 @@ namespace FamilyTreeBackend.Core.Application.Models.FamilyEvents
     public class FamilyEventModel
     {
         public long Id { get; set; }
+        public long? ParentEventId { get; set; }
         public long FamilyTreeId { get; set; }
         public string Note { get; set; }
         public DateTime StartDate { get; set; }
@@ -17,6 +18,6 @@ namespace FamilyTreeBackend.Core.Application.Models.FamilyEvents
         public RepeatEvent Repeat { get; set; }
         public int ReminderOffest { get; set; }
 
-        public IEnumerable<FamilyEventHistoryModel> EventHistories { get; set; }
+        public IEnumerable<FamilyEventExceptionCaseModel> EventExceptions { get; set; }
     }
 }
