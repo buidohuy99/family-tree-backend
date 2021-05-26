@@ -36,6 +36,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         }
 
         [HttpGet("tree/{treeId}")]
+        [SwaggerOperation(Summary = "Find family tree from Id")]
         [SwaggerResponse(200, Type = typeof(HttpResponse<FamilyTreeModel>), 
             Description = "Return the info of tree with given Id)")]
         public async Task<IActionResult> FindFamilyTree(long treeId)
@@ -53,6 +54,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         }
 
         [HttpPut("tree/{treeId}")]
+        [SwaggerOperation(Summary = "Update family tree with new infos")]
         [SwaggerResponse(200, Type = typeof(HttpResponse<FamilyTreeUpdateResponseModel>),
             Description = "Update the info of tree with given Id and new info)")]
         public async Task<IActionResult> UpdateFamilyTree(long treeId, [FromBody] FamilyTreeInputModel model)
@@ -72,7 +74,8 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         }
 
         [HttpDelete("tree/{treeId}")]
-        [SwaggerResponse(200, Type = typeof(Nullable),
+        [SwaggerOperation(Summary = "Delete tree provided by an id")]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<object>),
             Description = "Delete tree with given Id)")]
         public async Task<IActionResult> DeleteFamilyTree(long treeId)
         {
@@ -86,10 +89,11 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             }
 
             await _familyTreeService.DeleteFamilyTree(treeId);
-            return Ok(GenericResponseStrings.TreeController_RemoveTreeSuccessful);
+            return Ok(new HttpResponse<object>(null, GenericResponseStrings.TreeController_RemoveTreeSuccessful));
         }
 
         [HttpPost("tree")]
+        [SwaggerOperation(Summary = "Add a new family tree")]
         [SwaggerResponse(200, Type = typeof(HttpResponse<FamilyTreeModel>),
             Description = "Add a new tree with given new info")]
         public async Task<IActionResult> AddFamilyTree([FromBody] FamilyTreeInputModel model)
@@ -102,6 +106,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
 
         [AllowAnonymous]
         [HttpGet("trees")]
+        [SwaggerOperation(Summary = "Find all trees in the system")]
         [SwaggerResponse(200, Type = typeof(HttpResponse<IEnumerable<FamilyTreeListItemModel>>),
             Description = "Find all trees")]
         public async Task<IActionResult> FindAllTrees()
@@ -114,6 +119,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
 
         [AllowAnonymous]
         [HttpGet("trees-from-keyword")]
+        [SwaggerOperation(Summary = "Find all trees in the system from a keyword")]
         [SwaggerResponse(200, Type = typeof(HttpResponse<IEnumerable<FamilyTreeListItemModel>>),
             Description = "Find all trees with Name/Description fitting a query string")]
         public async Task<IActionResult> FindAllTreesFromKeyword([FromQuery] string q)
@@ -125,6 +131,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         }
 
         [HttpGet("trees/list")]
+        [SwaggerOperation(Summary = "Find all trees of user")]
         [SwaggerResponse(200, Type = typeof(HttpResponse<IEnumerable<FamilyTreeListItemModel>>),
             Description = "Find all trees accessible to user")]
         public async Task<IActionResult> FindAllTreeAccessibleToUser()
@@ -136,6 +143,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         }
 
         [HttpGet("trees-from-keyword/list")]
+        [SwaggerOperation(Summary = "Find all trees of user from keyword")]
         [SwaggerResponse(200, Type = typeof(HttpResponse<IEnumerable<FamilyTreeListItemModel>>),
             Description = "Find all trees accessible to user with Name/Description fitting a query string")]
         public async Task<IActionResult> FindAllTreesFromKeywordAccessibleToUser([FromQuery] string q)
@@ -147,6 +155,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         }
 
         [HttpPost("tree/{treeId}/add-users-to-editor")]
+        [SwaggerOperation(Summary = "Add an editor to edit tree (only open to tree owner)")]
         [SwaggerResponse(200, Type = typeof(HttpResponse<IEnumerable<string>>),
             Description = "Add list of users to be tree's editor, return the added users' username")]
         public async Task<IActionResult> AddUsersToEditor(long treeId, [FromBody] List<string> userNames)
@@ -164,6 +173,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         }
 
         [HttpPost("tree/{treeId}/remove-users-from-editor")]
+        [SwaggerOperation(Summary = "Remove editor from tree (only open to tree owner)")]
         [SwaggerResponse(200, Type = typeof(HttpResponse<IEnumerable<string>>),
             Description = "Remove list of users from tree's editor, return the removed users' username")]
         public async Task<IActionResult> RemoveUsersFromEditor(long treeId, [FromBody] List<string> userNames)
@@ -181,6 +191,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         }
 
         [HttpGet("tree/{treeId}/editors")]
+        [SwaggerOperation(Summary = "Get all contributors of the tree")]
         [SwaggerResponse(200, Type = typeof(HttpResponse<FamilyTreeContributorsModel>),
             Description = "Get editors of a tree")]
         public async Task<IActionResult> RetrieveEditors(long treeId)

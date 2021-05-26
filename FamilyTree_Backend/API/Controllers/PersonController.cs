@@ -125,6 +125,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         }
 
         [HttpGet("person/{personId}")]
+        [SwaggerOperation(Summary = "Get person from an id")]
         [SwaggerResponse(200, Type = typeof(HttpResponse<PersonModel>), 
             Description = "Return the info of the person")]
         public async Task<IActionResult> FindPerson(long personId)
@@ -147,6 +148,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         }
 
         [HttpGet("person/{personId}/children")]
+        [SwaggerOperation(Summary = "Get children of a person from his id")]
         [SwaggerResponse(200, Type = typeof(HttpResponse<IEnumerable<PersonModel>>), 
             Description = "Return the children of the person")]
         public async Task<IActionResult> FindChildren(long personId)
@@ -168,7 +170,8 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         }
 
         [HttpDelete("person/{personId}")]
-        [SwaggerResponse(200, Type = typeof(string),
+        [SwaggerOperation(Summary = "Remove the person provided by an id")]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<object>),
             Description = "Remove the person with given Id")]
         public async Task<IActionResult> RemovePerson(long personId)
         {
@@ -185,10 +188,11 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             }
 
             await _personService.RemovePerson(personId);
-            return Ok(GenericResponseStrings.PersonController_RemovePersonSuccessful);
+            return Ok(new HttpResponse<object>(null, GenericResponseStrings.PersonController_RemovePersonSuccessful));
         }
 
         [HttpPut("person/{personId}")]
+        [SwaggerOperation(Summary = "Update info of a person using his id")]
         [SwaggerResponse(200, Type = typeof(HttpResponse<PersonModel>), 
             Description = "Update the info of the person")]
         public async Task<IActionResult> UpdatePersonInfo(long personId, [FromBody] PersonInputModel updatedPersonModel)
