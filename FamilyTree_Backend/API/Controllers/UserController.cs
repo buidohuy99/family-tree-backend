@@ -24,8 +24,11 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
     {
         private readonly IEmailService _emailService;
         private readonly IUserService _userService;
-        
-        public UserController(IEmailService emailService, IUserService userService, UserManager<ApplicationUser> userManager) : base(userManager)
+
+        public UserController(
+            IEmailService emailService, 
+            IUserService userService, 
+            UserManager<ApplicationUser> userManager) : base(userManager)
         {
             _emailService = emailService;
             _userService = userService;
@@ -85,7 +88,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         [SwaggerResponse(200, Type = typeof(HttpResponse<UserDTO>), Description = "Returns user info after update")]
         public async Task<IActionResult> UpdateUsers([FromBody] UpdateUserModel model)
         {
-            var user = await _userManager.GetUserAsync(HttpContext.User);
+            var user = await _userManager.GetUserAsync(User);
 
             if (user == null)
             {
@@ -113,7 +116,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         [SwaggerResponse(200, Type = typeof(HttpResponse<UserDTO>), Description = "Returns a user's info")]
         public async Task<IActionResult> GetUserFromToken()
         {
-            var user = await _userManager.GetUserAsync(HttpContext.User);
+            var user = await _userManager.GetUserAsync(User);
 
             if (user == null)
             {
@@ -121,6 +124,50 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             }
 
             return Ok(new HttpResponse<UserDTO>(new UserDTO(user), GenericResponseStrings.UserController_FetchUserSuccessful));
+        }
+
+        [HttpGet("notifications")]
+        [SwaggerOperation(Summary = "Get user notifications")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [SwaggerResponse(200,Type = typeof(HttpResponse<IEnumerable<NotificationDTO>>))]
+        public async Task<IActionResult> GetUserNotifications() 
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user == null)
+            {
+                throw new UserNotFoundException(UserExceptionMessages.UserNotFound);
+            }
+
+            var notifications = await _userService.GetNotifications(user);
+
+            return Ok(new HttpResponse<IEnumerable<NotificationDTO>>(
+                notifications, 
+                GenericResponseStrings.UserController_GetNotificationSuccessul));
+        }
+
+        [HttpPut("notifications/{notficationId}")]
+        [SwaggerOperation(Summary = "Mark notification as read")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<NotificationDTO>))]
+        public async Task<IActionResult> ReadNotification(long notficationId)
+        {
+            var noti = await _userService.ReadNotification(notficationId);
+
+            return Ok(new HttpResponse<NotificationDTO>(
+                noti,
+                GenericResponseStrings.UserController_ReadNotificationSuccessul));
+        }
+
+        [HttpDelete("notifications/{notficationId}")]
+        [SwaggerOperation(Summary = "Delete notification")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [SwaggerResponse(200, Type = typeof(string))]
+        public async Task<IActionResult> RemoveNotification(long notficationId)
+        {
+            var noti = await _userService.RemoveNotification(notficationId);
+
+            return Ok(GenericResponseStrings.UserController_RemoveNotificationSuccessul);
         }
     }
 }

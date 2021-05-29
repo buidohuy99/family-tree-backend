@@ -22,5 +22,6 @@ namespace FamilyTreeBackend.Core.Domain.Entities
         public DateTime? UpdatedDate { get; set; }
 
         public ICollection<FamilyTree> EditorOfFamilyTrees { get; set; }
+        public ICollection<Notification> Notifications { get; set; }
     }
 }

@@ -10,6 +10,9 @@ using FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices.Swagger.Operat
 using FamilyTreeBackend.Core.Application.Helpers.ConfigModels;
 using AutoMapper;
 using FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices.MapperProfiles;
+using Quartz;
+using FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices.Quartz;
+using FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices.Quartz.QuartzJobs;
 
 namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices
 {
@@ -92,6 +95,20 @@ namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices
 
             #region Email Sender configuration
             services.Configure<SmtpSettings>(Configuration.GetSection("SmtpSettings"));
+            #endregion
+
+            #region Quartz Job configuration
+            services.AddQuartz(q =>
+            {
+                // Use a Scoped container to create jobs. I'll touch on this later
+                q.UseMicrosoftDependencyInjectionScopedJobFactory();
+
+                //register job
+                q.AddJobAndTrigger<DailyNotificationJob>(Configuration);
+            });
+            // Add the Quartz.NET hosted service
+            services.AddQuartzHostedService(
+                q => q.WaitForJobsToComplete = true);
             #endregion
         }
     }
