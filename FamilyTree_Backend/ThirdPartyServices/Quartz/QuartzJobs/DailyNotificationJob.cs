@@ -73,6 +73,46 @@ namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices.Quartz.Qua
         }
 
         private const string Sql_GetNotificationNeededEvents = @"
+WITH
+_events AS (
+SELECT DISTINCT e.*
+--ex.IsCancelled, 
+--ex.IsRescheduled, 
+--ex.StartDate RescheduledDate
+FROM FamilyEvent e LEFT JOIN FamilyEventExceptionCases ex ON e.Id = ex.FamilyEventId
+WHERE
+--if not cancelled or rescheduled to another day
+NOT (CAST(ex.IsRescheduled AS INT) + CAST(ex.IsCancelled AS INT)!= 2 
+	AND CAST(ex.StartDate AS DATE) = CAST(DATEADD(day, e.ReminderOffest, @Today) AS DATE))
+AND (
+--non repeat
+(e.Repeat = 0 AND CAST(e.StartDate AS DATE) = CAST(DATEADD(day, e.ReminderOffest, @Today) AS DATE))
+--repeat weekly
+OR (e.Repeat = 1 AND DATEPART(WEEKDAY, e.StartDate)  = DATEPART(WEEKDAY, DATEADD(day, e.ReminderOffest, @Today)))
+--repeat monthly
+OR (e.Repeat = 2 AND DATEPART(DAY, e.StartDate)  = DATEPART(DAY, DATEADD(day, e.ReminderOffest, @Today)))
+--repeat annually
+OR (e.Repeat = 3 
+	AND DATEPART(day, e.StartDate)  = DATEPART(DAY, DATEADD(day, e.ReminderOffest, @Today)))
+	AND DATEPART(MONTH, e.StartDate)  = DATEPART(DAY, DATEADD(MONTH, e.ReminderOffest, @Today)))
+--or has special rescheduled instance that is on today
+OR (ex.IsRescheduled = 1 AND ex.IsCancelled = 1 
+	AND CAST(ex.StartDate AS DATE) = CAST(DATEADD(day, e.ReminderOffest, @Today) AS DATE))
+),
+
+_updatedEvents AS (
+SELECT e1.*
+FROM _events e1 LEFT JOIN _events e2 ON e1.Id = e2.ParentEventId
+WHERE e2.Id IS NULL
+)
+
+SELECT DISTINCT *
+FROM _updatedEvents
+";
+
+
+
+        private const string Sql_GetNotificationNeededEvents_old = @"
             WITH
             _needNotifyEvents AS (
 	        SELECT e1.*
