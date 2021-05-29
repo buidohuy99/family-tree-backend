@@ -1,4 +1,5 @@
-﻿using FamilyTreeBackend.Core.Application.DTOs;
+﻿using AutoMapper;
+using FamilyTreeBackend.Core.Application.DTOs;
 using FamilyTreeBackend.Core.Application.Helpers.Exceptions;
 using FamilyTreeBackend.Core.Application.Helpers.Exceptions.UserExceptions;
 using FamilyTreeBackend.Core.Application.Interfaces;
@@ -6,6 +7,7 @@ using FamilyTreeBackend.Core.Application.Models.User;
 using FamilyTreeBackend.Core.Domain.Constants;
 using FamilyTreeBackend.Core.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using StopWord;
 using System.Collections.Generic;
@@ -19,12 +21,20 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
     public class UserService : IUserService
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
         private readonly IConfiguration _configuration;
 
-        public UserService(UserManager<ApplicationUser> userManager, IConfiguration configuration)
+        public UserService(
+            UserManager<ApplicationUser> userManager, 
+            IConfiguration configuration,
+            IUnitOfWork unitOfWork,
+            IMapper mapper)
         {
             _userManager = userManager;
             _configuration = configuration;
+            _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
         public async Task<string> GenerateResetPasswordUrl(string email)
@@ -170,6 +180,48 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             }
 
             return new UserDTO(user);
+        }
+
+        public async Task<IEnumerable<NotificationDTO>> GetNotifications(ApplicationUser user)
+        {
+            var notifications = await _unitOfWork.Repository<Notification>().GetDbset()
+                .Where(n => n.UserId == user.Id)
+                .OrderByDescending(n => n.DateCreated)
+                .ToListAsync();
+
+            List<NotificationDTO> result = new List<NotificationDTO>();
+            foreach(var noti in notifications)
+            {
+                result.Add(_mapper.Map<NotificationDTO>(noti));
+            }
+
+            return result;
+        }
+
+        public async Task<NotificationDTO> ReadNotification(long notficationId)
+        {
+            var noti = await _unitOfWork.Repository<Notification>().FindAsync(notficationId);
+            if (noti == null)
+            {
+                throw new NotificationNotFoundException(UserExceptionMessages.NotificationNotFound, notficationId);
+            }
+
+            noti.IsRead = true;
+            await _unitOfWork.SaveChangesAsync();
+            return _mapper.Map<NotificationDTO>(noti);
+        }
+
+        public async Task<NotificationDTO> RemoveNotification(long notficationId)
+        {
+            var noti = await _unitOfWork.Repository<Notification>().FindAsync(notficationId);
+            if (noti == null)
+            {
+                throw new NotificationNotFoundException(UserExceptionMessages.NotificationNotFound, notficationId);
+            }
+            noti = await _unitOfWork.Repository<Notification>().DeleteAsync(notficationId);
+            await _unitOfWork.SaveChangesAsync();
+
+            return _mapper.Map<NotificationDTO>(noti);
         }
     }
 }

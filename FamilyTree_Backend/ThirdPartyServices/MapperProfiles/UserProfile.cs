@@ -14,6 +14,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices.MapperProf
         public UserProfile()
         {
             CreateMap<ApplicationUser, UserIconDTO>();
+            CreateMap<Notification, NotificationDTO>();
         }
     }
 }

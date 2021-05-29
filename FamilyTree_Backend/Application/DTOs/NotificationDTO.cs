@@ -4,14 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FamilyTreeBackend.Core.Domain.Entities
+namespace FamilyTreeBackend.Core.Application.DTOs
 {
-    public class Notification : BaseEntity
+    public class NotificationDTO
     {
-        public string UserId {get;set;}
-        public ApplicationUser User { get; set; }
+        public long Id { get; set; }
         public string Message { get; set; }
-
         public bool IsRead { get; set; }
+        public DateTime DateCreated { get; set; }
+        public DateTime LastModified { get; set; }
     }
 }

@@ -34,7 +34,9 @@ namespace FamilyTreeBackend.Presentation.API.Controllers.Misc
                 [TreeExceptionMessages.TreeNotFound] = 404,
 
                 [UserExceptionMessages.UserNotFound] = 404,
+                [UserExceptionMessages.ResetPasswordFail] = 500,
                 [UserExceptionMessages.UpdateUserFail] = 500,
+                [UserExceptionMessages.NotificationNotFound] = 404,
 
                 [SendEmailExceptionMessages.SendEmailFailed] = 500,
 

@@ -17,5 +17,8 @@ namespace FamilyTreeBackend.Core.Application.Interfaces
         public IEnumerable<UserDTO> FindUser(UserFilterModel model);
         public Task<UserDTO> UpdateUser(string updatedUserId, UpdateUserModel model);
         public Task<UserDTO> GetUser(string userId);
+        public Task<IEnumerable<NotificationDTO>> GetNotifications(ApplicationUser user);
+        public Task<NotificationDTO> ReadNotification(long notficationId);
+        public Task<NotificationDTO> RemoveNotification(long notficationId);
     }
 }
