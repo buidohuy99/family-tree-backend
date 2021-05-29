@@ -3,10 +3,12 @@ using FamilyTreeBackend.Core.Domain.Entities;
 using FamilyTreeBackend.Core.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Quartz;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,9 +19,11 @@ namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices.Quartz.Qua
     public class DailyNotificationJob : IJob
     {
         private readonly IUnitOfWork _unitOfWork;
-        public DailyNotificationJob(IUnitOfWork unitOfWork)
+        private readonly ILogger<DailyNotificationJob> _logger;
+        public DailyNotificationJob(IUnitOfWork unitOfWork, ILogger<DailyNotificationJob> logger)
         {
             _unitOfWork = unitOfWork;
+            _logger = logger;
         }
         public Task Execute(IJobExecutionContext context)
         {

@@ -27,6 +27,7 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
         public virtual DbSet<Person> People { get; set; }
         public virtual DbSet<Relationship> Relationships { get; set; }
         public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
+        public virtual DbSet<Notification> Notifications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -234,6 +235,22 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
                     v => JsonSerializer.Serialize(v, null),
                     v => JsonSerializer.Deserialize<ICollection<string>>(v, null))
                 .Metadata.SetValueComparer(valueComparer);
+
+                entity.Property(e => e.DateCreated)
+                    .HasDefaultValueSql("GETUTCDATE()")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.LastModified)
+                    .HasDefaultValueSql("GETUTCDATE()")
+                    .ValueGeneratedOnAddOrUpdate();
+            });
+
+            modelBuilder.Entity<Notification>((entity) =>
+            {
+                entity.ToTable("Notifications");
+
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
 
                 entity.Property(e => e.DateCreated)
                     .HasDefaultValueSql("GETUTCDATE()")
