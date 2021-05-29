@@ -70,6 +70,11 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
 
                 entity.HasOne(e => e.Relationship)
                     .WithOne(e => e.Family);
+
+                entity.HasOne(e => e.FamilyTree)
+                    .WithMany(f => f.Families)
+                    .HasForeignKey(e => e.FamilyTreeId)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<Person>((entity) => {
@@ -97,6 +102,11 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
                     .HasForeignKey(e => e.UserId)
                     .HasConstraintName("FK_ConnectedWith_User")
                     .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasOne(e => e.FamilyTree)
+                    .WithMany(f => f.People)
+                    .HasForeignKey(e => e.FamilyTreeId)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<Relationship>((entity) => {
