@@ -4,14 +4,16 @@ using FamilyTreeBackend.Infrastructure.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(FamilyTreeDbContext))]
-    partial class FamilyTreeDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210528123037_AddIsRescheduleIsCancelledForEventException")]
+    partial class AddIsRescheduleIsCancelledForEventException
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -339,39 +341,6 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                     b.HasIndex("OwnerId");
 
                     b.ToTable("FamilyTree");
-                });
-
-            modelBuilder.Entity("FamilyTreeBackend.Core.Domain.Entities.Notification", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<DateTime?>("DateCreated")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
-
-                    b.Property<bool>("IsRead")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("LastModified")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
-
-                    b.Property<string>("Message")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("FamilyTreeBackend.Core.Domain.Entities.Person", b =>
@@ -713,15 +682,6 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                     b.Navigation("Owner");
                 });
 
-            modelBuilder.Entity("FamilyTreeBackend.Core.Domain.Entities.Notification", b =>
-                {
-                    b.HasOne("FamilyTreeBackend.Core.Domain.Entities.ApplicationUser", "User")
-                        .WithMany("Notifications")
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("FamilyTreeBackend.Core.Domain.Entities.Person", b =>
                 {
                     b.HasOne("FamilyTreeBackend.Core.Domain.Entities.Family", "ChildOfFamily")
@@ -834,11 +794,6 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("ParentRelationship");
-                });
-
-            modelBuilder.Entity("FamilyTreeBackend.Core.Domain.Entities.ApplicationUser", b =>
-                {
-                    b.Navigation("Notifications");
                 });
 
             modelBuilder.Entity("FamilyTreeBackend.Core.Domain.Entities.Family", b =>

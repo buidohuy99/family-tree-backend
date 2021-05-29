@@ -152,6 +152,10 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                     {
                         throw new InvalidOperationOnFamilyEventException(CalendarExceptionMessages.CannotAddMultipleFollowingEventsToEvent, familyEvent.Id);
                     }
+                    if(familyEvent.Repeat == RepeatEvent.NONE && model.Repeat == RepeatEvent.NONE)
+                    {
+                        throw new InvalidOperationOnFamilyEventException(CalendarExceptionMessages.NonRepeatableEventCantHaveFollowingEvents, familyEvent.Id);
+                    }
                     var newEvent = _mapper.Map<FamilyEvent>(model);
                     newEvent.FamilyTreeId = familyEvent.FamilyTreeId;
                     newEvent.ParentEvent = familyEvent;
@@ -184,6 +188,157 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                 }
             }
             
+            await _unitOfWork.SaveChangesAsync();
+
+            // Get following events
+            var entry = _unitOfWork.Entry(familyEvent);
+            if (entry != null)
+            {
+                await entry.Collection(e => e.EventExceptions).LoadAsync();
+            }
+            List<FamilyEventModel> followingEvents = new List<FamilyEventModel>();
+            await recursivelyFetchFollowingEvents(familyEvent, followingEvents);
+            var outputEvent = new FamilyEventOutputModel()
+            {
+                FollowingEvents = followingEvents
+            };
+            _mapper.Map(familyEvent, outputEvent);
+
+            return outputEvent;
+        }
+
+        public async Task<FamilyEventOutputModel> RescheduleFamilyEvent(long eventId, FamilyEventRescheduleModel model)
+        {
+            var familyEvent = await _unitOfWork.Repository<FamilyEvent>().GetDbset().Include(e => e.FollowingEvent).FirstOrDefaultAsync(e => e.Id == eventId);
+
+            if (familyEvent == null)
+            {
+                throw new FamilyEventNotFoundException(
+                    message: CalendarExceptionMessages.FamilyEventNotFound,
+                    eventId: eventId);
+            }
+
+            if (familyEvent.Repeat != RepeatEvent.NONE)
+            {
+                if(model.StartDate == null || model.EndDate == null)
+                {
+                    throw new FamilyEventDateException(CalendarExceptionMessages.MissingDateOnInput, model.StartDate, model.EndDate);
+                }
+                //Check valid timespan of edited timespan
+                checkTimeSpanOfInputValid(familyEvent.Repeat, model.StartDate.Value, model.EndDate.Value);
+            }
+            // Check valid timespan of rescheduled to timespan
+            checkTimeSpanOfInputValid(familyEvent.Repeat, model.RescheduledStartDate, model.RescheduledEndDate);
+
+            if (familyEvent.Repeat != RepeatEvent.NONE) {
+                // Cancel old event
+                var cancelOld = new FamilyEventExceptionCase()
+                {
+                    BaseFamilyEvent = familyEvent,
+                    Note = familyEvent.Note,
+                    StartDate = model.StartDate.Value,
+                    EndDate = model.EndDate.Value,
+                    IsCancelled = true,
+                    IsRescheduled = true,
+                };
+
+                await _unitOfWork.Repository<FamilyEventExceptionCase>().AddAsync(cancelOld);
+            }
+            else
+            {
+                // Cancel all previous reschedules if event is not repeated
+                var getEventExceptions = _unitOfWork.Entry(familyEvent);
+                if (getEventExceptions != null)
+                {
+                    await getEventExceptions.Collection(e => e.EventExceptions).LoadAsync();
+                }
+
+                foreach(var exception in familyEvent.EventExceptions)
+                {
+                    exception.IsCancelled = true;
+                }
+            }
+
+            // new rescheduled time
+            var reschedule = new FamilyEventExceptionCase()
+            {
+                BaseFamilyEvent = familyEvent,
+                Note = familyEvent.Note,
+                StartDate = model.RescheduledStartDate,
+                EndDate = model.RescheduledEndDate,
+                IsCancelled = false,
+                IsRescheduled = true,
+            };
+            
+            await _unitOfWork.Repository<FamilyEventExceptionCase>().AddAsync(reschedule);
+
+            await _unitOfWork.SaveChangesAsync();
+
+            // Get following events
+            var entry = _unitOfWork.Entry(familyEvent);
+            if (entry != null)
+            {
+                await entry.Collection(e => e.EventExceptions).LoadAsync();
+            }
+            List<FamilyEventModel> followingEvents = new List<FamilyEventModel>();
+            await recursivelyFetchFollowingEvents(familyEvent, followingEvents);
+            var outputEvent = new FamilyEventOutputModel()
+            {
+                FollowingEvents = followingEvents
+            };
+            _mapper.Map(familyEvent, outputEvent);
+
+            return outputEvent;
+        }
+
+        public async Task<FamilyEventOutputModel> CancelFamilyEvent(long eventId, FamilyEventCancelModel model)
+        {
+            var familyEvent = await _unitOfWork.Repository<FamilyEvent>().GetDbset().Include(e => e.FollowingEvent).FirstOrDefaultAsync(e => e.Id == eventId);
+
+            if (familyEvent == null)
+            {
+                throw new FamilyEventNotFoundException(
+                    message: CalendarExceptionMessages.FamilyEventNotFound,
+                    eventId: eventId);
+            }
+
+            if (familyEvent.Repeat != RepeatEvent.NONE)
+            {
+                if (model.StartDate == null || model.EndDate == null)
+                {
+                    throw new FamilyEventDateException(CalendarExceptionMessages.MissingDateOnInput, model.StartDate, model.EndDate);
+                }
+                //Check valid timespan of cancelled timespan
+                checkTimeSpanOfInputValid(familyEvent.Repeat, model.StartDate.Value, model.EndDate.Value);
+
+                // Cancel old event
+                var cancelOld = new FamilyEventExceptionCase()
+                {
+                    BaseFamilyEvent = familyEvent,
+                    Note = familyEvent.Note,
+                    StartDate = model.StartDate.Value,
+                    EndDate = model.EndDate.Value,
+                    IsCancelled = true,
+                    IsRescheduled = true,
+                };
+
+                await _unitOfWork.Repository<FamilyEventExceptionCase>().AddAsync(cancelOld);
+            }
+            else
+            {
+                // Cancel all previous reschedules if event is not repeated
+                var getEventExceptions = _unitOfWork.Entry(familyEvent);
+                if (getEventExceptions != null)
+                {
+                    await getEventExceptions.Collection(e => e.EventExceptions).LoadAsync();
+                }
+
+                foreach (var exception in familyEvent.EventExceptions)
+                {
+                    exception.IsCancelled = true;
+                }
+            }
+
             await _unitOfWork.SaveChangesAsync();
 
             // Get following events
@@ -266,6 +421,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                     break;
             }
         }
+        
         #endregion Private methods
     }
 }

@@ -12,6 +12,8 @@ namespace FamilyTreeBackend.Core.Application.Models.FamilyEvents
         public long Id { get; set; }
         public long FamilyEventId { get; set; }
         public string Note { get; set; }
+        public bool IsRescheduled { get; set; }
+        public bool IsCancelled { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
     }
