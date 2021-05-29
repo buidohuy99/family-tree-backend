@@ -40,6 +40,8 @@ namespace FamilyTreeBackend.Core.Domain.Constants
         public const string CalendarController_AddEventSuccessful = "Event has been added successfully";
         public const string CalendarController_UpdateEventSuccessful = "Event has been updated successfully";
         public const string CalendarController_RemoveEventSuccessful = "Event has been removed successfully";
+        public const string CalendarController_RescheduleEventSuccessful = "Event has been rescheduled successfully";
+        public const string CalendarController_CancelEventSuccessful = "Event has been cancelled successfully";
 
         //User Controller
         public const string UserController_FilterUsersSuccessful = "Users has been filtered successfully";
@@ -127,6 +129,7 @@ namespace FamilyTreeBackend.Core.Domain.Constants
         public const string FamilyEventNotFound = "Cannot find event with provided id";
         public const string MissingDateOnInput = "Cannot update event if one of the dates is missing";
         public const string CannotAddMultipleFollowingEventsToEvent = "One event can only have one and only one follow up event";
+        public const string NonRepeatableEventCantHaveFollowingEvents = "Cannot add following event to a non repeatable event";
         public const string StartDateIsAfterEndDate = "Start date must be before end date";
         public const string StartDateAndEndDateIsNotWithinSameRepeatCycle = "Start date and end date of event must be within the same cycle for recurring events";
     }

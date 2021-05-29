@@ -45,6 +45,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers.Misc
                 [CalendarExceptionMessages.StartDateAndEndDateIsNotWithinSameRepeatCycle] = 400,
                 [CalendarExceptionMessages.CannotAddMultipleFollowingEventsToEvent] = 403,
                 [CalendarExceptionMessages.MissingDateOnInput] = 400,
+                [CalendarExceptionMessages.NonRepeatableEventCantHaveFollowingEvents] = 403,
 
                 [MemoryExceptionMessages.FamilyMemoryNotFound] = 404,
             };

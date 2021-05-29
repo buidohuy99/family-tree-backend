@@ -57,7 +57,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         }
 
         [HttpPut("event/{eventId}")]
-        [SwaggerOperation(Summary = "Update original event OR create a follow up event/event exception(need to provide start&end dates)")]
+        [SwaggerOperation(Summary = "Update original event OR Create a follow up event/event exception(need to provide start&end dates)")]
         [SwaggerResponse(200, Type = typeof(HttpResponse<FamilyEventOutputModel>),
             Description = "Return the updated event")]
         public async Task<IActionResult> UpdateFamilyEvent(long eventId, [FromBody] FamilyEventUpdateModel model)
@@ -66,6 +66,30 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             return Ok(new HttpResponse<FamilyEventOutputModel>(
                 result,
                 GenericResponseStrings.CalendarController_UpdateEventSuccessful));
+        }
+
+        [HttpPut("event/{eventId}/reschedule")]
+        [SwaggerOperation(Summary = "Reschedule an event")]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<FamilyEventOutputModel>),
+            Description = "Return the event with the newly added reschedule exception(s)")]
+        public async Task<IActionResult> RescheduleFamilyEvent(long eventId, [FromBody] FamilyEventRescheduleModel model)
+        {
+            var result = await _calendarService.RescheduleFamilyEvent(eventId, model);
+            return Ok(new HttpResponse<FamilyEventOutputModel>(
+                result,
+                GenericResponseStrings.CalendarController_RescheduleEventSuccessful));
+        }
+
+        [HttpPut("event/{eventId}/cancel")]
+        [SwaggerOperation(Summary = "Cancel an event")]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<FamilyEventOutputModel>),
+            Description = "Return the event with the newly added cancellation exception")]
+        public async Task<IActionResult> CancelFamilyEvent(long eventId, [FromBody] FamilyEventCancelModel model)
+        {
+            var result = await _calendarService.CancelFamilyEvent(eventId, model);
+            return Ok(new HttpResponse<FamilyEventOutputModel>(
+                result,
+                GenericResponseStrings.CalendarController_CancelEventSuccessful));
         }
     }
 }
