@@ -208,6 +208,9 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Id).ValueGeneratedOnAdd();
 
+                entity.Property(e => e.IsRescheduled).HasDefaultValue(false);
+                entity.Property(e => e.IsCancelled).HasDefaultValue(false);
+
                 entity.Property(e => e.DateCreated)
                     .HasDefaultValueSql("GETUTCDATE()")
                     .ValueGeneratedOnAdd();
