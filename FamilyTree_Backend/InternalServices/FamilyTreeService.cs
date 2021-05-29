@@ -65,8 +65,10 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
         public async Task DeleteFamilyTree(long treeId)
         {
-            var tree = _unitOfWork.Repository<FamilyTree>().GetDbset()
-                .SingleOrDefault(tr => tr.Id == treeId);
+            var tree = await _unitOfWork.Repository<FamilyTree>().GetDbset()
+                .Include(tr => tr.People)
+                .Include(tr => tr.Families)
+                .SingleOrDefaultAsync(tr => tr.Id == treeId);
 
             if (tree == null)
             {
