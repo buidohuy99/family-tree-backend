@@ -12,12 +12,17 @@ namespace FamilyTreeBackend.Core.Application.DTOs
     {
         public long Id { get; set; }
         public RelationshipType RelationshipType { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
 
+        public RelationshipDTO() { }
         public RelationshipDTO(Relationship relationship)
         {
             if (relationship == null) return;
             Id = relationship.Id;
             RelationshipType = relationship.RelationshipType;
+            StartDate = relationship.StartDate;
+            EndDate = relationship.EndDate;
         }
     }
 }

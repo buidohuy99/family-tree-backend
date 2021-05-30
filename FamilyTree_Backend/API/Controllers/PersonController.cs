@@ -213,5 +213,30 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             var response = new HttpResponse<PersonModel>(personModel, GenericResponseStrings.PersonController_UpdatePersonSuccessful);
             return Ok(response);
         }
+
+        [HttpGet("person/{personId}/details")]
+        [SwaggerOperation(Summary = "Get person details with provided person Id")]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<PersonDetailsModel>),
+            Description = "The details of the person, including parents, spouses, and children info")]
+        public async Task<IActionResult> GetPersonDetail(long personId)
+        {
+            var authorizationResult = await _authorizationService.AuthorizeWithPersonAsync(
+                User,
+                personId,
+                PersonOperations.Update
+                );
+            if (!authorizationResult.Succeeded)
+            {
+                return Unauthorized(new HttpResponse<AuthorizationFailure>(
+                    authorizationResult.Failure,
+                    GenericResponseStrings.Person_NoPermissionRead));
+            }
+
+            var result = await _personService.GetPersonDetail(personId);
+
+            return Ok(new HttpResponse<PersonDetailsModel>(
+                result,
+                GenericResponseStrings.PersonController_FindPersonDetailSuccessful));
+        }
     }
 }

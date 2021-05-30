@@ -470,12 +470,14 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                 IEnumerable<Person> people = await _unitOfWork.Repository<Family>().GetDbset()
                 .Include(f => f.Parent2)
                 .Where(f => f.Parent1Id == person.Id)
+                .OrderBy(f => f.Relationship.StartDate)
                 .Select(f => f.Parent2)
                 .ToListAsync();
 
                 string query = _unitOfWork.Repository<Family>().GetDbset()
                 .Include(f => f.Parent2)
                 .Where(f => f.Parent1Id == person.Id)
+                .OrderBy(f => f.Relationship.StartDate)
                 .Select(f => f.Parent2).ToQueryString();
 
                 return people;
@@ -615,6 +617,66 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             await _unitOfWork.SaveChangesAsync();
 
             return _mapper.Map<PersonModel>(person);
+        }
+
+        public async Task<PersonDetailsModel> GetPersonDetail(long personId)
+        {
+            var person = await _unitOfWork.Repository<Person>().GetDbset()
+                .Include(p => p.ChildOfFamily)
+                .ThenInclude(f => f.Parent1)
+                .Include(p => p.ChildOfFamily)
+                .ThenInclude(f => f.Parent2)
+                .Where(p => p.Id == personId)
+                .SingleOrDefaultAsync();
+            if (person == null)
+            {
+                throw new PersonNotFoundException(PersonExceptionMessages.PersonNotFound, personId);
+            }
+
+            //Get family details, including spouses and children
+            var queryForFamily = _unitOfWork.Repository<Family>().GetDbset();
+
+            Func<Family, bool> whereCondition = null;
+            Func<Family, Person> includeOption = null;
+            if (person.Gender == Gender.MALE)
+            {
+                whereCondition = (f => f.Parent1Id == personId);
+                includeOption = (f => f.Parent2);
+            }
+            else
+            {
+                whereCondition = (f => f.Parent2Id == personId);
+                includeOption = (f => f.Parent1);
+            }
+
+            var families = queryForFamily
+                .Include((f => f.Parent2))
+                .Include(f => f.Relationship)
+                .Include(f => f.Children)
+                .Where(whereCondition)
+                .OrderBy(f => f.Relationship.StartDate).ToList();
+                
+
+            List<SpouseDetailDTO> spouseDetails = new List<SpouseDetailDTO>();
+            List<PersonSummaryDTO> childrenSummary = new List<PersonSummaryDTO>();
+
+            foreach (var family in families)
+            {
+                var spouseSummary = person.Gender == Gender.MALE?
+                    _mapper.Map<PersonSummaryDTO>(family.Parent2)
+                    : _mapper.Map<PersonSummaryDTO>(family.Parent1);
+                var relationshipDto = _mapper.Map<RelationshipDTO>(family.Relationship);
+                spouseDetails.Add(new SpouseDetailDTO(spouseSummary, relationshipDto));
+
+                var children = _mapper.Map<IEnumerable<Person>, List<PersonSummaryDTO>>(family.Children);
+                childrenSummary.AddRange(children);
+            }
+
+            var personDetail = _mapper.Map<PersonDetailsModel>(person);
+            personDetail.Spouses = spouseDetails;
+            personDetail.Children = childrenSummary;
+
+            return personDetail;
         }
     }
 }
