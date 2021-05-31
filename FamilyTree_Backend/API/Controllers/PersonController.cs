@@ -239,7 +239,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
                 GenericResponseStrings.PersonController_FindPersonDetailsSuccessful));
         }
 
-        [HttpPost("/person/{personId}/details")]
+        [HttpPut("/person/{personId}/details")]
         [SwaggerOperation(Summary = "Update person details, including personal info and spousal relationships with provided person Id")]
         [SwaggerResponse(200, Type = typeof(HttpResponse<PersonDetailsResponseModel>),
             Description = "The updated details of the person, including spousal relationships")]
