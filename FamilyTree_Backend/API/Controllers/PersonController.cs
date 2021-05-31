@@ -213,5 +213,51 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             var response = new HttpResponse<PersonModel>(personModel, GenericResponseStrings.PersonController_UpdatePersonSuccessful);
             return Ok(response);
         }
+
+        [HttpGet("person/{personId}/details")]
+        [SwaggerOperation(Summary = "Get person details with provided person Id")]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<PersonDetailsModel>),
+            Description = "The details of the person, including parents, spouses, and children info")]
+        public async Task<IActionResult> GetPersonDetails(long personId)
+        {
+            var authorizationResult = await _authorizationService.AuthorizeWithPersonAsync(
+                User,
+                personId,
+                PersonOperations.Read
+                );
+            if (!authorizationResult.Succeeded)
+            {
+                return Unauthorized(new HttpResponse<AuthorizationFailure>(
+                    authorizationResult.Failure,
+                    GenericResponseStrings.Person_NoPermissionRead));
+            }
+
+            var result = await _personService.GetPersonDetail(personId);
+
+            return Ok(new HttpResponse<PersonDetailsModel>(
+                result,
+                GenericResponseStrings.PersonController_FindPersonDetailsSuccessful));
+        }
+
+        [HttpPost("/person/{personId}/details")]
+        [SwaggerOperation(Summary = "Update person details, including personal info and spousal relationships with provided person Id")]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<PersonDetailsResponseModel>),
+            Description = "The updated details of the person, including spousal relationships")]
+        public async Task<IActionResult> UpdatePersonDetails(long personId, [FromBody] PersonDetailsUpdateModel input)
+        {
+            var authorizationResult = await _authorizationService.AuthorizeWithPersonAsync(
+                User,
+                personId,
+                PersonOperations.Update
+                );
+            if (!authorizationResult.Succeeded)
+            {
+                return Unauthorized(new HttpResponse<AuthorizationFailure>(
+                    authorizationResult.Failure,
+                    GenericResponseStrings.Person_NoPermissionEdit));
+            }
+            var result = await _personService.UpdatePersonDetails(personId, input);
+            return Ok(new HttpResponse<PersonDetailsResponseModel>(result, GenericResponseStrings.PersonController_UpdatePersonDetailsSuccessful));
+        }
     }
 }

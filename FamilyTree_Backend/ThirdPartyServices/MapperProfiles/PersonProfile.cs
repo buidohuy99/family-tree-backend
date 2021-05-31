@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FamilyTreeBackend.Core.Application.DTOs;
 using FamilyTreeBackend.Core.Application.Models;
 using FamilyTreeBackend.Core.Application.Models.Person;
 using FamilyTreeBackend.Core.Domain.Entities;
@@ -14,6 +15,17 @@ namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices.MapperProf
                 .ForMember(dest => dest.Parent2Id, opt => opt.MapFrom(src => src.ChildOfFamily.Parent2Id));
 
             CreateMap<PersonInputModel, Person>();
+
+            CreateMap<Person, PersonDetailsModel>()
+                .ForMember(dest => dest.Father, opt => opt.MapFrom(src => src.ChildOfFamily.Parent1))
+                .ForMember(dest => dest.Mother, opt => opt.MapFrom(src => src.ChildOfFamily.Parent2));
+            CreateMap<Relationship, RelationshipDTO>();
+            CreateMap<Person, PersonSummaryDTO>();
+            CreateMap<SpouseRelationshipUpdateModel, Relationship>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore()).ReverseMap()
+                .ForMember(dest => dest.SpouseId, opt => opt.Ignore());
+            CreateMap<PersonDetailsUpdateModel, Person>();
+            CreateMap<Person, PersonDetailsResponseModel>();
         }
     }
 }
