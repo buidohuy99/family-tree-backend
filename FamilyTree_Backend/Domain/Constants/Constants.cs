@@ -24,7 +24,8 @@ namespace FamilyTreeBackend.Core.Domain.Constants
         public const string PersonController_FindPersonSuccessful = "Person has been found successfully";
         public const string PersonController_UpdatePersonSuccessful = "Person has been updated successfully";
         public const string PersonController_RemovePersonSuccessful = "Person has been removed successfully";
-        public const string PersonController_FindPersonDetailSuccessful = "Person detail has been found successfully";
+        public const string PersonController_FindPersonDetailsSuccessful = "Person details has been found successfully";
+        public const string PersonController_UpdatePersonDetailsSuccessful = "Person details has been updated successfully";
 
         //Family Tree Controller
         public const string TreeController_FindTreeSuccessful = "Tree has been found successfully";

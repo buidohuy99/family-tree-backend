@@ -19,5 +19,6 @@ namespace FamilyTreeBackend.Core.Application.Interfaces
         public Task RemovePerson(long id);
         public Task<PersonModel> UpdatePersonInfo(long personId, PersonInputModel updatedPersonModel);
         public Task<PersonDetailsModel> GetPersonDetail(long personId);
+        public Task<PersonDetailsResponseModel> UpdatePersonDetails(long personId, PersonDetailsUpdateModel input);
     }
 }

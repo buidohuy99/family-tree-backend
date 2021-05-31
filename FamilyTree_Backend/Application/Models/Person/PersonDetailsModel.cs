@@ -16,10 +16,10 @@ namespace FamilyTreeBackend.Core.Application.Models.Person
         public DateTime? DateOfBirth { get; set; }
         public DateTime? DateOfDeath { get; set; }
         public Gender Gender { get; set; }
-        public PersonSummaryDTO Father;
-        public PersonSummaryDTO Mother;
-        public IEnumerable<SpouseDetailDTO> Spouses;
-        public IEnumerable<PersonSummaryDTO> Children;
+        public PersonSummaryDTO Father { get; set; }
+        public PersonSummaryDTO Mother { get; set; }
+        public IEnumerable<SpouseDetailDTO> Spouses { get; set; }
+        public IEnumerable<PersonSummaryDTO> Children { get; set; }
         public string PhoneNumber { get; set; }
         public string HomeAddress { get; set; }
         public string Occupation { get; set; }

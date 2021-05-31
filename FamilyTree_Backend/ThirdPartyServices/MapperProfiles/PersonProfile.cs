@@ -21,7 +21,11 @@ namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices.MapperProf
                 .ForMember(dest => dest.Mother, opt => opt.MapFrom(src => src.ChildOfFamily.Parent2));
             CreateMap<Relationship, RelationshipDTO>();
             CreateMap<Person, PersonSummaryDTO>();
-            
+            CreateMap<SpouseRelationshipUpdateModel, Relationship>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore()).ReverseMap()
+                .ForMember(dest => dest.SpouseId, opt => opt.Ignore());
+            CreateMap<PersonDetailsUpdateModel, Person>();
+            CreateMap<Person, PersonDetailsResponseModel>();
         }
     }
 }
