@@ -29,14 +29,7 @@ namespace FamilyTreeBackend.Core.Application.DTOs
             }
             if (family.Relationship != null)
             {
-                if (family.Relationship.RelationshipType == RelationshipType.MARRIED)
-                {
-                    Relationship = new MarriageDTO(family.Relationship as Marriage);
-                }
-                else
-                {
-                    Relationship = new RelationshipDTO(family.Relationship);
-                }
+                Relationship = new RelationshipDTO(family.Relationship);
             }
         }
     }

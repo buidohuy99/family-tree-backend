@@ -690,32 +690,41 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             _mapper.Map(input, person);
 
             List<Family> updatedFamilies = new List<Family>();
-            
-            foreach(var model in input.SpouseRelationships)
+
+            Expression<Func<Family, bool>> whereCondition = null;
+            if (person.Gender == Gender.MALE)
             {
-                Expression<Func<Family, bool>> whereCondition = null;
+                whereCondition = (f => f.Parent1Id == personId);
+            }
+            else
+            {
+                whereCondition = (f => f.Parent2Id == personId);
+            }
+            var families = await _unitOfWork.Repository<Family>().GetDbset()
+                    .Include(f => f.Relationship)
+                    .Where(whereCondition)
+                    .ToListAsync();
+
+            foreach (var model in input.SpouseRelationships)
+            {
+               Func<Family, bool> spouseCompareOption = null;
                 if (person.Gender == Gender.MALE)
                 {
-                    whereCondition = (f => f.Parent1Id == personId && f.Parent2Id == model.SpouseId);
+                    spouseCompareOption = (f => f.Parent2Id == model.SpouseId);
                 }
                 else
                 {
-                    whereCondition = (f => f.Parent2Id == personId && f.Parent1Id == model.SpouseId);
+                    spouseCompareOption = (f => f.Parent1Id == model.SpouseId);
                 }
 
-                var family = await _unitOfWork.Repository<Family>().GetDbset()
-                    .Include(f => f.Relationship)
-                    .Where(whereCondition)
-                    .SingleOrDefaultAsync();
+                var family = families.Where(spouseCompareOption).SingleOrDefault();
                 if (family != null)
                 {
                     _mapper.Map(model, family.Relationship);
                     updatedFamilies.Add(family);
                 }
             }
-
             await _unitOfWork.SaveChangesAsync();
-
             var result = _mapper.Map<PersonDetailsResponseModel>(person);
 
             List<SpouseRelationshipUpdateModel> relationships = new List<SpouseRelationshipUpdateModel>();

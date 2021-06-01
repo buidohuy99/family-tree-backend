@@ -355,7 +355,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
             family.Children.Add(person);
 
-            Marriage relationship = new Marriage
+            Relationship relationship = new Relationship
             {
                 RelationshipType = RelationshipType.MARRIED,
             };
