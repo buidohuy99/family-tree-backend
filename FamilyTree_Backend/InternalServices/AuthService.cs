@@ -37,135 +37,121 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
         public async Task<AuthResponseModel> Login(AuthLoginModel model)
         {
-            try
+            var user = await _userManager.FindByNameAsync(model.UsernameOrEmail) ?? await _userManager.FindByEmailAsync(model.UsernameOrEmail);
+
+            if (user == null)
             {
-                var user = await _userManager.FindByNameAsync(model.UsernameOrEmail) ?? await _userManager.FindByEmailAsync(model.UsernameOrEmail);
-            
-                if(user == null)
-                {
-                    throw new UserNotFoundException(UserExceptionMessages.UserNotFound);
-                }
-                else
-                {
-                    var checkPassword = await _userManager.CheckPasswordAsync(user, model.Password);
-                    if (checkPassword)
-                    {
-                        string accessToken = new JwtSecurityTokenHandler().WriteToken(generateAccessToken(user));
-
-                        string refreshToken = null;
-                        if (model.GetRefreshToken)
-                        {
-                            refreshToken = await generateRefreshToken(user);
-                        }
-
-                        return new AuthResponseModel(user, accessToken, refreshToken);
-                    }
-                    throw new LoginUserFailException(AuthExceptionMessages.InvalidPassword);
-                }
+                throw new UserNotFoundException(UserExceptionMessages.UserNotFound);
             }
-            catch(Exception e)
+            else
             {
-                throw;
+                var checkPassword = await _userManager.CheckPasswordAsync(user, model.Password);
+                if (checkPassword)
+                {
+                    string accessToken = new JwtSecurityTokenHandler().WriteToken(generateAccessToken(user));
+
+                    string refreshToken = null;
+                    if (model.GetRefreshToken)
+                    {
+                        refreshToken = await generateRefreshToken(user);
+                    }
+
+                    return new AuthResponseModel(user, accessToken, refreshToken);
+                }
+                throw new LoginUserFailException(AuthExceptionMessages.InvalidPassword);
             }
         }
 
         public async Task<RefreshTokenResponseModel> RefreshAccessToken(string refreshToken)
         {
-            try
+            //Hash the refresh token
+            using (var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(_jwtConfig.RefreshTokenKey)))
             {
-                //Hash the refresh token
-                using (var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(_jwtConfig.RefreshTokenKey)))
+                byte[] hashed = null;
+                try
                 {
-                    var hashed = hmac.ComputeHash(Convert.FromBase64String(refreshToken));
-
-                    var token = _unitOfWork.GetRefreshTokens().Include(t => t.User).SingleOrDefault(e => e.Token.Equals(Convert.ToBase64String(hashed)));
-
-                    if (token == null) // can't find token
-                    {
-                        throw new RefreshTokenFailException(AuthExceptionMessages.InvalidRefreshToken, refreshToken);
-                    }
-                    else if (token.User == null) // Bad token
-                    {
-                        _unitOfWork.GetRefreshTokens().Attach(token);
-                        _unitOfWork.GetRefreshTokens().Remove(token);
-                        await _unitOfWork.SaveChangesAsync();
-                        throw new RefreshTokenFailException(AuthExceptionMessages.RefreshTokenIsCorrupted, refreshToken);
-                    }
-                    else
-                    {
-                        string accessToken = new JwtSecurityTokenHandler().WriteToken(generateAccessToken(token.User));
-                        string newRefreshToken = null;
-                        // purgeeeee old stuff or stuff that no longer has an owner
-                        foreach (var foundToken in _unitOfWork.GetRefreshTokens().Where(t => t.UserId == null || (t.UserId.Equals(token.User.Id) && DateTime.UtcNow.CompareTo(t.ExpiredDate) > 0)))
-                        {
-                            _unitOfWork.GetRefreshTokens().Attach(foundToken);
-                            _unitOfWork.GetRefreshTokens().Remove(foundToken);
-                        }
-                        //and generate a new refresh token if current one is expired
-                        if (DateTime.UtcNow.CompareTo(token.ExpiredDate) > 0) 
-                        {
-                            newRefreshToken = await generateRefreshToken(token.User);
-                        }
-                        await _unitOfWork.SaveChangesAsync();
-                        return new RefreshTokenResponseModel(token.User, accessToken, newRefreshToken);
-                    }
+                    hashed = hmac.ComputeHash(Convert.FromBase64String(refreshToken));
+                } catch (FormatException)
+                {
+                    throw new RefreshTokenFailException(AuthExceptionMessages.InvalidRefreshToken, refreshToken);
                 }
-            } 
-            catch(Exception e)
-            {
-                throw;
+
+                var token = _unitOfWork.GetRefreshTokens().Include(t => t.User).SingleOrDefault(e => e.Token.Equals(Convert.ToBase64String(hashed)));
+
+                if (token == null) // can't find token
+                {
+                    throw new RefreshTokenFailException(AuthExceptionMessages.InvalidRefreshToken, refreshToken);
+                }
+                else if (token.User == null) // Bad token
+                {
+                    _unitOfWork.GetRefreshTokens().Attach(token);
+                    _unitOfWork.GetRefreshTokens().Remove(token);
+                    await _unitOfWork.SaveChangesAsync();
+                    throw new RefreshTokenFailException(AuthExceptionMessages.RefreshTokenIsCorrupted, refreshToken);
+                }
+                else
+                {
+                    string accessToken = new JwtSecurityTokenHandler().WriteToken(generateAccessToken(token.User));
+                    string newRefreshToken = null;
+                    // purgeeeee old stuff or stuff that no longer has an owner
+                    foreach (var foundToken in _unitOfWork.GetRefreshTokens().Where(t => t.UserId == null || (t.UserId.Equals(token.User.Id) && DateTime.UtcNow.CompareTo(t.ExpiredDate) > 0)))
+                    {
+                        _unitOfWork.GetRefreshTokens().Attach(foundToken);
+                        _unitOfWork.GetRefreshTokens().Remove(foundToken);
+                    }
+                    //and generate a new refresh token if current one is expired
+                    if (DateTime.UtcNow.CompareTo(token.ExpiredDate) > 0) 
+                    {
+                        newRefreshToken = await generateRefreshToken(token.User);
+                    }
+                    await _unitOfWork.SaveChangesAsync();
+                    return new RefreshTokenResponseModel(token.User, accessToken, newRefreshToken);
+                }
             }
         }
 
         public async Task<AuthResponseModel> RegisterUser(AuthRegisterModel model)
         {
-            try
+            var sameUsernameUser = await _userManager.FindByNameAsync(model.UserName);
+
+            if (sameUsernameUser != null)
             {
-                var sameUsernameUser = await _userManager.FindByNameAsync(model.UserName);
-
-                if (sameUsernameUser != null)
-                {
-                    throw new RegisterUserFailException(AuthExceptionMessages.UsernameAlreadyExists, username: model.UserName);
-                }
-
-                var sameEmailUser = await _userManager.FindByEmailAsync(model.Email);
-
-                if (sameEmailUser != null)
-                {
-                    throw new RegisterUserFailException(AuthExceptionMessages.EmailAlreadyExists, email: model.Email);
-                }
-
-                var newUser = new ApplicationUser()
-                {
-                    UserName = model.UserName,
-                    Email = model.Email,
-                    PhoneNumber = model.Phone,
-                    FirstName = model.FirstName,
-                    LastName = model.LastName,
-                    MidName = model.MidName,
-                };
-                var identityResult = await _userManager.CreateAsync(newUser, model.Password);
-
-                if (identityResult.Succeeded)
-                {
-                    string accessToken = new JwtSecurityTokenHandler().WriteToken(generateAccessToken(newUser));
-
-                    string refreshToken = null;
-                    if (model.GetRefreshToken)
-                    {
-                        refreshToken = await generateRefreshToken(newUser);
-                    }
-
-                    return new AuthResponseModel(newUser, accessToken, refreshToken);
-                }
-                else
-                {
-                    throw new RegisterUserFailException(AuthExceptionMessages.RegisterUserFail, identityResult.Errors.ToList());
-                }
+                throw new RegisterUserFailException(AuthExceptionMessages.UsernameAlreadyExists, username: model.UserName);
             }
-            catch (Exception ex)
+
+            var sameEmailUser = await _userManager.FindByEmailAsync(model.Email);
+
+            if (sameEmailUser != null)
             {
-                throw;
+                throw new RegisterUserFailException(AuthExceptionMessages.EmailAlreadyExists, email: model.Email);
+            }
+
+            var newUser = new ApplicationUser()
+            {
+                UserName = model.UserName,
+                Email = model.Email,
+                PhoneNumber = model.Phone,
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                MidName = model.MidName,
+            };
+            var identityResult = await _userManager.CreateAsync(newUser, model.Password);
+
+            if (identityResult.Succeeded)
+            {
+                string accessToken = new JwtSecurityTokenHandler().WriteToken(generateAccessToken(newUser));
+
+                string refreshToken = null;
+                if (model.GetRefreshToken)
+                {
+                    refreshToken = await generateRefreshToken(newUser);
+                }
+
+                return new AuthResponseModel(newUser, accessToken, refreshToken);
+            }
+            else
+            {
+                throw new RegisterUserFailException(AuthExceptionMessages.RegisterUserFail, identityResult.Errors.ToList());
             }
         }
 

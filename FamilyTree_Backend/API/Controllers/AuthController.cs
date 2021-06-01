@@ -53,9 +53,9 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         [HttpPost("refresh-access-token")]
         [SwaggerOperation(Summary = "Refresh the access token with a refresh token")]
         [SwaggerResponse(200, Type = typeof(HttpResponse<RefreshTokenResponseModel>))]
-        public async Task<IActionResult> RefreshAccessToken([FromBody] string refreshToken)
+        public async Task<IActionResult> RefreshAccessToken([FromBody] AuthRefreshAccessTokenModel model)
         {
-            RefreshTokenResponseModel response = await _authService.RefreshAccessToken(refreshToken);
+            RefreshTokenResponseModel response = await _authService.RefreshAccessToken(model.RefreshToken);
             return Ok(new HttpResponse<RefreshTokenResponseModel>(response, GenericResponseStrings.Auth_RefreshTokenSuccessful));
         }
     }
