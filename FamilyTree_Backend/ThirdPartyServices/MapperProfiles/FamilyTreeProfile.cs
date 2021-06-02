@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using FamilyTreeBackend.Core.Application.Models.FamilyTree;
+using FamilyTreeBackend.Core.Application.Models.FileIO;
 using FamilyTreeBackend.Core.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,8 @@ namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices.MapperProf
         public FamilyTreeProfile()
         {
             CreateMap<FamilyTree, FamilyTreeModel>()
+                .ForMember(dest => dest.People, opt => opt.MapFrom(src => src.People));
+            CreateMap<FamilyTree, FamilyTreeFileIOModel>()
                 .ForMember(dest => dest.People, opt => opt.MapFrom(src => src.People));
 
             CreateMap<FamilyTreeInputModel, FamilyTree>();

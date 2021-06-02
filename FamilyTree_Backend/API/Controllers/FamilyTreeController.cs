@@ -16,6 +16,7 @@ using FamilyTreeBackend.Presentation.API.Handlers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
+using System.IO;
 
 namespace FamilyTreeBackend.Presentation.API.Controllers
 {
@@ -200,6 +201,28 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
                 return _familyTreeService.GetTreeEditors(treeId); 
             });
             return Ok(new HttpResponse<FamilyTreeContributorsModel>(result, GenericResponseStrings.TreeController_GetEditorsOfTreeSuccessful));
+        }
+
+        [AllowAnonymous]
+        [HttpPost("tree/{treeId}/export/json")]
+        [SwaggerOperation(Summary = "Get json export of the tree")]
+        [SwaggerResponse(200, Type = typeof(FileContentResult),
+            Description = "Get json export")]
+        public async Task<FileContentResult> GetJsonExport(long treeId)
+        {
+            var result = await _familyTreeService.ExportFamilyTree(treeId);
+            var tree = await _familyTreeService.FindFamilyTree(treeId);
+            return File(new System.Text.UTF8Encoding().GetBytes(result), "application/json", $"FamilyTreeExport_{tree.Name}_{DateTime.Now:yyyyMMddHHmmss}.json");
+        }
+
+        [AllowAnonymous]
+        [HttpPost("tree/{treeId}/backup")]
+        [SwaggerOperation(Summary = "Get json backup of the tree (can be used for import)")]
+        [SwaggerResponse(200, Type = typeof(FileContentResult),
+            Description = "Get json backup")]
+        public async Task<FileContentResult> GetJsonBackup(long treeId)
+        {
+            throw new NotImplementedException();    
         }
     }
 }

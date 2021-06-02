@@ -13,6 +13,9 @@ namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices.MapperProf
             CreateMap<Person, PersonModel>()
                 .ForMember(dest => dest.Parent1Id, opt => opt.MapFrom(src => src.ChildOfFamily.Parent1Id))
                 .ForMember(dest => dest.Parent2Id, opt => opt.MapFrom(src => src.ChildOfFamily.Parent2Id));
+            CreateMap<Person, FileIOPersonDTO>()
+               .ForMember(dest => dest.Parent1Id, opt => opt.MapFrom(src => src.ChildOfFamily.Parent1Id))
+               .ForMember(dest => dest.Parent2Id, opt => opt.MapFrom(src => src.ChildOfFamily.Parent2Id));
 
             CreateMap<PersonInputModel, Person>();
 
@@ -20,6 +23,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices.MapperProf
                 .ForMember(dest => dest.Father, opt => opt.MapFrom(src => src.ChildOfFamily.Parent1))
                 .ForMember(dest => dest.Mother, opt => opt.MapFrom(src => src.ChildOfFamily.Parent2));
             CreateMap<Relationship, RelationshipDTO>();
+            CreateMap<Relationship, FileIOSpouseDTO.FileIOSpouseRelationshipDTO>();
             CreateMap<Person, PersonSummaryDTO>();
             CreateMap<SpouseRelationshipUpdateModel, Relationship>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore()).ReverseMap()

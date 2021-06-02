@@ -4,21 +4,28 @@ using FamilyTreeBackend.Core.Application.Helpers.Exceptions;
 using FamilyTreeBackend.Core.Application.Interfaces;
 using FamilyTreeBackend.Core.Application.Models;
 using FamilyTreeBackend.Core.Application.Models.FamilyTree;
+using FamilyTreeBackend.Core.Application.Models.FileIO;
+using FamilyTreeBackend.Core.Application.Models.Person;
 using FamilyTreeBackend.Core.Domain.Constants;
 using FamilyTreeBackend.Core.Domain.Entities;
 using FamilyTreeBackend.Core.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using StopWord;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 {
@@ -266,6 +273,60 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             }
 
             return trees;
+        }
+
+        public async Task<FamilyTreeModel> ImportFamilyTree(FamilyTreeFileIOModel model, ClaimsPrincipal claimsPrincipal)
+        {
+            var user = await _userManager.GetUserAsync(claimsPrincipal);
+            if (user == null)
+            {
+                throw new UserNotFoundException(UserExceptionMessages.UserNotFound);
+            }
+
+            throw new NotImplementedException();
+        }
+
+        public async Task<string> ExportFamilyTree(long treeId)
+        {
+            var tree = await _unitOfWork.Repository<FamilyTree>().GetDbset()
+                .Include(tr => tr.People)
+                .Include(tr => tr.Families)
+                .ThenInclude(f => f.Relationship)
+                .SingleOrDefaultAsync(tr => tr.Id == treeId);
+
+            if (tree == null)
+            {
+                throw new TreeNotFoundException(TreeExceptionMessages.TreeNotFound, treeId);
+            }
+
+            // Map normal attribs
+            var mappedTree = _mapper.Map<FamilyTreeFileIOModel>(tree);
+            // Map spouses
+            foreach (var personModel in mappedTree.People)
+            {
+                Func<Family, bool> whereCondition = null;
+
+                if (personModel.Gender == Gender.MALE)
+                {
+                    whereCondition = (f => f.Parent1Id == personModel.Id);
+                }
+                else
+                {
+                    whereCondition = (f => f.Parent2Id == personModel.Id);
+                }
+
+                var spouses = tree.Families.Where(whereCondition)
+                    .Select(e => new FileIOSpouseDTO(){
+                        SpouseId = personModel.Gender == Gender.MALE ? e.Parent2Id : e.Parent1Id,
+                        RelationshipInfo = e.Relationship != null ? _mapper.Map<FileIOSpouseDTO.FileIOSpouseRelationshipDTO>(e.Relationship) : null
+                    });
+
+                personModel.Spouses = spouses;
+            }
+
+            string payload = JsonConvert.SerializeObject(mappedTree);
+
+            return payload;
         }
 
         #region Helper methods
