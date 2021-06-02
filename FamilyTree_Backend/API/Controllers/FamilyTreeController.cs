@@ -17,6 +17,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
 using System.IO;
+using System.Net;
+using System.Security.Cryptography.X509Certificates;
+using System.Security.Cryptography;
+using Microsoft.Extensions.Options;
+using FamilyTreeBackend.Core.Application.Helpers.ConfigModels;
+using Jose;
 
 namespace FamilyTreeBackend.Presentation.API.Controllers
 {
@@ -27,13 +33,16 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
     {
         private readonly IFamilyTreeService _familyTreeService;
         private readonly ITreeAuthorizationService _authorizationService;
+        private readonly JWEConfig _jweConfigs;
         public FamilyTreeController(
             UserManager<ApplicationUser> userManager, 
             IFamilyTreeService familyTreeService,
-            ITreeAuthorizationService authorizationService) : base(userManager)
+            ITreeAuthorizationService authorizationService,
+            IOptions<JWEConfig> jweConfigs) : base(userManager)
         {
             _familyTreeService = familyTreeService;
             _authorizationService = authorizationService;
+            _jweConfigs = jweConfigs.Value;
         }
 
         [HttpGet("tree/{treeId}")]
@@ -206,22 +215,28 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         [AllowAnonymous]
         [HttpPost("tree/{treeId}/export/json")]
         [SwaggerOperation(Summary = "Get json export of the tree")]
-        [SwaggerResponse(200, Type = typeof(FileContentResult),
-            Description = "Get json export")]
-        public async Task<FileContentResult> GetJsonExport(long treeId)
+        [SwaggerResponse(200, Type = typeof(FileResult),
+            Description = "Get json export") ]
+        [ProducesResponseType(typeof(FileResult), (int)HttpStatusCode.OK)]
+        [Produces("application/json")]
+        public async Task<FileResult> GetJsonExport(long treeId)
         {
-            var result = await _familyTreeService.ExportFamilyTree(treeId);
-            return File(new System.Text.UTF8Encoding().GetBytes(result.payload), "application/json", $"FamilyTreeExport_Name:{result.treeName}_{DateTime.Now:yyyyMMddHHmmss}.json");
+            var result = await _familyTreeService.ExportFamilyTreeJson(treeId);
+            return File(new System.Text.UTF8Encoding().GetBytes(result.payload), "application/json", $"FamilyTreeExport_{result.treeName}_{DateTime.Now:yyyyMMddHHmmss}.json");
         }
 
         [AllowAnonymous]
         [HttpPost("tree/{treeId}/backup")]
         [SwaggerOperation(Summary = "Get json backup of the tree (can be used for import)")]
-        [SwaggerResponse(200, Type = typeof(FileContentResult),
+        [SwaggerResponse(200, Type = typeof(FileResult),
             Description = "Get json backup")]
-        public async Task<FileContentResult> GetJsonBackup(long treeId)
+        [ProducesResponseType(typeof(FileResult), (int)HttpStatusCode.OK)]
+        [Produces("application/json")]
+        public async Task<FileResult> GetJsonBackup(long treeId)
         {
-            throw new NotImplementedException();    
+            var result = await _familyTreeService.ExportFamilyTreeJson(treeId);
+            string token = JWE.Encrypt(result.payload, new[] { new JweRecipient(JweAlgorithm.PBES2_HS256_A128KW, _jweConfigs.FileIOFamilyTreeKey, null) }, JweEncryption.A256GCM);
+            return File(new System.Text.UTF8Encoding().GetBytes(token), "application/json", $"FamilyTreeBackup_{result.treeName}_{DateTime.Now:yyyyMMddHHmmss}.json");
         }
     }
 }

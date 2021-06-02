@@ -286,7 +286,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             throw new NotImplementedException();
         }
 
-        public async Task<(string treeName, string payload)> ExportFamilyTree(long treeId)
+        public async Task<(string treeName, string payload)> ExportFamilyTreeJson(long treeId)
         {
             var tree = await _unitOfWork.Repository<FamilyTree>().GetDbset()
                 .Include(tr => tr.People)

@@ -93,6 +93,10 @@ namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices
             services.Configure<ImageKitAccounts>(Configuration.GetSection("ImageKit"));
             #endregion
 
+            #region JWE configuration
+            services.Configure<JWEConfig>(Configuration.GetSection("JWE"));
+            #endregion
+
             #region Email Sender configuration
             services.Configure<SmtpSettings>(Configuration.GetSection("SmtpSettings"));
             #endregion
