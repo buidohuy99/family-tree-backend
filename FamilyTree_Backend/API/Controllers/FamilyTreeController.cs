@@ -211,8 +211,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         public async Task<FileContentResult> GetJsonExport(long treeId)
         {
             var result = await _familyTreeService.ExportFamilyTree(treeId);
-            var tree = await _familyTreeService.FindFamilyTree(treeId);
-            return File(new System.Text.UTF8Encoding().GetBytes(result), "application/json", $"FamilyTreeExport_{tree.Name}_{DateTime.Now:yyyyMMddHHmmss}.json");
+            return File(new System.Text.UTF8Encoding().GetBytes(result.payload), "application/json", $"FamilyTreeExport_Name:{result.treeName}_{DateTime.Now:yyyyMMddHHmmss}.json");
         }
 
         [AllowAnonymous]

@@ -286,7 +286,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             throw new NotImplementedException();
         }
 
-        public async Task<string> ExportFamilyTree(long treeId)
+        public async Task<(string treeName, string payload)> ExportFamilyTree(long treeId)
         {
             var tree = await _unitOfWork.Repository<FamilyTree>().GetDbset()
                 .Include(tr => tr.People)
@@ -326,7 +326,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
             string payload = JsonConvert.SerializeObject(mappedTree);
 
-            return payload;
+            return (treeName: tree.Name, payload);
         }
 
         #region Helper methods
