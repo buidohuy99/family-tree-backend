@@ -169,5 +169,14 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
 
             return Ok(GenericResponseStrings.UserController_RemoveNotificationSuccessul);
         }
+
+        [HttpGet("notifications/test")]
+        [SwaggerOperation(Summary = "Test trigger notification")]
+        public async Task<IActionResult> TestTriggerNotification()
+        {
+            await _userService.TestTriggerNotification();
+
+            return Ok();
+        }
     }
 }

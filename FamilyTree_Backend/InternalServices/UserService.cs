@@ -6,6 +6,7 @@ using FamilyTreeBackend.Core.Application.Interfaces;
 using FamilyTreeBackend.Core.Application.Models.User;
 using FamilyTreeBackend.Core.Domain.Constants;
 using FamilyTreeBackend.Core.Domain.Entities;
+using FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices.Quartz.QuartzJobs;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -222,6 +223,12 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             await _unitOfWork.SaveChangesAsync();
 
             return _mapper.Map<NotificationDTO>(noti);
+        }
+
+        public Task TestTriggerNotification()
+        {
+            DailyNotificationJob job = new DailyNotificationJob(_unitOfWork, null);
+            return job.DistributeNotification();
         }
     }
 }

@@ -1,16 +1,11 @@
 ﻿using FamilyTreeBackend.Core.Application.Interfaces;
 using FamilyTreeBackend.Core.Domain.Entities;
-using FamilyTreeBackend.Core.Domain.Enums;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Quartz;
 using System;
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices.Quartz.QuartzJobs
@@ -30,33 +25,33 @@ namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices.Quartz.Qua
             return DistributeNotification();
         }
 
-        private async Task DistributeNotification()
+        public async Task DistributeNotification()
         {
-            var param = new SqlParameter("Today", DateTime.Now);
+            var param = new SqlParameter("Today", DateTime.Now.ToString());
             var eventsNeedNotification = await _unitOfWork.Repository<FamilyEvent>().GetDbset()
                 .FromSqlRaw(Sql_GetNotificationNeededEvents, param)
                 .AsNoTracking()
                 .ToListAsync();
 
-            foreach(var familyEvent in eventsNeedNotification)
+            foreach (var familyEvent in eventsNeedNotification)
             {
-                NotifyUsers(familyEvent).Start();
+                await NotifyUsers(familyEvent);
             }
         }
 
         private async Task NotifyUsers(FamilyEvent familyEvent)
         {
-            var tree =  await _unitOfWork.Repository<FamilyTree>().GetDbset()
+            var tree = await _unitOfWork.Repository<FamilyTree>().GetDbset()
                 .Include(tr => tr.Owner)
                 .Include(tr => tr.Editors)
                 .Where(tr => tr.Id == familyEvent.FamilyTreeId)
                 .SingleOrDefaultAsync();
 
-            AddNotificationToUser($"Reminder for event: {familyEvent.Note} on {familyEvent.StartDate:yyyy/MM/dd HH:mm}", tree.Owner).Start();
+            _= AddNotificationToUser($"Reminder for event: {familyEvent.Note} on {familyEvent.StartDate:yyyy/MM/dd HH:mm}", tree.Owner);
 
-            foreach(var editors in tree.Editors)
+            foreach (var editors in tree.Editors)
             {
-                AddNotificationToUser($"Reminder for event: {familyEvent.Note}", editors).Start();
+                _= AddNotificationToUser($"Reminder for event: {familyEvent.Note}", editors);
             }
         }
 
@@ -67,7 +62,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices.Quartz.Qua
                 Message = message,
                 UserId = user.Id,
             };
-            
+
             await _unitOfWork.Repository<Notification>().AddAsync(notification);
             await _unitOfWork.SaveChangesAsync();
         }
@@ -76,14 +71,16 @@ namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices.Quartz.Qua
 WITH
 _events AS (
 SELECT DISTINCT e.*
+--, cast(ex.IsRescheduled as int) + cast(ex.IsCancelled as int) 
 --ex.IsCancelled, 
 --ex.IsRescheduled, 
 --ex.StartDate RescheduledDate
 FROM FamilyEvent e LEFT JOIN FamilyEventExceptionCases ex ON e.Id = ex.FamilyEventId
 WHERE
---if not cancelled or rescheduled to another day
-NOT (CAST(ex.IsRescheduled AS INT) + CAST(ex.IsCancelled AS INT)!= 2 
-	AND CAST(ex.StartDate AS DATE) = CAST(DATEADD(day, e.ReminderOffest, @Today) AS DATE))
+----if not cancelled or rescheduled to another day
+(
+NOT (coalesce(CAST(ex.IsRescheduled AS INT), 0) + coalesce(CAST(ex.IsCancelled AS INT), 0)!= 2 
+	AND coalesce(CAST(ex.StartDate AS DATE), '0001-01-01') = CAST(DATEADD(day, e.ReminderOffest, @Today) AS DATE))
 AND (
 --non repeat
 (e.Repeat = 0 AND CAST(e.StartDate AS DATE) = CAST(DATEADD(day, e.ReminderOffest, @Today) AS DATE))
@@ -95,6 +92,7 @@ OR (e.Repeat = 2 AND DATEPART(DAY, e.StartDate)  = DATEPART(DAY, DATEADD(day, e.
 OR (e.Repeat = 3 
 	AND DATEPART(day, e.StartDate)  = DATEPART(DAY, DATEADD(day, e.ReminderOffest, @Today)))
 	AND DATEPART(MONTH, e.StartDate)  = DATEPART(DAY, DATEADD(MONTH, e.ReminderOffest, @Today)))
+)
 --or has special rescheduled instance that is on today
 OR (ex.IsRescheduled = 1 AND ex.IsCancelled = 1 
 	AND CAST(ex.StartDate AS DATE) = CAST(DATEADD(day, e.ReminderOffest, @Today) AS DATE))

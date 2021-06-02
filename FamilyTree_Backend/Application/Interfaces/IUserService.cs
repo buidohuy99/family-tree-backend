@@ -20,5 +20,6 @@ namespace FamilyTreeBackend.Core.Application.Interfaces
         public Task<IEnumerable<NotificationDTO>> GetNotifications(ApplicationUser user);
         public Task<NotificationDTO> ReadNotification(long notficationId);
         public Task<NotificationDTO> RemoveNotification(long notficationId);
+        Task TestTriggerNotification();
     }
 }
