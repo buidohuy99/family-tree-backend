@@ -13,6 +13,5 @@ namespace FamilyTreeBackend.Core.Domain.Enums
         WEEKLY,
         MONTHLY,
         ANNUALLY,
-        NEVER,
     }
 }
