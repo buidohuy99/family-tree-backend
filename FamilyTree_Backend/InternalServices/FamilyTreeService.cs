@@ -11,6 +11,7 @@ using FamilyTreeBackend.Core.Domain.Entities;
 using FamilyTreeBackend.Core.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using StopWord;
@@ -333,8 +334,9 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
         private async Task<IEnumerable<FamilyTree>> FindAccessibleTrees(ApplicationUser applicationUser)
         {
+            var param = new SqlParameter("User", applicationUser.Id);
             var query = _unitOfWork.Repository<FamilyTree>().GetDbset()
-                .FromSqlRaw(Sql_FindUserAllTrees, applicationUser.Id)
+                .FromSqlRaw(Sql_FindUserAllTrees, param)
                 .Include(tr => tr.Owner)
                 .Include(tr => tr.Editors);
 
@@ -475,8 +477,12 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
         #endregion
 
         private const string Sql_FindUserAllTrees = @"
-        SELECT tree.*
-        FROM FamilyTree tree LEFT JOIN ApplicationUserFamilyTree editors ON tree.Id = editors.EditorOfFamilyTreesId
-        WHERE tree.OwnerId = {0} OR editors.EditorsId = {0}";
+        SELECT distinct tree.*
+        FROM FamilyTree tree 
+            LEFT JOIN ApplicationUserFamilyTree editors ON tree.Id = editors.EditorOfFamilyTreesId
+            LEFT JOIN Person persons ON  tree.Id = persons.FamilyTreeId
+        WHERE tree.OwnerId = @User 
+		OR editors.EditorsId = @User 
+		OR persons.UserId = @User";
     }
 }
