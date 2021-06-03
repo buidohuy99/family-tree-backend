@@ -178,7 +178,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                 throw new FamilyEventDateException(CalendarExceptionMessages.MissingDateOnInput, model.StartDate, model.EndDate);    
             } else // Update without changing the start and end date
             {
-                if (model.Repeat == null || model.Repeat != familyEvent.Repeat)
+                if (model.Repeat == null || model.Repeat == familyEvent.Repeat)
                 {
                     if (model.ReminderOffest != null)
                     {
