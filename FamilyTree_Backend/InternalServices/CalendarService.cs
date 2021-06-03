@@ -159,7 +159,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                     var newEvent = _mapper.Map<FamilyEvent>(model);
                     newEvent.FamilyTreeId = familyEvent.FamilyTreeId;
                     newEvent.ParentEvent = familyEvent;
-                    if (model.Repeat == null)
+                    if (model.Repeat == null || model.Repeat == familyEvent.Repeat)
                     {
                         newEvent.Repeat = familyEvent.Repeat;
                     }
@@ -176,15 +176,34 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             } else if (!(model.StartDate == null && model.EndDate == null)) // missing input 
             {
                 throw new FamilyEventDateException(CalendarExceptionMessages.MissingDateOnInput, model.StartDate, model.EndDate);    
-            } else // Update non-schedule related attribs
+            } else // Update without changing the start and end date
             {
-                if (model.ReminderOffest != null)
+                if (model.Repeat == null || model.Repeat != familyEvent.Repeat)
                 {
-                    familyEvent.ReminderOffest = model.ReminderOffest.Value;
+                    if (model.ReminderOffest != null)
+                    {
+                        familyEvent.ReminderOffest = model.ReminderOffest.Value;
+                    }
+                    if (model.Note != null)
+                    {
+                        familyEvent.Note = model.Note;
+                    }
                 }
-                if (model.Note != null)
+                else
                 {
-                    familyEvent.Note = model.Note;
+                    checkTimeSpanOfInputValid(model.Repeat.Value, familyEvent.StartDate, familyEvent.EndDate);
+
+                    var newEvent = new FamilyEvent() { 
+                        ParentEvent = familyEvent,
+                        Note = model.Note ?? familyEvent.Note,
+                        ReminderOffest = model.ReminderOffest.HasValue ? model.ReminderOffest.Value : familyEvent.ReminderOffest,
+                        StartDate = familyEvent.StartDate,
+                        EndDate = familyEvent.EndDate,
+                        Repeat = model.Repeat.Value,
+                        FamilyTreeId = familyEvent.FamilyTreeId
+                    };
+
+                    await _unitOfWork.Repository<FamilyEvent>().AddAsync(newEvent);
                 }
             }
             
