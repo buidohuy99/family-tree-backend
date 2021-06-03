@@ -687,6 +687,17 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             {
                 throw new PersonNotFoundException(PersonExceptionMessages.PersonNotFound, personId);
             }
+
+            //check if user already in the tree
+            var existingUserId = await _unitOfWork.Repository<Person>().GetDbset()
+                .AnyAsync(p => p.Id.Equals(input.UserId) && p.Id != personId);
+            if (existingUserId)
+            {
+                throw new UserExistsInTreeException(
+                    PersonExceptionMessages.UserAlreadyExistedInTree,
+                    input.UserId, person.FamilyTreeId);
+            }
+            
             _mapper.Map(input, person);
 
             List<Family> updatedFamilies = new List<Family>();
