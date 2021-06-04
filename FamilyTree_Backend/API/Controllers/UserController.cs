@@ -14,6 +14,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace FamilyTreeBackend.Presentation.API.Controllers
@@ -175,6 +176,17 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         public async Task<IActionResult> TestTriggerNotification()
         {
             await _userService.TestTriggerNotification();
+
+            return Ok();
+        }
+
+        [HttpPost("find-user-connection")]
+        [SwaggerOperation(Summary = "Test trigger notification")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> FindUserConnection([FromBody] string searchingUserId)
+        {
+            var id = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            await _userService.FindUserConnection(User, searchingUserId);
 
             return Ok();
         }

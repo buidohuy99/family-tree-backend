@@ -1,4 +1,5 @@
 ﻿using FamilyTreeBackend.Core.Domain.Entities;
+using FamilyTreeBackend.Core.Domain.Entities.KeyLess;
 using FamilyTreeBackend.Core.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -28,6 +29,7 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
         public virtual DbSet<Relationship> Relationships { get; set; }
         public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
         public virtual DbSet<Notification> Notifications { get; set; }
+        public virtual DbSet<UserConnectionModel> UserConnections { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -273,6 +275,8 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
                     .HasDefaultValueSql("GETUTCDATE()")
                     .ValueGeneratedOnAddOrUpdate();
             });
+
+            modelBuilder.Entity<UserConnectionModel>().HasNoKey().ToView(null);
         }
 
         public void SeedData()

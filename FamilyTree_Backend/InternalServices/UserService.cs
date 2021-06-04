@@ -6,6 +6,8 @@ using FamilyTreeBackend.Core.Application.Interfaces;
 using FamilyTreeBackend.Core.Application.Models.User;
 using FamilyTreeBackend.Core.Domain.Constants;
 using FamilyTreeBackend.Core.Domain.Entities;
+using FamilyTreeBackend.Core.Domain.Entities.KeyLess;
+using FamilyTreeBackend.Infrastructure.Persistence.Repository;
 using FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices.Quartz.QuartzJobs;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +15,7 @@ using Microsoft.Extensions.Configuration;
 using StopWord;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -229,6 +232,32 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
         {
             DailyNotificationJob job = new DailyNotificationJob(_unitOfWork, null);
             return job.DistributeNotification();
+        }
+
+        public async Task FindUserConnection(ClaimsPrincipal user, string searchingUserId)
+        {
+            List<UserConnectionDTO> result = new List<UserConnectionDTO>();
+            var userId = user?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (!_userManager.Users.Any(u => u.Id.Equals(userId)))
+            {
+                throw new UserNotFoundException(UserExceptionMessages.UserNotFound, userId);
+            }
+
+            //var nodesBelongsToUser = await _unitOfWork.Repository<Person>().GetDbset()
+            //    .Where(p => p.UserId.Equals(userId))
+            //    .ToListAsync();
+
+            //var relatedPeople = await _unitOfWork.Repository<Person>().GetDbset()
+            //    .Where(p => nodesBelongsToUser.Any(n => n.FamilyTreeId == p.FamilyTreeId) 
+            //        && p.UserId.Equals(searchingUserId))
+            //    .ToListAsync();
+
+            var connections = await _unitOfWork.Repository<UserConnectionModel>()
+                .GetUserConnection(userId, searchingUserId)
+                .ToListAsync();
+
+
         }
     }
 }
