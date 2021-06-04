@@ -168,7 +168,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         [SwaggerOperation(Summary = "Add an editor to edit tree (only open to tree owner)")]
         [SwaggerResponse(200, Type = typeof(HttpResponse<IEnumerable<string>>),
             Description = "Add list of users to be tree's editor, return the added users' username")]
-        public async Task<IActionResult> AddUsersToEditor(long treeId, [FromBody] List<string> userNames)
+        public async Task<IActionResult> AddUsersToEditor(long treeId, [FromBody] AddEditorsModel input)
         {
             var authorizeResult = await _authorizationService.AuthorizeAsync(User, treeId, TreeOperations.AddEditor);
 
@@ -178,7 +178,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
                     authorizeResult.Failure,
                     GenericResponseStrings.Tree_NoPermissionEdit));
             }
-            var result =  await _familyTreeService.AddUsersToEditor(treeId, userNames);
+            var result =  await _familyTreeService.AddUsersToEditor(treeId, input.Usernames as IList<string>);
             return Ok(new HttpResponse<IEnumerable<string>>(result, GenericResponseStrings.TreeController_AddEditorsToTreeSuccessful));
         }
 
@@ -186,7 +186,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         [SwaggerOperation(Summary = "Remove editor from tree (only open to tree owner)")]
         [SwaggerResponse(200, Type = typeof(HttpResponse<IEnumerable<string>>),
             Description = "Remove list of users from tree's editor, return the removed users' username")]
-        public async Task<IActionResult> RemoveUsersFromEditor(long treeId, [FromBody] List<string> userNames)
+        public async Task<IActionResult> RemoveUsersFromEditor(long treeId, [FromBody] RemoveEditorsModel input)
         {
             var authorizeResult = await _authorizationService.AuthorizeAsync(User, treeId, TreeOperations.RemoveEditor);
 
@@ -196,7 +196,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
                     authorizeResult.Failure,
                     GenericResponseStrings.Tree_NoPermissionEdit));
             }
-            var result = await _familyTreeService.RemoveUsersFromEditor(treeId, userNames);
+            var result = await _familyTreeService.RemoveUsersFromEditor(treeId, input.Usernames as IList<string>);
             return Ok(new HttpResponse<IEnumerable<string>>(result, GenericResponseStrings.TreeController_RemoveEditorsFromTreeSuccessful));
         }
 
