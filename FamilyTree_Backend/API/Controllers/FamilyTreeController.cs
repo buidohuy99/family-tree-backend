@@ -16,6 +16,13 @@ using FamilyTreeBackend.Presentation.API.Handlers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
+using System.IO;
+using System.Net;
+using System.Security.Cryptography.X509Certificates;
+using System.Security.Cryptography;
+using Microsoft.Extensions.Options;
+using FamilyTreeBackend.Core.Application.Helpers.ConfigModels;
+using Jose;
 
 namespace FamilyTreeBackend.Presentation.API.Controllers
 {
@@ -26,13 +33,16 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
     {
         private readonly IFamilyTreeService _familyTreeService;
         private readonly ITreeAuthorizationService _authorizationService;
+        private readonly JWEConfig _jweConfigs;
         public FamilyTreeController(
             UserManager<ApplicationUser> userManager, 
             IFamilyTreeService familyTreeService,
-            ITreeAuthorizationService authorizationService) : base(userManager)
+            ITreeAuthorizationService authorizationService,
+            IOptions<JWEConfig> jweConfigs) : base(userManager)
         {
             _familyTreeService = familyTreeService;
             _authorizationService = authorizationService;
+            _jweConfigs = jweConfigs.Value;
         }
 
         [HttpGet("tree/{treeId}")]
@@ -200,6 +210,43 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
                 return _familyTreeService.GetTreeEditors(treeId); 
             });
             return Ok(new HttpResponse<FamilyTreeContributorsModel>(result, GenericResponseStrings.TreeController_GetEditorsOfTreeSuccessful));
+        }
+
+        [HttpPost("tree/import")]
+        [SwaggerOperation(Summary = "Import tree from json backup")]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<FamilyTreeModel>),
+            Description = "Import new family tree from json backup")]
+        public async Task<IActionResult> ImportFamilyTree([FromForm] FamilyTreeImportModel model)
+        {
+            var result = await _familyTreeService.ImportFamilyTree(model, HttpContext.User);
+            return Ok(new HttpResponse<FamilyTreeModel>(result, GenericResponseStrings.TreeController_ImportTreeSuccessful));
+        }
+
+        [AllowAnonymous]
+        [HttpPost("tree/{treeId}/export/json")]
+        [SwaggerOperation(Summary = "Get json export of the tree")]
+        [SwaggerResponse(200, Type = typeof(FileResult),
+            Description = "Get json export") ]
+        [ProducesResponseType(typeof(FileResult), (int)HttpStatusCode.OK)]
+        [Produces("application/json")]
+        public async Task<FileResult> GetJsonExport(long treeId)
+        {
+            var result = await _familyTreeService.ExportFamilyTreeJson(treeId, false);
+            return File(new System.Text.UTF8Encoding().GetBytes(result.payload), "application/json", $"FamilyTreeExport_{result.treeName}_{DateTime.Now:yyyyMMddHHmmss}.json");
+        }
+
+        [AllowAnonymous]
+        [HttpPost("tree/{treeId}/backup")]
+        [SwaggerOperation(Summary = "Get json backup of the tree (can be used for import)")]
+        [SwaggerResponse(200, Type = typeof(FileResult),
+            Description = "Get json backup")]
+        [ProducesResponseType(typeof(FileResult), (int)HttpStatusCode.OK)]
+        [Produces("application/json")]
+        public async Task<FileResult> GetJsonBackup(long treeId)
+        {
+            var result = await _familyTreeService.ExportFamilyTreeJson(treeId, true);
+            string token = JWE.Encrypt(result.payload, new[] { new JweRecipient(JweAlgorithm.PBES2_HS256_A128KW, _jweConfigs.FileIOFamilyTreeKey, null) }, JweEncryption.A256GCM);
+            return File(new System.Text.UTF8Encoding().GetBytes(token), "application/json", $"FamilyTreeBackup_{result.treeName}_{DateTime.Now:yyyyMMddHHmmss}.json");
         }
     }
 }

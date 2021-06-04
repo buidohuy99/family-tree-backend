@@ -32,6 +32,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers.Misc
                 [PersonExceptionMessages.TreeDivergenceAfterDeletion] = 403,
 
                 [TreeExceptionMessages.TreeNotFound] = 404,
+                [TreeExceptionMessages.TreeImportFileDoesNotHaveProperFormat] = 400,
 
                 [UserExceptionMessages.UserNotFound] = 404,
                 [UserExceptionMessages.ResetPasswordFail] = 500,
