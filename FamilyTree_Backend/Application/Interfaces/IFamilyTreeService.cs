@@ -34,7 +34,7 @@ namespace FamilyTreeBackend.Core.Application.Interfaces
         public FamilyTreeContributorsModel GetTreeEditors(long treeId);
 
         //Import-export
-        public Task<FamilyTreeModel> ImportFamilyTree(FamilyTreeFileIOModel model, ClaimsPrincipal user);
-        public Task<(string treeName, string payload)> ExportFamilyTreeJson(long treeId);
+        public Task<FamilyTreeModel> ImportFamilyTree(FamilyTreeImportModel model, ClaimsPrincipal user);
+        public Task<(string treeName, string payload)> ExportFamilyTreeJson(long treeId, bool isForBackup);
     }
 }

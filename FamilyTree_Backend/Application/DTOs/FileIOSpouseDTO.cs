@@ -15,6 +15,7 @@ namespace FamilyTreeBackend.Core.Application.DTOs
             public DateTime? EndDate { get; set; }
         }
         public long? SpouseId { get; set; }
+        public long CoupleId { get; set; }
         public FileIOSpouseRelationshipDTO RelationshipInfo { get; set; }
     }
 }

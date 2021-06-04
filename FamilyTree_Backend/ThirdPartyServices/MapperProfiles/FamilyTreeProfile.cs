@@ -18,6 +18,8 @@ namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices.MapperProf
                 .ForMember(dest => dest.People, opt => opt.MapFrom(src => src.People));
             CreateMap<FamilyTree, FamilyTreeFileIOModel>()
                 .ForMember(dest => dest.People, opt => opt.MapFrom(src => src.People));
+            CreateMap<FamilyTreeFileIOModel, FamilyTree>()
+                .ForMember(dest => dest.People, opt => opt.Ignore());
 
             CreateMap<FamilyTreeInputModel, FamilyTree>();
             CreateMap<FamilyTree, FamilyTreeUpdateResponseModel>();

@@ -17,6 +17,7 @@ namespace FamilyTreeBackend.Core.Application.DTOs
         public DateTime? DateOfDeath { get; set; }
         public long? Parent1Id { get; set; }
         public long? Parent2Id { get; set; }
+        public long? ChildOfCoupleId { get; set; }
         public Gender Gender { get; set; }
         public IEnumerable<FileIOSpouseDTO> Spouses { get; set; }
         public string Note { get; set; }

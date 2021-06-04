@@ -31,6 +31,7 @@ namespace FamilyTreeBackend.Core.Domain.Constants
         public const string TreeController_FindTreeSuccessful = "Tree has been found successfully";
         public const string TreeController_FindAllTreeSuccessful = "List of trees has been found successfully";
         public const string TreeController_AddTreeSuccessful = "Tree has been added successfully";
+        public const string TreeController_ImportTreeSuccessful = "Tree has been imported successfully";
         public const string TreeController_UpdateTreeSuccessful = "Tree has been updated successfully";
         public const string TreeController_RemoveTreeSuccessful = "Tree has been removed successful";
         public const string TreeController_AddEditorsToTreeSuccessful = "Editors has been added to tree successfully";
@@ -109,6 +110,7 @@ namespace FamilyTreeBackend.Core.Domain.Constants
     public static class TreeExceptionMessages
     {
         public const string TreeNotFound = "Cannot find tree with provided Id";
+        public const string TreeImportFileDoesNotHaveProperFormat = "Cannot import tree from file with wrong format, cannot retrieve content";
     }
 
     public static class UserExceptionMessages

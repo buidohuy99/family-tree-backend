@@ -212,6 +212,16 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             return Ok(new HttpResponse<FamilyTreeContributorsModel>(result, GenericResponseStrings.TreeController_GetEditorsOfTreeSuccessful));
         }
 
+        [HttpPost("tree/import")]
+        [SwaggerOperation(Summary = "Import tree from json backup")]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<FamilyTreeModel>),
+            Description = "Import new family tree from json backup")]
+        public async Task<IActionResult> ImportFamilyTree([FromForm] FamilyTreeImportModel model)
+        {
+            var result = await _familyTreeService.ImportFamilyTree(model, HttpContext.User);
+            return Ok(new HttpResponse<FamilyTreeModel>(result, GenericResponseStrings.TreeController_ImportTreeSuccessful));
+        }
+
         [AllowAnonymous]
         [HttpPost("tree/{treeId}/export/json")]
         [SwaggerOperation(Summary = "Get json export of the tree")]
@@ -221,7 +231,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         [Produces("application/json")]
         public async Task<FileResult> GetJsonExport(long treeId)
         {
-            var result = await _familyTreeService.ExportFamilyTreeJson(treeId);
+            var result = await _familyTreeService.ExportFamilyTreeJson(treeId, false);
             return File(new System.Text.UTF8Encoding().GetBytes(result.payload), "application/json", $"FamilyTreeExport_{result.treeName}_{DateTime.Now:yyyyMMddHHmmss}.json");
         }
 
@@ -234,7 +244,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         [Produces("application/json")]
         public async Task<FileResult> GetJsonBackup(long treeId)
         {
-            var result = await _familyTreeService.ExportFamilyTreeJson(treeId);
+            var result = await _familyTreeService.ExportFamilyTreeJson(treeId, true);
             string token = JWE.Encrypt(result.payload, new[] { new JweRecipient(JweAlgorithm.PBES2_HS256_A128KW, _jweConfigs.FileIOFamilyTreeKey, null) }, JweEncryption.A256GCM);
             return File(new System.Text.UTF8Encoding().GetBytes(token), "application/json", $"FamilyTreeBackup_{result.treeName}_{DateTime.Now:yyyyMMddHHmmss}.json");
         }
