@@ -25,7 +25,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             _memoryService = memoryService;
         }
 
-        [HttpPost("memories/tree/{treeId}")]
+        [HttpGet("memories/tree/{treeId}")]
         [SwaggerOperation(Summary = "Get all the memory in the tree with provided Id")]
         [SwaggerResponse(200, Type = typeof(HttpResponse<IEnumerable<FamilyMemoryModel>>))]
         public async Task<IActionResult> GetMemoryByTree(long treeId)
