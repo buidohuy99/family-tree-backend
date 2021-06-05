@@ -61,6 +61,8 @@ namespace FamilyTreeBackend.Core.Domain.Constants
         //Memory Controller
         public const string MemoryControoler_AddMemorySuccesful = "Memory has been created successfully";
         public const string MemoryControoler_DeleteMemorySuccesful = "Memory has been deleted successfully";
+        public const string MemoryControoler_FindMemoriesSuccesful = "List of memories has been found successfully";
+
         //Permission
         public const string Tree_NoPermissionEdit = "User does not have permission to edit this tree";
         public const string Tree_NoPermissionDelete = "User does not have permission delete this tree";
