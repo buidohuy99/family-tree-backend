@@ -16,6 +16,14 @@
       "launchBrowser": true,
       "applicationUrl": "http://localhost:3000"
     },
+    "Production": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Production"
+      },
+      "launchBrowser": true,
+      "applicationUrl": "http://localhost:3000"
+    },
     "Docker": {
       "commandName": "Docker",
       "publishAllPorts": true

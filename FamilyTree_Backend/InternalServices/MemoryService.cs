@@ -42,7 +42,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                     (MemoryExceptionMessages.FamilyMemoryNotFound, memoryId);
             }
 
-            await _unitOfWork.Repository<FamilyEvent>().DeleteAsync(memoryId);
+            await _unitOfWork.Repository<FamilyMemory>().DeleteAsync(memoryId);
             await _unitOfWork.SaveChangesAsync();
 
             return;
