@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FamilyTreeBackend.Core.Application.DTOs;
 using FamilyTreeBackend.Core.Application.Models.FamilyTree;
 using FamilyTreeBackend.Core.Application.Models.FileIO;
 using FamilyTreeBackend.Core.Domain.Entities;
@@ -26,7 +27,9 @@ namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices.MapperProf
 
             CreateMap<FamilyTree, FamilyTreeListItemModel>()
                 .ForMember(dest => dest.Owner, opt => opt.MapFrom(src => src.Owner))
-                .ForMember(dest => dest.Editors, opt => opt.MapFrom(src => src.Editors)); ;
+                .ForMember(dest => dest.Editors, opt => opt.MapFrom(src => src.Editors));
+
+            CreateMap<FamilyTree, FamilyTreeDTO>();
         }
     }
 }

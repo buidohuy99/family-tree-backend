@@ -8,11 +8,13 @@ using FamilyTreeBackend.Core.Domain.Constants;
 using FamilyTreeBackend.Core.Domain.Entities;
 using FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices.Quartz.QuartzJobs;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using StopWord;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -27,7 +29,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
         private readonly IConfiguration _configuration;
 
         public UserService(
-            UserManager<ApplicationUser> userManager, 
+            UserManager<ApplicationUser> userManager,
             IConfiguration configuration,
             IUnitOfWork unitOfWork,
             IMapper mapper)
@@ -122,27 +124,27 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
         {
             var user = await _userManager.FindByIdAsync(updatedUserId);
 
-            if(user == null)
+            if (user == null)
             {
                 throw new UserNotFoundException(UserExceptionMessages.UserNotFound, updatedUserId);
             }
 
-            if(model.FirstName != null)
+            if (model.FirstName != null)
             {
                 user.FirstName = string.IsNullOrEmpty(model.FirstName) ? null : model.FirstName;
             }
 
-            if(model.MidName != null)
+            if (model.MidName != null)
             {
                 user.MidName = string.IsNullOrEmpty(model.MidName) ? null : model.MidName;
             }
 
-            if(model.LastName != null)
+            if (model.LastName != null)
             {
                 user.LastName = string.IsNullOrEmpty(model.LastName) ? null : model.LastName;
             }
 
-            if(model.Address != null)
+            if (model.Address != null)
             {
                 user.Address = string.IsNullOrEmpty(model.Address) ? null : model.Address;
             }
@@ -157,12 +159,12 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                 user.AvatarUrl = string.IsNullOrEmpty(model.AvatarUrl) ? null : model.AvatarUrl;
             }
 
-            if(model.Gender != null)
+            if (model.Gender != null)
             {
                 user.Gender = model.Gender;
             }
 
-            if(model.DateOfBirth != null)
+            if (model.DateOfBirth != null)
             {
                 user.DateOfBirth = model.DateOfBirth;
             }
@@ -196,7 +198,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                 .ToListAsync();
 
             List<NotificationDTO> result = new List<NotificationDTO>();
-            foreach(var noti in notifications)
+            foreach (var noti in notifications)
             {
                 result.Add(_mapper.Map<NotificationDTO>(noti));
             }
@@ -235,5 +237,166 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             DailyNotificationJob job = new DailyNotificationJob(_unitOfWork, null);
             return job.DistributeNotification();
         }
+
+        public async Task<IEnumerable<UserConnectionDTO>> FindUserConnection(ClaimsPrincipal user, string searchingUserId)
+        {
+            List<UserConnectionDTO> result = new List<UserConnectionDTO>();
+            var userId = user?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (!_userManager.Users.Any(u => u.Id.Equals(userId)))
+            {
+                throw new UserNotFoundException(UserExceptionMessages.UserNotFound, userId);
+            }
+            if (!_userManager.Users.Any(u => u.Id.Equals(searchingUserId)))
+            {
+                throw new UserNotFoundException(UserExceptionMessages.UserNotFound, searchingUserId);
+            }
+
+            //var nodesBelongsToUser = await _unitOfWork.Repository<Person>().GetDbset()
+            //    .Where(p => p.UserId.Equals(userId))
+            //    .ToListAsync();
+
+            //var relatedPeople = await _unitOfWork.Repository<Person>().GetDbset()
+            //    .Where(p => nodesBelongsToUser.Any(n => n.FamilyTreeId == p.FamilyTreeId) 
+            //        && p.UserId.Equals(searchingUserId))
+            //    .ToListAsync();
+
+            var sourceUser = new SqlParameter("SourceUser", userId);
+            var destinationUser = new SqlParameter("DestinationUser", searchingUserId);
+
+            Dictionary<string, UserConnection> connections = await _unitOfWork.GetUserConnections()
+                .FromSqlRaw(Sql_GetUserConnection, sourceUser, destinationUser).ToDictionaryAsync(uc => uc.SourceUserId);
+
+            
+            foreach (var pair in connections)
+            {
+                var connection = pair.Value;
+
+                //if this is the first node in the string of connections
+                if (connection.SourceUserId.Equals(userId))
+                {
+                    var dto = await CreateUserConnectionDTO(connection);
+                    result.Add(dto);
+
+                    //loop till it reaches the end of the connection
+                    while (connection.DestinationUserId.Equals(searchingUserId) == false)
+                    {
+                        var nextConnection = connections.GetValueOrDefault(connection.DestinationUserId);
+                        if (nextConnection == null)
+                        {
+                            break;
+                        }
+                        dto.NextConnection = await CreateUserConnectionDTO(nextConnection);
+                        dto = dto.NextConnection;
+                        connection = nextConnection;
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        private async Task<UserConnectionDTO> CreateUserConnectionDTO(UserConnection connection)
+        {
+            var source = await _userManager.FindByIdAsync(connection.SourceUserId);
+            var destination = await _userManager.FindByIdAsync(connection.SourceUserId);
+            var tree = await _unitOfWork.Repository<FamilyTree>().FindAsync(connection.FamilyTreeId);
+            return new UserConnectionDTO(
+                _mapper.Map<UserDTO>(source),
+                _mapper.Map<UserDTO>(destination),
+                _mapper.Map<FamilyTreeDTO>(tree), null
+                );
+        }
+
+        private const string Sql_GetUserConnection = @"
+with
+_connectedUserLevel1 as (
+select p1.UserId as SourceId
+, p2.UserId as DestinationId
+, p1.FamilyTreeId
+from Person p1 inner join Person p2 on (p1.FamilyTreeId = p2.FamilyTreeId and p2.UserId is not null)
+where p1.UserId = @SourceUser
+),
+
+_connectedUserLevel2 as (
+select p1.UserId as SourceId
+, p2.UserId as DestinationId
+, p1.FamilyTreeId
+from _connectedUserLevel1 lv1 
+inner join Person p1 on (lv1.SourceId = p1.UserId) 
+inner join Person p2 on (p1.FamilyTreeId = p2.FamilyTreeId and p2.UserId is not null)
+),
+
+_connectedUserLevel3 as (
+select p1.UserId as SourceId
+, p2.UserId as DestinationId
+, p1.FamilyTreeId
+from _connectedUserLevel1 lv2 
+inner join Person p1 on (lv2.SourceId = p1.UserId) 
+inner join Person p2 on (p1.FamilyTreeId = p2.FamilyTreeId and p2.UserId is not null)
+),
+
+_map as (
+select *
+from _connectedUserLevel1
+union
+select *
+from _connectedUserLevel2
+union 
+select *
+from _connectedUserLevel3
+),
+
+_reachedDestinationConnections as (
+select *
+from _map
+where _map.DestinationId = @DestinationUser
+)
+
+
+select _map.*
+from _map inner join _reachedDestinationConnections 
+on (_map.SourceId = _reachedDestinationConnections.SourceId 
+OR _map.DestinationId = _reachedDestinationConnections.SourceId)
+union
+select *
+from _reachedDestinationConnections";
+
+//        private const string Sql_GetUserConnection = @"
+//with
+//_treesConnectedToUser1 as (
+//select p.FamilyTreeId
+//from Person p
+//where p.UserId = @User1
+//),
+
+//_treesConnectedToUser2 as (
+//select p.FamilyTreeId
+//from Person p
+//where p.UserId = @User2
+//),
+
+//_connectedPeople1 as (
+//select p.UserId
+//, p.FamilyTreeId
+//from Person p
+//where
+//p.UserId is not null 
+//and p.FamilyTreeId in (select * from _treesConnectedToUser1)
+//),
+
+//_connectedPeople2 as (
+//select p.UserId
+//, p.FamilyTreeId
+//from Person p
+//where 
+//p.UserId is not null
+//and p.FamilyTreeId in (select * from _treesConnectedToUser2)
+//)
+
+//select p1.FamilyTreeId as FamilyTreeId
+//, p1.UserId as SourceUserId
+//, p2.UserId as DestinationUserId
+//from _connectedPeople1 p1 inner join _connectedPeople2 p2 on p1.FamilyTreeId = p2.FamilyTreeId";
     }
 }

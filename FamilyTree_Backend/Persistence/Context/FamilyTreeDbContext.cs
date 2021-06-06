@@ -28,6 +28,7 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
         public virtual DbSet<Relationship> Relationships { get; set; }
         public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
         public virtual DbSet<Notification> Notifications { get; set; }
+        public virtual DbSet<UserConnection> UserConnections { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -273,6 +274,8 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
                     .HasDefaultValueSql("GETUTCDATE()")
                     .ValueGeneratedOnAddOrUpdate();
             });
+
+            modelBuilder.Entity<UserConnection>().HasNoKey().ToView(null);
         }
 
         public void SeedData()

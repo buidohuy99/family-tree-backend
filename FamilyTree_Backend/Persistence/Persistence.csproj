@@ -27,10 +27,6 @@
     <ProjectReference Include="..\ThirdPartyServices\ThirdPartyServices.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Repository\" />
-  </ItemGroup>
-
   <Target Name="BeforeBuild">
     <!-- Remove obj folder -->
     <RemoveDir Directories="$(BaseIntermediateOutputPath)" />
