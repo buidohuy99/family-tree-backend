@@ -49,6 +49,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers.Misc
                 [CalendarExceptionMessages.CannotAddMultipleFollowingEventsToEvent] = 403,
                 [CalendarExceptionMessages.MissingDateOnInput] = 400,
                 [CalendarExceptionMessages.NonRepeatableEventCantHaveFollowingEvents] = 403,
+                [CalendarExceptionMessages.FollowingEventMustBeAfterEvent] = 400,
 
                 [MemoryExceptionMessages.FamilyMemoryNotFound] = 404,
             };

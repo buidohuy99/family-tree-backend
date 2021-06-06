@@ -143,6 +143,7 @@ namespace FamilyTreeBackend.Core.Domain.Constants
         public const string NonRepeatableEventCantHaveFollowingEvents = "Cannot add following event to a non repeatable event";
         public const string StartDateIsAfterEndDate = "Start date must be before end date";
         public const string StartDateAndEndDateIsNotWithinSameRepeatCycle = "Start date and end date of event must be within the same cycle for recurring events";
+        public const string FollowingEventMustBeAfterEvent = "Cannot add a following event before the current event";
     }
 
     public static class MemoryExceptionMessages

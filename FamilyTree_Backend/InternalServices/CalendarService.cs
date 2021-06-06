@@ -156,6 +156,10 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                     {
                         throw new InvalidOperationOnFamilyEventException(CalendarExceptionMessages.NonRepeatableEventCantHaveFollowingEvents, familyEvent.Id);
                     }
+                    if(model.StartDate.Value.CompareTo(familyEvent.EndDate) < 0)
+                    {
+                        throw new FamilyEventDateException(CalendarExceptionMessages.FollowingEventMustBeAfterEvent, model.StartDate, model.EndDate);
+                    }
                     var newEvent = _mapper.Map<FamilyEvent>(model);
                     newEvent.FamilyTreeId = familyEvent.FamilyTreeId;
                     newEvent.ParentEvent = familyEvent;
