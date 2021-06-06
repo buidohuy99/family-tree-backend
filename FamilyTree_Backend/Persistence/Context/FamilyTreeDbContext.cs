@@ -34,6 +34,16 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<ApplicationUser>((entity) => {
+                entity.Property(e => e.CreatedDate)
+                    .HasDefaultValueSql("GETUTCDATE()")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.UpdatedDate)
+                    .HasDefaultValueSql("GETUTCDATE()")
+                   .ValueGeneratedOnAddOrUpdate();
+            });
+
             modelBuilder.Entity<RefreshToken>((entity) => {
                 entity.ToTable("RefreshToken");
 

@@ -184,7 +184,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         public async Task<IActionResult> FindUserConnection([FromBody] string searchingUserId)
         {
             var result = await _userService.FindUserConnection(User, searchingUserId);
-            return Ok(new HttpResponse<IEnumerable<UserConnectionDTO>>(result, GenericResponseStrings.UserController_FindConnectionsSuccessul))
+            return Ok(new HttpResponse<IEnumerable<UserConnectionDTO>>(result, GenericResponseStrings.UserController_FindConnectionsSuccessul));
         }
     }
 }
