@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace WebAccesss.Models
+namespace FamilyTreeBackend.Core.Application.Operation.Models
 {
     public class WebAccessUserModel
     {

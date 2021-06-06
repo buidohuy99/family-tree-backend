@@ -1,20 +1,18 @@
-﻿using FamilyTreeBackend.Core.Domain.Entities;
-using Microsoft.AspNetCore.Http;
+﻿using FamilyTreeBackend.Core.Application.Operation.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Operation.Services;
 using System.Threading.Tasks;
-using WebAccesss.Models;
-using WebAccesss.Services;
 
-namespace WebAccesss.Controllers
+namespace Operation.Controllers
 {
-    public class UserController : Controller
+    [Authorize]
+    public class UsersController : Controller
     {
         private readonly IWebAccessUserService _userService;
 
-        public UserController(IWebAccessUserService userService)
+        public UsersController(IWebAccessUserService userService)
         {
             _userService = userService;
         }
@@ -22,7 +20,6 @@ namespace WebAccesss.Controllers
         // GET: UserController
         public async Task<ActionResult> Index(string filter)
         {
-            var result = 
             var result = await _userService.GetAllUser();
             return View(result);
         }

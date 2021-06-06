@@ -1,15 +1,13 @@
 ﻿using AutoMapper;
-using FamilyTreeBackend.Core.Application.Interfaces;
+using FamilyTreeBackend.Core.Application.Operation.Models;
 using FamilyTreeBackend.Core.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using WebAccesss.Models;
 
-namespace WebAccesss.Services
+namespace Operation.Services
 {
     public interface IWebAccessUserService
     {

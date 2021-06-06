@@ -15,7 +15,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "WebAccesss": {
+    "Operation": {
       "commandName": "Project",
       "dotnetRunMessages": "true",
       "launchBrowser": true,

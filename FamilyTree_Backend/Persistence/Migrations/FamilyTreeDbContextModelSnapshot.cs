@@ -502,6 +502,8 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
 
                     b.Property<string>("SourceUserId")
                         .HasColumnType("nvarchar(max)");
+
+                    b.ToTable("UserConnection");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

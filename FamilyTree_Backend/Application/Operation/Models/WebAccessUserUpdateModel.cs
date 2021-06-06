@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace WebAccesss.Models
+namespace FamilyTreeBackend.Core.Application.Operation.Models
 {
     public class WebAccessUserUpdateModel
     {
@@ -14,6 +14,6 @@ namespace WebAccesss.Models
         public string Email { get; set; }
         public string AvatarUrl { get; set; }
         public string Address { get; set; }
-       
+
     }
 }

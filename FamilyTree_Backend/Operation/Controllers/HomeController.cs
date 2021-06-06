@@ -1,13 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FamilyTreeBackend.Core.Application.Operation.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
-using WebAccesss.Models;
 
-namespace WebAccesss.Controllers
+namespace Operation.Controllers
 {
     public class HomeController : Controller
     {

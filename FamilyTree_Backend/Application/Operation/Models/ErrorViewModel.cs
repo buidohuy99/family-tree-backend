@@ -1,6 +1,6 @@
 using System;
 
-namespace WebAccesss.Models
+namespace FamilyTreeBackend.Core.Application.Operation.Models
 {
     public class ErrorViewModel
     {

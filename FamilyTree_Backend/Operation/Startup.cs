@@ -1,19 +1,13 @@
-using AutoMapper;
 using FamilyTreeBackend.Infrastructure.Persistence;
+using FamilyTreeBackend.Infrastructure.Service.InternalServices;
+using FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using WebAccesss.AutoMapper;
-using WebAccesss.Services;
 
-namespace WebAccesss
+namespace Operation
 {
     public class Startup
     {
@@ -29,20 +23,20 @@ namespace WebAccesss
         {
             services.AddControllersWithViews();
 
-            services.RegisterServices_Persistence(Configuration);
-
-            var mapperConfig = new MapperConfiguration(mc =>
-            {
-                mc.AddProfile(new WebAccessUserProfile());
-                
-            });
-
-            IMapper mapper = mapperConfig.CreateMapper();
-            services.AddSingleton(mapper);
-
             #region Register internal services
-            services.AddScoped<IWebAccessUserService, WebAccessUserService>();
+            services.RegisterOperationServices_Internal(Configuration);
             #endregion
+
+            #region Register third party services
+            services.RegisterOperationServices_FromThirdParty(Configuration);
+            #endregion
+
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = $"/Identity/Account/Login";
+                options.LogoutPath = $"/Identity/Account/Logout";
+                options.AccessDeniedPath = $"/Identity/Account/AccessDenied";
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -63,14 +57,16 @@ namespace WebAccesss
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
-
+            
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
+
         }
     }
 }

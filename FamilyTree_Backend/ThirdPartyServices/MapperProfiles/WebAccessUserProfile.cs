@@ -1,12 +1,8 @@
 ﻿using AutoMapper;
+using FamilyTreeBackend.Core.Application.Operation.Models;
 using FamilyTreeBackend.Core.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using WebAccesss.Models;
 
-namespace WebAccesss.AutoMapper
+namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices.MapperProfiles
 {
     public class WebAccessUserProfile : Profile
     {
