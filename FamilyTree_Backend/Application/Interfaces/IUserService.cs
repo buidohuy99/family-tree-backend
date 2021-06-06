@@ -22,6 +22,6 @@ namespace FamilyTreeBackend.Core.Application.Interfaces
         public Task<NotificationDTO> ReadNotification(long notficationId);
         public Task<NotificationDTO> RemoveNotification(long notficationId);
         Task TestTriggerNotification();
-        Task FindUserConnection(ClaimsPrincipal user, string searchingUserId);
+        public Task<IEnumerable<UserConnectionDTO>> FindUserConnection(ClaimsPrincipal user, string searchingUserId);
     }
 }

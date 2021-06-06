@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FamilyTreeBackend.Core.Domain.Entities.KeyLess
+namespace FamilyTreeBackend.Core.Domain.Entities
 {
-    public class UserConnectionModel : BaseEntity
+    public class UserConnection
     {
         public long FamilyTreeId { get; set; }
         public string SourceUserId { get; set; }

@@ -1,15 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace FamilyTreeBackend.Core.Application.DTOs
+﻿namespace FamilyTreeBackend.Core.Application.DTOs
 {
     public class UserConnectionDTO
     {
         public UserDTO ConnectionSource { get; set; }
         public UserDTO ConnectionDestination { get; set; }
         public FamilyTreeDTO FamilyTree { get; set; }
+        public UserConnectionDTO NextConnection { get; set; }
+        public UserConnectionDTO(UserDTO source, UserDTO destination, FamilyTreeDTO tree, UserConnectionDTO nextConnection)
+        {
+            ConnectionSource = source;
+            ConnectionDestination = destination;
+            FamilyTree = tree;
+            NextConnection = nextConnection;
+        }
     }
 }

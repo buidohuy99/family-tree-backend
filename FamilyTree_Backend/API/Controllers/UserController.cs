@@ -21,6 +21,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
 {
     [Area("user-management")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class UserController : BaseController
     {
         private readonly IEmailService _emailService;
@@ -35,6 +36,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             _userService = userService;
         }
 
+        [AllowAnonymous]
         [HttpPost("send-test-email")]
         [SwaggerOperation(Summary = "This is used to test sending email")]
         public async Task<IActionResult> TestSendEmail([FromBody] string email)
@@ -85,7 +87,6 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
 
         [HttpPut("user")]
         [SwaggerOperation(Summary = "Update info of a user")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [SwaggerResponse(200, Type = typeof(HttpResponse<UserDTO>), Description = "Returns user info after update")]
         public async Task<IActionResult> UpdateUsers([FromBody] UpdateUserModel model)
         {
@@ -113,7 +114,6 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
 
         [HttpGet("user-by-token")]
         [SwaggerOperation(Summary = "Get user info from a token")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [SwaggerResponse(200, Type = typeof(HttpResponse<UserDTO>), Description = "Returns a user's info")]
         public async Task<IActionResult> GetUserFromToken()
         {
@@ -129,7 +129,6 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
 
         [HttpGet("notifications")]
         [SwaggerOperation(Summary = "Get user notifications")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [SwaggerResponse(200,Type = typeof(HttpResponse<IEnumerable<NotificationDTO>>))]
         public async Task<IActionResult> GetUserNotifications() 
         {
@@ -149,7 +148,6 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
 
         [HttpPut("notifications/{notficationId}")]
         [SwaggerOperation(Summary = "Mark notification as read")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [SwaggerResponse(200, Type = typeof(HttpResponse<NotificationDTO>))]
         public async Task<IActionResult> ReadNotification(long notficationId)
         {
@@ -162,7 +160,6 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
 
         [HttpDelete("notifications/{notficationId}")]
         [SwaggerOperation(Summary = "Delete notification")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [SwaggerResponse(200, Type = typeof(string))]
         public async Task<IActionResult> RemoveNotification(long notficationId)
         {
@@ -180,15 +177,14 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             return Ok();
         }
 
-        [HttpPost("find-user-connection")]
+        [HttpGet("find-user-connection")]
         [SwaggerOperation(Summary = "Test trigger notification")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<IEnumerable<UserConnectionDTO>>),
+            Description = "The list of connections, with each node in the list lead to another node (if any), eventually to the destination user, max 3 nodes deep")]
         public async Task<IActionResult> FindUserConnection([FromBody] string searchingUserId)
         {
-            var id = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            await _userService.FindUserConnection(User, searchingUserId);
-
-            return Ok();
+            var result = await _userService.FindUserConnection(User, searchingUserId);
+            return Ok(new HttpResponse<IEnumerable<UserConnectionDTO>>(result, GenericResponseStrings.UserController_FindConnectionsSuccessul))
         }
     }
 }
