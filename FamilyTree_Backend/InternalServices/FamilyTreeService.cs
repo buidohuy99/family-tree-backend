@@ -1,25 +1,36 @@
 ﻿using AutoMapper;
 using FamilyTreeBackend.Core.Application.DTOs;
+using FamilyTreeBackend.Core.Application.Helpers.ConfigModels;
 using FamilyTreeBackend.Core.Application.Helpers.Exceptions;
+using FamilyTreeBackend.Core.Application.Helpers.Exceptions.TreeExceptions;
 using FamilyTreeBackend.Core.Application.Interfaces;
 using FamilyTreeBackend.Core.Application.Models;
 using FamilyTreeBackend.Core.Application.Models.FamilyTree;
+using FamilyTreeBackend.Core.Application.Models.FileIO;
+using FamilyTreeBackend.Core.Application.Models.Person;
 using FamilyTreeBackend.Core.Domain.Constants;
 using FamilyTreeBackend.Core.Domain.Entities;
 using FamilyTreeBackend.Core.Domain.Enums;
+using Jose;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using StopWord;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 {
@@ -28,12 +39,14 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly JWEConfig _jweConfig;
 
-        public FamilyTreeService(IUnitOfWork unitOfWork, IMapper mapper, UserManager<ApplicationUser> userManager)
+        public FamilyTreeService(IUnitOfWork unitOfWork, IMapper mapper, UserManager<ApplicationUser> userManager, IOptions<JWEConfig> jweConfig)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _userManager = userManager;
+            _jweConfig = jweConfig.Value;
         }
 
         public async Task<FamilyTreeModel> FindFamilyTree(long treeId)
@@ -269,6 +282,169 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             return trees;
         }
 
+        public async Task<FamilyTreeModel> ImportFamilyTree(FamilyTreeImportModel model, ClaimsPrincipal claimsPrincipal)
+        {
+            var user = await _userManager.GetUserAsync(claimsPrincipal);
+            if (user == null)
+            {
+                throw new UserNotFoundException(UserExceptionMessages.UserNotFound);
+            }
+
+            //Read the file content
+            var fileStream = model.ImportedFile.OpenReadStream();
+            var reader = new StreamReader(fileStream);
+            string token = await reader.ReadToEndAsync();
+            fileStream.Close();
+
+            //Decrypt the file content
+            FamilyTreeFileIOModel import = null;
+            try
+            {
+                JweToken jwe = JWE.Decrypt(token, _jweConfig.FileIOFamilyTreeKey);
+                string content = jwe.Plaintext;
+                import = JsonConvert.DeserializeObject<FamilyTreeFileIOModel>(content);
+            }
+            catch(Exception)
+            {
+                throw new TreeImportException(TreeExceptionMessages.TreeImportFileDoesNotHaveProperFormat, 0);
+            }
+
+            var newFamilyTree = new FamilyTree()
+            {
+                Name = import.Name,
+                Description = import.Description,
+                PublicMode = import.PublicMode,
+                Owner = user,
+            };
+            await _unitOfWork.Repository<FamilyTree>().AddAsync(newFamilyTree);
+
+            var eldestPeople = import.People.Where(e => e.ChildOfCoupleId == null).ToList();
+            var addedPeople = new Dictionary<long, Person>();
+            var addedCouples = new Dictionary<long, Family>();
+
+            while(eldestPeople.Count > 0)
+            {
+                var person = eldestPeople[0];
+                eldestPeople.RemoveAt(0);
+                if (!addedPeople.ContainsKey(person.Id))
+                {
+                    var newPerson = new Person()
+                    {
+                        FirstName = person.FirstName,
+                        LastName = person.LastName,
+                        DateOfBirth = person.DateOfBirth,
+                        DateOfDeath = person.DateOfDeath,
+                        Gender = person.Gender,
+                        Note = person.Note,
+                        ChildOfFamily = person.ChildOfCoupleId != null ? addedCouples[person.ChildOfCoupleId.Value] : null,
+                        FamilyTree = newFamilyTree
+                    };
+                    await _unitOfWork.Repository<Person>().AddAsync(newPerson);
+                    addedPeople.Add(person.Id, newPerson);
+                }
+
+                foreach(var relationship in person.Spouses)
+                {
+                    var spouse = import.People.FirstOrDefault(e => e.Id == relationship.SpouseId);
+                    if (spouse != null && !addedPeople.ContainsKey(spouse.Id))
+                    {
+                        var newPerson = new Person()
+                        {
+                            FirstName = spouse.FirstName,
+                            LastName = spouse.LastName,
+                            DateOfBirth = spouse.DateOfBirth,
+                            DateOfDeath = spouse.DateOfDeath,
+                            Gender = spouse.Gender,
+                            Note = spouse.Note,
+                            ChildOfFamily = spouse.ChildOfCoupleId != null ? addedCouples[spouse.ChildOfCoupleId.Value] : null,
+                            FamilyTree = newFamilyTree
+                        };
+                        await _unitOfWork.Repository<Person>().AddAsync(newPerson);
+                        addedPeople.Add(spouse.Id, newPerson);
+                    }
+
+                    //Make family with relationship
+                    if (!addedCouples.ContainsKey(relationship.CoupleId))
+                    {
+                        var newFamily = new Family()
+                        {
+                            Parent1 = addedPeople[person.Id].Gender == Gender.MALE ? addedPeople[person.Id] : (spouse != null ? addedPeople[spouse.Id] : null),
+                            Parent2 = addedPeople[person.Id].Gender == Gender.FEMALE ? addedPeople[person.Id] : (spouse != null ? addedPeople[spouse.Id] : null),
+                            FamilyTree = newFamilyTree,
+                            Relationship = relationship.RelationshipInfo != null ? _mapper.Map<Relationship>(relationship.RelationshipInfo) : null,
+                        };
+                        await _unitOfWork.Repository<Family>().AddAsync(newFamily);
+                        addedCouples.Add(relationship.CoupleId, newFamily);
+
+                        // Only add children into list when create new family, only accept new people into the eldest people queue
+                        var children = import.People.Where(e => e.ChildOfCoupleId == relationship.CoupleId && !eldestPeople.Any(el => el.Id == e.Id));
+                        eldestPeople.AddRange(children.ToList());
+                    }
+                }
+            }
+
+            await _unitOfWork.SaveChangesAsync();
+            var mappedTree = ManualMapTreeToModel(newFamilyTree);
+
+            return mappedTree;
+        }
+
+        public async Task<(string treeName, string payload)> ExportFamilyTreeJson(long treeId, bool isForBackup)
+        {
+            var tree = await _unitOfWork.Repository<FamilyTree>().GetDbset()
+                .Include(tr => tr.People)
+                .Include(tr => tr.Families)
+                .ThenInclude(f => f.Relationship)
+                .SingleOrDefaultAsync(tr => tr.Id == treeId);
+
+            if (tree == null)
+            {
+                throw new TreeNotFoundException(TreeExceptionMessages.TreeNotFound, treeId);
+            }
+
+            if (isForBackup)
+            {
+                // Map normal attribs
+                var mappedTree = _mapper.Map<FamilyTreeFileIOModel>(tree);
+                // Map spouses
+                foreach (var personModel in mappedTree.People)
+                {
+                    Func<Family, bool> whereCondition = null;
+
+                    if (personModel.Gender == Gender.MALE)
+                    {
+                        whereCondition = (f => f.Parent1Id == personModel.Id);
+                    }
+                    else
+                    {
+                        whereCondition = (f => f.Parent2Id == personModel.Id);
+                    }
+
+                    var spouses = tree.Families.Where(whereCondition)
+                        .Select(e => new FileIOSpouseDTO()
+                        {
+                            SpouseId = personModel.Gender == Gender.MALE ? e.Parent2Id : e.Parent1Id,
+                            CoupleId = e.Id,
+                            RelationshipInfo = e.Relationship != null ? _mapper.Map<FileIOSpouseDTO.FileIOSpouseRelationshipDTO>(e.Relationship) : null
+                        });
+
+                    personModel.Spouses = spouses;
+                }
+
+                string payload = JsonConvert.SerializeObject(mappedTree);
+
+                return (treeName: tree.Name, payload);
+            }
+            else
+            {
+                var outputTree = await FindFamilyTree(treeId);
+
+                string payload = JsonConvert.SerializeObject(outputTree);
+
+                return (treeName: tree.Name, payload);
+            }
+        }
+
         #region Helper methods
 
         private async Task<IEnumerable<FamilyTree>> FindAccessibleTrees(ApplicationUser applicationUser)
@@ -397,12 +573,12 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
             if (gender == Gender.MALE)
             {
-                whereCondition = (f => f.Parent1Id == personId);
+                whereCondition = (f => f.Parent1Id == personId && f.Parent2Id != null);
                 selectOption = (f => f.Parent2);
             }
             else
             {
-                whereCondition = (f => f.Parent2Id == personId);
+                whereCondition = (f => f.Parent2Id == personId && f.Parent1Id != null);
                 selectOption = (f => f.Parent1);
             }
 

@@ -1,7 +1,9 @@
 ﻿using FamilyTreeBackend.Core.Application.Models.FamilyTree;
+using FamilyTreeBackend.Core.Application.Models.FileIO;
 using FamilyTreeBackend.Core.Domain.Entities;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
@@ -11,7 +13,7 @@ namespace FamilyTreeBackend.Core.Application.Interfaces
 {
     public interface IFamilyTreeService
     {
-
+        //CRUD
         public Task<FamilyTreeModel> FindFamilyTree(long treeId);
 
         public Task<FamilyTreeUpdateResponseModel> UpdateFamilyTree(long treeId, FamilyTreeInputModel model);
@@ -26,9 +28,13 @@ namespace FamilyTreeBackend.Core.Application.Interfaces
         public Task<IEnumerable<FamilyTreeListItemModel>> FindTreesFromKeyword(string keyword);
         public Task<IEnumerable<FamilyTreeListItemModel>> FindTreesFromKeywordAccessibleToUser(ClaimsPrincipal user, string keyword);
 
+        //Editors
         public Task<IEnumerable<string>> AddUsersToEditor(long treeId, IList<string> userNames);
         public Task<IEnumerable<string>> RemoveUsersFromEditor(long treeId, IList<string> userNames);
         public FamilyTreeContributorsModel GetTreeEditors(long treeId);
 
+        //Import-export
+        public Task<FamilyTreeModel> ImportFamilyTree(FamilyTreeImportModel model, ClaimsPrincipal user);
+        public Task<(string treeName, string payload)> ExportFamilyTreeJson(long treeId, bool isForBackup);
     }
 }
