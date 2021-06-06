@@ -59,6 +59,11 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.UnitOfWork
             return _dbContext.RefreshTokens;
         }
 
+        public DbSet<UserConnection> GetUserConnections()
+        {
+            return _dbContext.UserConnections;
+        }
+
     }
 
 }
