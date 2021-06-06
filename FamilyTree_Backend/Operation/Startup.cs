@@ -3,6 +3,7 @@ using FamilyTreeBackend.Infrastructure.Service.InternalServices;
 using FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -31,12 +32,20 @@ namespace Operation
             services.RegisterOperationServices_FromThirdParty(Configuration);
             #endregion
 
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
+        .AddRazorPagesOptions(options =>
+        {
+            options.Conventions.AuthorizeAreaFolder("Identity", "/Account/Manage");
+            options.Conventions.AuthorizeAreaPage("Identity", "/Account/Logout");
+        });
+
             services.ConfigureApplicationCookie(options =>
             {
                 options.LoginPath = $"/Identity/Account/Login";
                 options.LogoutPath = $"/Identity/Account/Logout";
                 options.AccessDeniedPath = $"/Identity/Account/AccessDenied";
             });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -65,6 +74,7 @@ namespace Operation
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapRazorPages();
             });
 
         }

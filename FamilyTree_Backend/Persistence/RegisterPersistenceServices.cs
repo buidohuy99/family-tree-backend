@@ -25,6 +25,7 @@ namespace FamilyTreeBackend.Infrastructure.Persistence
                 options.User.RequireUniqueEmail = true;
             })
             .AddEntityFrameworkStores<FamilyTreeDbContext>()
+            .AddDefaultUI()
             .AddDefaultTokenProviders();
         }
     }
