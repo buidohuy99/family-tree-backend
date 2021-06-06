@@ -147,7 +147,12 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                 user.Address = string.IsNullOrEmpty(model.Address) ? null : model.Address;
             }
 
-            if(model.AvatarUrl != null)
+            if (model.Phone != null)
+            {
+                user.PhoneNumber = string.IsNullOrEmpty(model.Phone) ? null : model.Phone;
+            }
+
+            if (model.AvatarUrl != null)
             {
                 user.AvatarUrl = string.IsNullOrEmpty(model.AvatarUrl) ? null : model.AvatarUrl;
             }
