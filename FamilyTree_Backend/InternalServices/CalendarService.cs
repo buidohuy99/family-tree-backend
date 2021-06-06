@@ -410,14 +410,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
             switch (repeatEvent)
             {
-                case RepeatEvent.DAILY:
-                    if (startDate.Date.CompareTo(endDate.Date) != 0)
-                    {
-                        throw new FamilyEventRecurringDateException(CalendarExceptionMessages.StartDateAndEndDateIsNotWithinSameRepeatCycle
-                            , RepeatEvent.DAILY, startDate, endDate);
-                    }// different days
-                    break;
-                case RepeatEvent.WEEKLY:
+               case RepeatEvent.WEEKLY:
                     if(!DatesAreInTheSameWeek(startDate, endDate))
                     {
                         throw new FamilyEventRecurringDateException(CalendarExceptionMessages.StartDateAndEndDateIsNotWithinSameRepeatCycle
