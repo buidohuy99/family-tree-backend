@@ -445,6 +445,173 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             }
         }
 
+        public async Task<FindTreesPaginationResponseModel> FindAllTree(PaginationModel model)
+        {
+            var trees = _unitOfWork.Repository<FamilyTree>().GetDbset()
+                .Include(tr => tr.Owner)
+                .Include(tr => tr.Editors)
+                .Where(tr => tr.DateCreated == null || tr.DateCreated.Value.CompareTo(model.CreatedBefore) <= 0);
+
+            var totalPage = (ulong)MathF.Ceiling((ulong)trees.Count() / model.ItemsPerPage);
+            totalPage = totalPage <= 0 ? 1 : totalPage;
+
+            if (model.Page > totalPage)
+            {
+                throw new PaginationException(GeneralExceptionMessages.PageOutOfBounds, model.Page, model.ItemsPerPage, totalPage);
+            }
+
+            trees = trees.Skip((int)((model.Page - 1) * model.ItemsPerPage)).Take((int)model.ItemsPerPage);
+
+            List<FamilyTreeListItemModel> models = new List<FamilyTreeListItemModel>();
+            foreach (var tree in await trees.ToListAsync())
+            {
+                models.Add(_mapper.Map<FamilyTreeListItemModel>(tree));
+            }
+
+            return new FindTreesPaginationResponseModel() { 
+                Result = models,
+                TotalPages = totalPage,
+                CurrentPage = model.Page,
+                ItemsPerPage = model.ItemsPerPage
+            };
+        }
+
+        public async Task<FindTreesPaginationResponseModel> FindAllTreeAccessibleToUser(ClaimsPrincipal user, PaginationModel model)
+        {
+            var applicationUser = await _userManager.GetUserAsync(user);
+
+            if (applicationUser == null)
+            {
+                throw new UserNotFoundException(UserExceptionMessages.UserNotFound);
+            }
+
+            var trees = _unitOfWork.Repository<FamilyTree>().GetDbset()
+                .Include(tr => tr.Owner)
+                .Include(tr => tr.Editors)
+                .Where(tr => tr.DateCreated == null || tr.DateCreated.Value.CompareTo(model.CreatedBefore) <= 0)
+                .Where(tr => tr.OwnerId.Equals(applicationUser.Id) || tr.Editors.Any(e => e.Id.Equals(applicationUser.Id)));
+
+            var totalPage = (ulong)MathF.Ceiling((ulong)trees.Count() / model.ItemsPerPage);
+            totalPage = totalPage <= 0 ? 1 : totalPage;
+
+            if (model.Page > totalPage)
+            {
+                throw new PaginationException(GeneralExceptionMessages.PageOutOfBounds, model.Page, model.ItemsPerPage, totalPage);
+            }
+
+            trees = trees.Skip((int)((model.Page - 1) * model.ItemsPerPage)).Take((int)model.ItemsPerPage);
+
+            List<FamilyTreeListItemModel> models = new List<FamilyTreeListItemModel>();
+            foreach (var tree in trees)
+            {
+                models.Add(_mapper.Map<FamilyTreeListItemModel>(tree));
+            }
+
+            return new FindTreesPaginationResponseModel()
+            {
+                Result = models,
+                TotalPages = totalPage,
+                CurrentPage = model.Page,
+                ItemsPerPage = model.ItemsPerPage
+            };
+        }
+
+        public async Task<FindTreesPaginationResponseModel> FindTreesFromKeyword(string keyword, PaginationModel model)
+        {
+            var query = FindTreesUsingKeyword(keyword);
+
+            if (query == null)
+            {
+                return new FindTreesPaginationResponseModel()
+                {
+                    Result = new List<FamilyTreeListItemModel>(),
+                    TotalPages = 1,
+                    CurrentPage = 1,
+                    ItemsPerPage = model.ItemsPerPage
+                };
+            }
+
+            query = query.Where(tr => tr.DateCreated == null || tr.DateCreated.Value.CompareTo(model.CreatedBefore) <= 0);
+
+            var totalPage = (ulong)MathF.Ceiling((ulong)query.Count() / model.ItemsPerPage);
+            totalPage = totalPage <= 0 ? 1 : totalPage;
+
+            if (model.Page > totalPage)
+            {
+                throw new PaginationException(GeneralExceptionMessages.PageOutOfBounds, model.Page, model.ItemsPerPage, totalPage);
+            }
+
+            query = query.Skip((int)((model.Page - 1) * model.ItemsPerPage)).Take((int)model.ItemsPerPage);
+
+            query = query.Include(e => e.Owner).Include(e => e.Editors);
+
+            List<FamilyTreeListItemModel> trees = new List<FamilyTreeListItemModel>();
+            foreach (var tree in (await query.ToListAsync()))
+            {
+                trees.Add(_mapper.Map<FamilyTreeListItemModel>(tree));
+            }
+
+            return new FindTreesPaginationResponseModel()
+            {
+                Result = trees,
+                TotalPages = totalPage,
+                CurrentPage = model.Page,
+                ItemsPerPage = model.ItemsPerPage
+            };
+        }
+
+        public async Task<FindTreesPaginationResponseModel> FindTreesFromKeywordAccessibleToUser(ClaimsPrincipal user, string keyword, PaginationModel model)
+        {
+            var applicationUser = await _userManager.GetUserAsync(user);
+
+            if (applicationUser == null)
+            {
+                throw new UserNotFoundException(UserExceptionMessages.UserNotFound);
+            }
+
+            var query = FindTreesUsingKeyword(keyword);
+
+            if (query == null)
+            {
+                return new FindTreesPaginationResponseModel()
+                {
+                    Result = new List<FamilyTreeListItemModel>(),
+                    TotalPages = 1,
+                    CurrentPage = 1,
+                    ItemsPerPage = model.ItemsPerPage
+                };
+            }
+
+            query = query.Where(tr => tr.DateCreated == null || tr.DateCreated.Value.CompareTo(model.CreatedBefore) <= 0)
+                .Where(tr => tr.OwnerId.Equals(applicationUser.Id) || tr.Editors.Any(e => e.Id.Equals(applicationUser.Id)));
+
+            var totalPage = (ulong)MathF.Ceiling((ulong)query.Count() / model.ItemsPerPage);
+            totalPage = totalPage <= 0 ? 1 : totalPage;
+
+            if (model.Page > totalPage)
+            {
+                throw new PaginationException(GeneralExceptionMessages.PageOutOfBounds, model.Page, model.ItemsPerPage, totalPage);
+            }
+
+            query = query.Skip((int)((model.Page - 1) * model.ItemsPerPage)).Take((int)model.ItemsPerPage);
+
+            query = query.Include(e => e.Owner).Include(e => e.Editors);
+
+            List<FamilyTreeListItemModel> trees = new List<FamilyTreeListItemModel>();
+            foreach (var tree in (await query.ToListAsync()))
+            {
+                trees.Add(_mapper.Map<FamilyTreeListItemModel>(tree));
+            }
+
+            return new FindTreesPaginationResponseModel()
+            {
+                Result = trees,
+                TotalPages = totalPage,
+                CurrentPage = model.Page,
+                ItemsPerPage = model.ItemsPerPage
+            };
+        }
+
         #region Helper methods
 
         private async Task<IEnumerable<FamilyTree>> FindAccessibleTrees(ApplicationUser applicationUser)
