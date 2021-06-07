@@ -73,6 +73,11 @@ namespace FamilyTreeBackend.Core.Domain.Constants
         public const string Person_NoPermissionRead = "User does not have permission to see this person";
     }
 
+    public static class GeneralExceptionMessages
+    {
+        public const string PageOutOfBounds = "Cannot fetch page because it's out of bounds";
+    }
+
     public static class AuthExceptionMessages
     {
         //RegisterUserFail

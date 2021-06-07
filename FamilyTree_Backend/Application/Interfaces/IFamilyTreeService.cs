@@ -1,4 +1,5 @@
-﻿using FamilyTreeBackend.Core.Application.Models.FamilyTree;
+﻿using FamilyTreeBackend.Core.Application.Models;
+using FamilyTreeBackend.Core.Application.Models.FamilyTree;
 using FamilyTreeBackend.Core.Application.Models.FileIO;
 using FamilyTreeBackend.Core.Domain.Entities;
 using System;
@@ -23,10 +24,14 @@ namespace FamilyTreeBackend.Core.Application.Interfaces
         public Task<FamilyTreeModel> AddFamilyTree(FamilyTreeInputModel model, ClaimsPrincipal user);
 
         public Task<IEnumerable<FamilyTreeListItemModel>> FindAllTree();
+        public Task<FindTreesPaginationResponseModel> FindAllTree(PaginationModel model);
         public Task<IEnumerable<FamilyTreeListItemModel>> FindAllTreeAccessibleToUser(ClaimsPrincipal user);
+        public Task<FindTreesPaginationResponseModel> FindAllTreeAccessibleToUser(ClaimsPrincipal user, PaginationModel model);
 
         public Task<IEnumerable<FamilyTreeListItemModel>> FindTreesFromKeyword(string keyword);
+        public Task<FindTreesPaginationResponseModel> FindTreesFromKeyword(string keyword, PaginationModel model);
         public Task<IEnumerable<FamilyTreeListItemModel>> FindTreesFromKeywordAccessibleToUser(ClaimsPrincipal user, string keyword);
+        public Task<FindTreesPaginationResponseModel> FindTreesFromKeywordAccessibleToUser(ClaimsPrincipal user, string keyword, PaginationModel model);
 
         //Editors
         public Task<IEnumerable<string>> AddUsersToEditor(long treeId, IList<string> userNames);

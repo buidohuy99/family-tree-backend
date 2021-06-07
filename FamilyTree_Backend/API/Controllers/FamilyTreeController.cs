@@ -23,6 +23,7 @@ using System.Security.Cryptography;
 using Microsoft.Extensions.Options;
 using FamilyTreeBackend.Core.Application.Helpers.ConfigModels;
 using Jose;
+using FamilyTreeBackend.Core.Application.Models;
 
 namespace FamilyTreeBackend.Presentation.API.Controllers
 {
@@ -128,6 +129,19 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         }
 
         [AllowAnonymous]
+        [HttpGet("trees/using-pagination")]
+        [SwaggerOperation(Summary = "Find all trees of a page")]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<FindTreesPaginationResponseModel>),
+            Description = "Find all trees of a page")]
+        public async Task<IActionResult> FindAllTrees([FromQuery] PaginationModel model)
+        {
+            var result = await _familyTreeService.FindAllTree(model);
+
+            return Ok(new HttpResponse<FindTreesPaginationResponseModel>(
+                result, GenericResponseStrings.TreeController_FindAllTreeSuccessful));
+        }
+
+        [AllowAnonymous]
         [HttpGet("trees-from-keyword")]
         [SwaggerOperation(Summary = "Find all trees in the system from a keyword")]
         [SwaggerResponse(200, Type = typeof(HttpResponse<IEnumerable<FamilyTreeListItemModel>>),
@@ -149,6 +163,18 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             var result = await _familyTreeService.FindAllTreeAccessibleToUser(User);
 
             return Ok(new HttpResponse<IEnumerable<FamilyTreeListItemModel>>(
+                result, GenericResponseStrings.TreeController_FindAllTreeSuccessful));
+        }
+
+        [HttpGet("trees/list/using-pagination")]
+        [SwaggerOperation(Summary = "Find all trees in page of user")]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<FindTreesPaginationResponseModel>),
+            Description = "Find all trees in page accessible to user")]
+        public async Task<IActionResult> FindAllTreeAccessibleToUser([FromQuery] PaginationModel model)
+        {
+            var result = await _familyTreeService.FindAllTreeAccessibleToUser(User, model);
+
+            return Ok(new HttpResponse<FindTreesPaginationResponseModel>(
                 result, GenericResponseStrings.TreeController_FindAllTreeSuccessful));
         }
 
