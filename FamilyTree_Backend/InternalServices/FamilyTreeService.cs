@@ -447,7 +447,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
         public async Task<FindTreesPaginationResponseModel> FindAllTree(PaginationModel model)
         {
-           var trees = _unitOfWork.Repository<FamilyTree>().GetDbset()
+            var trees = _unitOfWork.Repository<FamilyTree>().GetDbset()
                 .Include(tr => tr.Owner)
                 .Include(tr => tr.Editors)
                 .Where(tr => tr.DateCreated == null || tr.DateCreated.Value.CompareTo(model.CreatedBefore) <= 0);
