@@ -1,4 +1,5 @@
 ﻿using FamilyTreeBackend.Core.Application.Operation.Models;
+using FamilyTreeBackend.Infrastructure.Persistence.Role;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Operation.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = ApplicationUserRoles.Admin)]
     public class UsersController : Controller
     {
         private readonly IWebAccessUserService _userService;
@@ -20,7 +21,7 @@ namespace Operation.Controllers
         // GET: UserController
         public async Task<ActionResult> Index(string filter)
         {
-            var result = await _userService.GetAllUser();
+            var result = await _userService.FindUserByFilter(filter);
             return View(result);
         }
 

@@ -381,7 +381,7 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
                     EmailConfirmed = true,
                     PhoneNumber = "0123434552",
                     PhoneNumberConfirmed = true,
-                    Status = 1
+                    Status = true,
                 };
 
                 await userManager.CreateAsync(defaultUser, "test@123");

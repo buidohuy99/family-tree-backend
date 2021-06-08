@@ -10,7 +10,7 @@
     <EmbeddedResource Remove="Views\User\**" />
     <None Remove="Views\User\**" />
   </ItemGroup>
-
+  
   <ItemGroup>
     <ProjectReference Include="..\InternalServices\InternalServices.csproj" />
   </ItemGroup>
@@ -32,6 +32,12 @@
 
   <ItemGroup>
     <Folder Include="Services\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\tick.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 
 </Project>

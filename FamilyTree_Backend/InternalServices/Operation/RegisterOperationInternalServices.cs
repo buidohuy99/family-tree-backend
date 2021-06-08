@@ -15,7 +15,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
         {
             // add scoped services down here
             #region Persistence Layer
-            services.RegisterServices_Persistence(Configuration);
+            services.RegisterOperationServices_Persistence(Configuration);
             #endregion
 
             #region Register scoped services

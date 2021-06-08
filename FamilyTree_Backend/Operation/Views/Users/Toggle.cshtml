@@ -9,7 +9,7 @@
 <h1>Toggle</h1>
 <h3>@message</h3>
 <div>
-    <h4>User</h4>
+    <h4>Application User</h4>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
@@ -34,8 +34,10 @@
     </dl>
     
     <form asp-action="Toggle">
-        @{ var buttonAction = Model.Status ? "Disable" : "Enable";}
-        <input type="submit" value=@buttonAction class="btn btn-danger" /> |
+        @{ var buttonAction = Model.Status ? "Disable" : "Enable";
+           var buttonClass = Model.Status ? "btn btn-danger" : "btn btn-success";
+         }
+        <input type="submit" value=@buttonAction class="@buttonClass"/> |
         <a asp-action="Index">Back to List</a>
     </form>
 </div>

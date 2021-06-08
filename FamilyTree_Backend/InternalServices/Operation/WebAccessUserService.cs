@@ -16,6 +16,7 @@ namespace Operation.Services
         public Task<WebAccessUserModel> UpdateUser(string userId, WebAccessUserUpdateModel model);
         public Task<WebAccessUserModel> GetUser(string userId);
         public Task ToggleUser(string id);
+        public Task<IEnumerable<WebAccessUserModel>> FindUserByFilter(string filter);
     }
 
     public class WebAccessUserService : IWebAccessUserService
@@ -66,14 +67,7 @@ namespace Operation.Services
         public async Task ToggleUser(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
-            if (user.Status == 0)
-            {
-                user.Status = 1;
-            }
-            else
-            {
-                user.Status = 0;
-            }
+            user.Status = !user.Status;
             await _userManager.UpdateAsync(user);
         }
 
@@ -88,6 +82,23 @@ namespace Operation.Services
             foreach (var user in users)
             {
                 result.Add(_mapper.Map<WebAccessUserModel>(user));
+            }
+            return result;
+        }
+
+        public async Task<IEnumerable<WebAccessUserModel>> FindUserByFilter(string filter)
+        {
+            List<WebAccessUserModel> result = new List<WebAccessUserModel>();
+            if (string.IsNullOrWhiteSpace(filter) == false)
+            {
+                var users = await _userManager.Users.Where(u =>
+                    u.UserName.Contains(filter) || u.Email.Contains(filter))
+                    .ToListAsync();
+
+                foreach(var user in users)
+                {
+                    result.Add(_mapper.Map<WebAccessUserModel>(user));
+                }
             }
             return result;
         }

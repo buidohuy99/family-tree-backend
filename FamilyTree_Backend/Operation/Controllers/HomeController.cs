@@ -1,10 +1,13 @@
 ﻿using FamilyTreeBackend.Core.Application.Operation.Models;
+using FamilyTreeBackend.Infrastructure.Persistence.Role;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 
 namespace Operation.Controllers
 {
+    [Authorize(Roles = ApplicationUserRoles.Admin)]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;

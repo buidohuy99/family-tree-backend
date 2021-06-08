@@ -9,9 +9,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace FamilyTreeBackend.Infrastructure.Persistence
 {
-    public static class RegisterPersistenceServices
+    public static class RegisterOperationPersistenceServices
     {
-        public static void RegisterServices_Persistence(this IServiceCollection services, IConfiguration Configuration)
+        public static void RegisterOperationServices_Persistence(this IServiceCollection services, IConfiguration Configuration)
         {
             // add db context
             services.AddDbContext<FamilyTreeDbContext>(options =>
@@ -25,6 +25,7 @@ namespace FamilyTreeBackend.Infrastructure.Persistence
                 options.User.RequireUniqueEmail = true;
             })
             .AddEntityFrameworkStores<FamilyTreeDbContext>()
+            .AddDefaultUI()
             .AddDefaultTokenProviders();
         }
     }

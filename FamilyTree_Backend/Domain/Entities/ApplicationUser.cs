@@ -17,7 +17,7 @@ namespace FamilyTreeBackend.Core.Domain.Entities
         public string Address { get; set; }
         public Gender? Gender { get; set; }
         public DateTime? DateOfBirth { get; set; }
-        public byte Status { get; set; }
+        public bool Status { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime? UpdatedDate { get; set; }
 
