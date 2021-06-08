@@ -22,10 +22,11 @@ namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices
         {
             #region logging configuration
             // Set up logging
+            var logFilePath = Configuration.GetSection("Serilog").GetSection("LogFilePath").Value;
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Information()
                 .WriteTo.Console()
-                .WriteTo.File("SysLogs/SystemLog.txt", rollingInterval: RollingInterval.Day)
+                .WriteTo.File(logFilePath, rollingInterval: RollingInterval.Day)
                 .CreateLogger();
             AppDomain.CurrentDomain.ProcessExit += (s, e) => Log.CloseAndFlush();
             services.AddSingleton(Log.Logger);
