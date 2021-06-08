@@ -117,6 +117,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             IEnumerable<FamilyTree> trees = await _unitOfWork.Repository<FamilyTree>().GetDbset()
                 .Include(tr => tr.Owner)
                 .Include(tr => tr.Editors)
+                .Where(tr => tr.PublicMode == true)
                 .ToListAsync();
 
             List<FamilyTreeListItemModel> models = new List<FamilyTreeListItemModel>();
@@ -271,7 +272,8 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                 return new List<FamilyTreeListItemModel>();
             }
 
-            query = query.Include(e => e.Owner).Include(e => e.Editors);
+            query = query.Include(e => e.Owner).Include(e => e.Editors)
+                .Where(tr => tr.PublicMode == true);
 
             List<FamilyTreeListItemModel> trees = new List<FamilyTreeListItemModel>();
             foreach (var tree in (await query.ToListAsync()))
@@ -450,7 +452,8 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             var trees = _unitOfWork.Repository<FamilyTree>().GetDbset()
                 .Include(tr => tr.Owner)
                 .Include(tr => tr.Editors)
-                .Where(tr => tr.DateCreated == null || tr.DateCreated.Value.CompareTo(model.CreatedBefore) <= 0);
+                .Where(tr => tr.DateCreated == null || tr.DateCreated.Value.CompareTo(model.CreatedBefore) <= 0)
+                .Where(tr => tr.PublicMode == true);
 
             var totalPage = (ulong)MathF.Ceiling((ulong)trees.Count() / model.ItemsPerPage);
             totalPage = totalPage <= 0 ? 1 : totalPage;
@@ -531,7 +534,8 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                 };
             }
 
-            query = query.Where(tr => tr.DateCreated == null || tr.DateCreated.Value.CompareTo(model.CreatedBefore) <= 0);
+            query = query.Where(tr => tr.DateCreated == null || tr.DateCreated.Value.CompareTo(model.CreatedBefore) <= 0)
+                .Where(tr => tr.PublicMode == true);
 
             var totalPage = (ulong)MathF.Ceiling((ulong)query.Count() / model.ItemsPerPage);
             totalPage = totalPage <= 0 ? 1 : totalPage;
