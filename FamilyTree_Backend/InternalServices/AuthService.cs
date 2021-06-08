@@ -46,19 +46,26 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             else
             {
                 var checkPassword = await _userManager.CheckPasswordAsync(user, model.Password);
-                if (checkPassword)
+                if (checkPassword ==false)
                 {
-                    string accessToken = new JwtSecurityTokenHandler().WriteToken(generateAccessToken(user));
-
-                    string refreshToken = null;
-                    if (model.GetRefreshToken)
-                    {
-                        refreshToken = await generateRefreshToken(user);
-                    }
-
-                    return new AuthResponseModel(user, accessToken, refreshToken);
+                    throw new LoginUserFailException(AuthExceptionMessages.InvalidPassword);
                 }
-                throw new LoginUserFailException(AuthExceptionMessages.InvalidPassword);
+                
+                if (user.Status == false)
+                {
+                    throw new LoginUserFailException(AuthExceptionMessages.DisabledUser);
+                }
+
+                string accessToken = new JwtSecurityTokenHandler().WriteToken(generateAccessToken(user));
+                string refreshToken = null;
+                if (model.GetRefreshToken)
+                {
+                    refreshToken = await generateRefreshToken(user);
+                }
+                return new AuthResponseModel(user, accessToken, refreshToken);
+
+
+
             }
         }
 
@@ -134,6 +141,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                 FirstName = model.FirstName,
                 LastName = model.LastName,
                 MidName = model.MidName,
+                Status = true,
             };
             var identityResult = await _userManager.CreateAsync(newUser, model.Password);
 

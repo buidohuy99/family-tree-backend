@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FamilyTreeBackend.Core.Application.Interfaces;
 using FamilyTreeBackend.Core.Application.Operation.Models;
 using FamilyTreeBackend.Core.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -23,11 +24,16 @@ namespace Operation.Services
     {
         private readonly IMapper _mapper;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public WebAccessUserService(IMapper mapper, UserManager<ApplicationUser> userManager)
+        public WebAccessUserService(
+            IMapper mapper, 
+            UserManager<ApplicationUser> userManager,
+            IUnitOfWork unitOfWork)
         {
             _mapper = mapper;
             _userManager = userManager;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<IEnumerable<WebAccessUserModel>> GetAllUser()
@@ -69,6 +75,20 @@ namespace Operation.Services
             var user = await _userManager.FindByIdAsync(id);
             user.Status = !user.Status;
             await _userManager.UpdateAsync(user);
+
+            //remove access token
+            if (user.Status == false)
+            {
+                var refreshTokens = _unitOfWork.GetRefreshTokens();
+                var beDeletedToken = refreshTokens.SingleOrDefault(tk => tk.UserId.Equals(id));
+                if (beDeletedToken != null)
+                {
+                    refreshTokens.Remove(beDeletedToken);
+                    await _unitOfWork.SaveChangesAsync();
+                }
+            }
+            await Task.WhenAll(_userManager.UpdateAsync(user), _unitOfWork.SaveChangesAsync());
+            
         }
 
         public async Task<IEnumerable<WebAccessUserModel>> FilterUser(string filter)
