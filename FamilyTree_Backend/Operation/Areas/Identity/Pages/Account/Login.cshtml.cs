@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using FamilyTreeBackend.Infrastructure.Persistence.Role;
 
 namespace Operation.Areas.Identity.Pages.Account
 {
@@ -79,6 +80,14 @@ namespace Operation.Areas.Identity.Pages.Account
         
             if (ModelState.IsValid)
             {
+                var user = await _userManager.FindByNameAsync(Input.Username);
+                var roles = await _userManager.GetRolesAsync(user);
+                if (!roles.Any(str => str.Equals(ApplicationUserRoles.Admin)))
+                {
+                    ModelState.AddModelError(string.Empty, "User is not authorized to access this site");
+                    return Page();
+                }
+
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
                 var result = await _signInManager.PasswordSignInAsync(Input.Username, Input.Password, Input.RememberMe, lockoutOnFailure: false);

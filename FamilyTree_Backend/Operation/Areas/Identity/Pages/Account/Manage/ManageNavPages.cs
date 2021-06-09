@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FamilyTreeBackend.Infrastructure.Persistence.Role;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Operation.Areas.Identity.Pages.Account.Manage
 {
+    [Authorize(Roles = ApplicationUserRoles.Admin)]
     public static class ManageNavPages
     {
         public static string Index => "Index";
