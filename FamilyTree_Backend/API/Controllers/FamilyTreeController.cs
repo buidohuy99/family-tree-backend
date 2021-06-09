@@ -23,6 +23,7 @@ using System.Security.Cryptography;
 using Microsoft.Extensions.Options;
 using FamilyTreeBackend.Core.Application.Helpers.ConfigModels;
 using Jose;
+using FamilyTreeBackend.Core.Application.Models;
 
 namespace FamilyTreeBackend.Presentation.API.Controllers
 {
@@ -128,6 +129,19 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         }
 
         [AllowAnonymous]
+        [HttpGet("trees/using-pagination")]
+        [SwaggerOperation(Summary = "Find all trees of a page")]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<FindTreesPaginationResponseModel>),
+            Description = "Find all trees of a page")]
+        public async Task<IActionResult> FindAllTrees([FromQuery] PaginationModel model)
+        {
+            var result = await _familyTreeService.FindAllTree(model);
+
+            return Ok(new HttpResponse<FindTreesPaginationResponseModel>(
+                result, GenericResponseStrings.TreeController_FindAllTreeSuccessful));
+        }
+
+        [AllowAnonymous]
         [HttpGet("trees-from-keyword")]
         [SwaggerOperation(Summary = "Find all trees in the system from a keyword")]
         [SwaggerResponse(200, Type = typeof(HttpResponse<IEnumerable<FamilyTreeListItemModel>>),
@@ -137,6 +151,19 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             var result = await _familyTreeService.FindTreesFromKeyword(q != null ? q : string.Empty);
 
             return Ok(new HttpResponse<IEnumerable<FamilyTreeListItemModel>>(
+                result, GenericResponseStrings.TreeController_FindAllTreeSuccessful));
+        }
+
+        [AllowAnonymous]
+        [HttpGet("trees-from-keyword/using-pagination")]
+        [SwaggerOperation(Summary = "Find all trees in the system from a keyword (only take a page)")]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<FindTreesPaginationResponseModel>),
+            Description = "Find all trees with Name/Description fitting a query string (only take a page)")]
+        public async Task<IActionResult> FindAllTreesFromKeyword([FromQuery] string q, [FromQuery] PaginationModel model)
+        {
+            var result = await _familyTreeService.FindTreesFromKeyword(q != null ? q : string.Empty, model);
+
+            return Ok(new HttpResponse<FindTreesPaginationResponseModel>(
                 result, GenericResponseStrings.TreeController_FindAllTreeSuccessful));
         }
 
@@ -152,6 +179,18 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
                 result, GenericResponseStrings.TreeController_FindAllTreeSuccessful));
         }
 
+        [HttpGet("trees/list/using-pagination")]
+        [SwaggerOperation(Summary = "Find all trees in page of user")]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<FindTreesPaginationResponseModel>),
+            Description = "Find all trees in page accessible to user")]
+        public async Task<IActionResult> FindAllTreeAccessibleToUser([FromQuery] PaginationModel model)
+        {
+            var result = await _familyTreeService.FindAllTreeAccessibleToUser(User, model);
+
+            return Ok(new HttpResponse<FindTreesPaginationResponseModel>(
+                result, GenericResponseStrings.TreeController_FindAllTreeSuccessful));
+        }
+
         [HttpGet("trees-from-keyword/list")]
         [SwaggerOperation(Summary = "Find all trees of user from keyword")]
         [SwaggerResponse(200, Type = typeof(HttpResponse<IEnumerable<FamilyTreeListItemModel>>),
@@ -161,6 +200,18 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             var result = await _familyTreeService.FindTreesFromKeywordAccessibleToUser(User, q != null ? q : string.Empty);
 
             return Ok(new HttpResponse<IEnumerable<FamilyTreeListItemModel>>(
+                result, GenericResponseStrings.TreeController_FindAllTreeSuccessful));
+        }
+
+        [HttpGet("trees-from-keyword/list/using-pagination")]
+        [SwaggerOperation(Summary = "Find all trees of user from keyword (only get by page)")]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<FindTreesPaginationResponseModel>),
+            Description = "Find all trees accessible to user with Name/Description fitting a query string (only get by page)")]
+        public async Task<IActionResult> FindAllTreesFromKeywordAccessibleToUser([FromQuery] string q, [FromQuery] PaginationModel model)
+        {
+            var result = await _familyTreeService.FindTreesFromKeywordAccessibleToUser(User, q != null ? q : string.Empty, model);
+
+            return Ok(new HttpResponse<FindTreesPaginationResponseModel>(
                 result, GenericResponseStrings.TreeController_FindAllTreeSuccessful));
         }
 

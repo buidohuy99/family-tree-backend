@@ -3,6 +3,7 @@ using FamilyTreeBackend.Core.Application.DTOs;
 using FamilyTreeBackend.Core.Application.Helpers.Exceptions;
 using FamilyTreeBackend.Core.Application.Helpers.Exceptions.UserExceptions;
 using FamilyTreeBackend.Core.Application.Interfaces;
+using FamilyTreeBackend.Core.Application.Models;
 using FamilyTreeBackend.Core.Application.Models.User;
 using FamilyTreeBackend.Core.Domain.Constants;
 using FamilyTreeBackend.Core.Domain.Entities;
@@ -12,6 +13,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using StopWord;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -88,6 +90,11 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
             if (model.UserName == null && model.Email == null)
             {
+                if(model.UsernameOrEmailContains != null)
+                {
+                    users = users.Where(e => e.UserName.Contains(model.UsernameOrEmailContains) || e.Email.Contains(model.UsernameOrEmailContains));
+                }
+
                 if (model.Phone != null)
                 {
                     users = users.Where(e => e.PhoneNumber.Contains(model.Phone));
@@ -118,6 +125,75 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             }
 
             return users.Select(e => new UserDTO(e));
+        }
+
+        public FindUsersPaginationResponseModel FindUser(UserFilterModel model, PaginationModel paginationModel)
+        {
+            var users = _userManager.Users;
+
+            if (model.UserName != null)
+            {
+                users = users.Where(e => e.UserName.Equals(model.UserName));
+            }
+            else if (model.Email != null)
+            {
+                users = users.Where(e => e.Email.Equals(model.Email));
+            }
+
+            if (model.UserName == null && model.Email == null)
+            {
+                if (model.UsernameOrEmailContains != null)
+                {
+                    users = users.Where(e => e.UserName.Contains(model.UsernameOrEmailContains) || e.Email.Contains(model.UsernameOrEmailContains));
+                }
+
+                if (model.Phone != null)
+                {
+                    users = users.Where(e => e.PhoneNumber.Contains(model.Phone));
+                }
+
+                if (model.BornBefore.HasValue)
+                {
+                    users = users.Where(e => (e.DateOfBirth.HasValue ? e.DateOfBirth.Value.CompareTo(model.BornBefore.Value) : int.MaxValue) < 0);
+                }
+
+                if (model.Gender.HasValue)
+                {
+                    users = users.Where(e => e.Gender == model.Gender);
+                }
+
+                if (model.Name != null)
+                {
+                    var nameWithoutStopwords = model.Name.RemoveStopWords().ToLower();
+
+                    MatchCollection matches = Regex.Matches(nameWithoutStopwords, "[a-z]([:'-]?[a-z])*",
+                                        RegexOptions.IgnoreCase);
+                    foreach (Match match in matches)
+                    {
+                        users = users.Where(e => e.FirstName.ToLower().Contains(match.Value)
+                                || e.LastName.ToLower().Contains(match.Value) || e.MidName.ToLower().Contains(match.Value));
+                    }
+                }
+            }
+
+            users = users.Where(tr => tr.CreatedDate.CompareTo(paginationModel.CreatedBefore) <= 0);
+
+            var totalPage = (ulong)MathF.Ceiling((ulong)users.Count() / paginationModel.ItemsPerPage);
+            totalPage = totalPage <= 0 ? 1 : totalPage;
+
+            if (paginationModel.Page > totalPage)
+            {
+                throw new PaginationException(GeneralExceptionMessages.PageOutOfBounds, paginationModel.Page, paginationModel.ItemsPerPage, totalPage);
+            }
+
+            users = users.Skip((int)((paginationModel.Page - 1) * paginationModel.ItemsPerPage)).Take((int)paginationModel.ItemsPerPage);
+
+            return new FindUsersPaginationResponseModel(){
+                Result = users.Select(e => new UserDTO(e)),
+                TotalPages = totalPage,
+                CurrentPage = paginationModel.Page,
+                ItemsPerPage = paginationModel.ItemsPerPage
+            };
         }
 
         public async Task<UserDTO> UpdateUser(string updatedUserId, UpdateUserModel model)

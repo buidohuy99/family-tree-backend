@@ -3,6 +3,7 @@ using FamilyTreeBackend.Core.Application.Helpers;
 using FamilyTreeBackend.Core.Application.Helpers.Exceptions;
 using FamilyTreeBackend.Core.Application.Helpers.Exceptions.UserExceptions;
 using FamilyTreeBackend.Core.Application.Interfaces;
+using FamilyTreeBackend.Core.Application.Models;
 using FamilyTreeBackend.Core.Application.Models.User;
 using FamilyTreeBackend.Core.Domain.Constants;
 using FamilyTreeBackend.Core.Domain.Entities;
@@ -83,6 +84,16 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             var result = await Task.Run(() => { return _userService.FindUser(model); });
 
             return Ok(new HttpResponse<IEnumerable<UserDTO>>(result, GenericResponseStrings.UserController_FilterUsersSuccessful));
+        }
+
+        [HttpPost("users/using-pagination")]
+        [SwaggerOperation(Summary = "Filter users based on params, set params to null to not use that filter (only take a page)")]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<FindUsersPaginationResponseModel>), Description = "Returns list of users in a page")]
+        public async Task<IActionResult> FilterUsers([FromBody] UserFilterModel model, [FromQuery] PaginationModel paginationModel)
+        {
+            var result = await Task.Run(() => { return _userService.FindUser(model, paginationModel); });
+
+            return Ok(new HttpResponse<FindUsersPaginationResponseModel>(result, GenericResponseStrings.UserController_FilterUsersSuccessful));
         }
 
         [HttpPut("user")]
