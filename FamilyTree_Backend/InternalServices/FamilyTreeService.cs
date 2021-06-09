@@ -252,7 +252,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             }
 
             query = query.Include(e => e.Owner).Include(e => e.Editors)
-                .Where(e => e.OwnerId == applicationUser.Id || e.Editors.Any(editor => editor.Id == applicationUser.Id));
+                .Where(e => e.PublicMode == true || e.OwnerId == applicationUser.Id || e.Editors.Any(editor => editor.Id == applicationUser.Id));
 
             List<FamilyTreeListItemModel> trees = new List<FamilyTreeListItemModel>();
             foreach (var tree in (await query.ToListAsync()))
@@ -587,7 +587,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             }
 
             query = query.Where(tr => tr.DateCreated == null || tr.DateCreated.Value.CompareTo(model.CreatedBefore) <= 0)
-                .Where(tr => tr.OwnerId.Equals(applicationUser.Id) || tr.Editors.Any(e => e.Id.Equals(applicationUser.Id)));
+                .Where(tr => tr.PublicMode == true || tr.OwnerId.Equals(applicationUser.Id) || tr.Editors.Any(e => e.Id.Equals(applicationUser.Id)));
 
             var totalPage = (ulong)MathF.Ceiling((ulong)query.Count() / model.ItemsPerPage);
             totalPage = totalPage <= 0 ? 1 : totalPage;

@@ -52,6 +52,8 @@ namespace FamilyTreeBackend.Presentation.API.Controllers.Misc
                 [CalendarExceptionMessages.FollowingEventMustBeAfterEvent] = 400,
 
                 [MemoryExceptionMessages.FamilyMemoryNotFound] = 404,
+
+                [GeneralExceptionMessages.PageOutOfBounds] = 400,
             };
         }
 
