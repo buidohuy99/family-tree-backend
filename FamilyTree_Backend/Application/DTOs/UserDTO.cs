@@ -38,7 +38,7 @@ namespace FamilyTreeBackend.Core.Application.DTOs
         public string Phone { get; set; }
         public Gender? Gender { get; set; }
         public DateTime? DateOfBirth { get; set; }
-        public byte Status { get; set; }
+        public bool Status { get; set; }
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedDate { get; set; }
     }

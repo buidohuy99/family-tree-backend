@@ -88,6 +88,7 @@ namespace FamilyTreeBackend.Core.Domain.Constants
         //LoginUserFail
         public const string CannotFindUser = "Valid user cannot be found from the specified infos";
         public const string InvalidPassword = "Provided password is wrong for the username/email";
+        public const string DisabledUser = "user has been deactivated, contact support for more information";
 
         //RefreshTokenFail
         public const string InvalidRefreshToken = "Refresh token provided is either invalid or expired so please get a new one";

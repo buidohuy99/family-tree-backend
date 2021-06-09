@@ -84,6 +84,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices
                 mc.AddProfile(new FamilyEventProfile());
                 mc.AddProfile(new UserProfile());
                 mc.AddProfile(new FamilyMemoryProfile());
+                mc.AddProfile(new WebAccessUserProfile());
             });
 
             IMapper mapper = mapperConfig.CreateMapper();

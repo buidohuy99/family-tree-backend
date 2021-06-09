@@ -1,0 +1,43 @@
+﻿@model FamilyTreeBackend.Core.Application.Operation.Models.WebAccessUserModel
+
+@{
+    ViewData["Title"] = "Toggle";
+    var action = Model.Status ? "disable" : "enable";
+    var message = $"Are you sure you want to {action} this?";
+}
+
+<h1>Toggle</h1>
+<h3>@message</h3>
+<div>
+    <h4>Application User</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Id)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Id)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.UserName)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.UserName)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Email)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Email)
+        </dd>
+        
+    </dl>
+    
+    <form asp-action="Toggle">
+        @{ var buttonAction = Model.Status ? "Disable" : "Enable";
+           var buttonClass = Model.Status ? "btn btn-danger" : "btn btn-success";
+         }
+        <input type="submit" value=@buttonAction class="@buttonClass"/> |
+        <a asp-action="Index">Back to List</a>
+    </form>
+</div>

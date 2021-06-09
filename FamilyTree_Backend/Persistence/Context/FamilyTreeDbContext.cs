@@ -1,5 +1,6 @@
 ﻿using FamilyTreeBackend.Core.Domain.Entities;
 using FamilyTreeBackend.Core.Domain.Enums;
+using FamilyTreeBackend.Infrastructure.Persistence.Role;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -380,12 +381,20 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
                     EmailConfirmed = true,
                     PhoneNumber = "0123434552",
                     PhoneNumberConfirmed = true,
-                    Status = 1
+                    Status = true,
                 };
 
                 await userManager.CreateAsync(defaultUser, "test@123");
 
                 logger.Information("Seeding complete for test user...");
+            }
+
+            if (!roleManager.Roles.Any())
+            {
+                logger.Information("Seeding user roles...");
+                await roleManager.CreateAsync(new IdentityRole(ApplicationUserRoles.Admin));
+                await roleManager.CreateAsync(new IdentityRole(ApplicationUserRoles.User));
+                logger.Information("Seeding complete for user roles...");
             }
         }
     }
