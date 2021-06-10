@@ -22,6 +22,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             services.AddScoped<ICalendarService, CalendarService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IMemoryService, MemoryService>();
+            services.AddScoped<IRequestResponseLoggingService, RequestResponseLoggingService>();
             #endregion
 
             #region Register singleton

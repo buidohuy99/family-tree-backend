@@ -1,7 +1,9 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -11,21 +13,22 @@ namespace FamilyTreeBackend.Core.Domain.Entities
 {
     public class RequestResponseDataModel
     {
-        public string RequestSchema { get; }
-        public string RequestHost { get; }
-        public string RequestPath { get; }
-        public string RequestBody { get; }
-        public string ResponseBody { get; }
-        private static XmlSerializer xmlSerializer = new XmlSerializer(typeof(RequestResponseDataModel));
-        public static RequestResponseDataModel GetDataFromXML(string xml)
-        {
-            using (var reader = new StringReader(xml))
-            {
-                var result = (RequestResponseDataModel)xmlSerializer.Deserialize(reader);
-                return result;
-            }
-        }
+        [DataMember]
+        public string RequestSchema { get; set; }
+        [DataMember]
+        public string RequestHost { get; set; }
+        [DataMember]
+        public string RequestPath { get; set; }
+        [DataMember]
+        public string RequestHeader { get; set; }
+        [DataMember]
+        public string RequestBody { get; set; }
+        [DataMember]
+        public string ResponseBody { get; set; }
 
+        private static XmlSerializer xmlSerializer = new XmlSerializer(typeof(RequestResponseDataModel));
+
+       
         public static string GetXMLStringFromData(RequestResponseDataModel data)
         {
             using (StringWriter textWriter = new StringWriter())

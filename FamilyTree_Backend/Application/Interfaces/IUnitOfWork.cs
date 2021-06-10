@@ -15,8 +15,10 @@ namespace FamilyTreeBackend.Core.Application.Interfaces
         public IGenericRepository<TEntity> Repository<TEntity>() where TEntity : BaseEntity;
         public DbSet<RefreshToken> GetRefreshTokens();
         public DbSet<UserConnection> GetUserConnections();
+        public DbSet<RequestResponseLog> GetRequestResponseLogs();
 
         public int SaveChanges();
+        
         public Task<int> SaveChangesAsync();
 
         public Task<IDbContextTransaction> CreateTransaction();

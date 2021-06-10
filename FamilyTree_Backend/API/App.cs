@@ -76,6 +76,7 @@ namespace FamilyTreeBackend.Presentation.API
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, FamilyTreeDbContext dbContext, IServiceProvider serviceProvider)
         {
+            app.UseRequestLoggingMiddleware();
             app.UseExceptionHandler("/error");
 
             dbContext.Database.Migrate();
