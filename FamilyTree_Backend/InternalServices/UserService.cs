@@ -77,7 +77,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
         public IEnumerable<UserDTO> FindUser(UserFilterModel model)
         {
-            var users = _userManager.Users;
+            var users = _userManager.Users.Where(e => e.Status == false);
 
             if (model.UserName != null)
             {
@@ -129,7 +129,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
         public FindUsersPaginationResponseModel FindUser(UserFilterModel model, PaginationModel paginationModel)
         {
-            var users = _userManager.Users;
+            var users = _userManager.Users.Where(e => e.Status == false);
 
             if (model.UserName != null)
             {
