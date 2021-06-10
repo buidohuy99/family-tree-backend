@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using FamilyTreeBackend.Infrastructure.Persistence.Role;
+﻿using FamilyTreeBackend.Core.Application.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
 
 namespace Operation.Areas.Identity.Pages.Account.Manage
 {

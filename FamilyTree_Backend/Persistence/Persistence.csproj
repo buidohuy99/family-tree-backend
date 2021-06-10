@@ -28,6 +28,10 @@
     <ProjectReference Include="..\ThirdPartyServices\ThirdPartyServices.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Role\" />
+  </ItemGroup>
+
   <Target Name="BeforeBuild">
     <!-- Remove obj folder -->
     <RemoveDir Directories="$(BaseIntermediateOutputPath)" />

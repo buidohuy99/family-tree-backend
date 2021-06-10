@@ -1,6 +1,5 @@
-﻿using FamilyTreeBackend.Core.Application.Operation.Models;
-using FamilyTreeBackend.Infrastructure.Persistence.Role;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using FamilyTreeBackend.Core.Application.Helpers;
+using FamilyTreeBackend.Core.Application.Operation.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Operation.Services;

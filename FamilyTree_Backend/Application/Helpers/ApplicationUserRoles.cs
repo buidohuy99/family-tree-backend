@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FamilyTreeBackend.Infrastructure.Persistence.Role
+namespace FamilyTreeBackend.Core.Application.Helpers
 {
     public static class ApplicationUserRoles
     {
