@@ -29,7 +29,8 @@ namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices
             #region AutoMapper configuration
             var mapperConfig = new MapperConfiguration(mc =>
             {
-                mc.AddProfile(new WebAccessUserProfile());
+                mc.AddProfile(new UserProfile());
+                mc.AddProfile(new RequestResponseLogProfile());
             });
 
             IMapper mapper = mapperConfig.CreateMapper();

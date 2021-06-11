@@ -70,7 +70,9 @@ namespace FamilyTreeBackend.Presentation.API.Middlewares
             var text = await new StreamReader(context.Response.Body).ReadToEndAsync();
             context.Response.Body.Seek(0, SeekOrigin.Begin);
             await responseBody.CopyToAsync(originalBodyStream);
+            logContainer.StatusCode = context.Response.StatusCode;
             logContainer.ResponseBody = text;
+            logContainer.DateCreated = DateTime.Now.ToString("yyyy/MM/dd hh:mm:ss");
         }
 
 

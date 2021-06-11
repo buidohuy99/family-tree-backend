@@ -2,6 +2,7 @@
 using FamilyTreeBackend.Core.Domain.Entities;
 using FamilyTreeBackend.Infrastructure.Persistence;
 using FamilyTreeBackend.Infrastructure.Persistence.Context;
+using FamilyTreeBackend.Infrastructure.Service.InternalServices.Operation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,6 +21,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
             #region Register scoped services
             services.AddScoped<IWebAccessUserService, WebAccessUserService>();
+            services.AddScoped<IRequestResponseLogReaderService, RequestResponseLogReaderService>();
             #endregion
 
             #region Register singleton

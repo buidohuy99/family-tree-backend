@@ -24,7 +24,11 @@ namespace FamilyTreeBackend.Core.Domain.Entities
         [DataMember]
         public string RequestBody { get; set; }
         [DataMember]
+        public int StatusCode { get; set; }
+        [DataMember]
         public string ResponseBody { get; set; }
+        [DataMember]
+        public string DateCreated { get; set; }
 
         private static XmlSerializer xmlSerializer = new XmlSerializer(typeof(RequestResponseDataModel));
 
