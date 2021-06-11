@@ -263,27 +263,6 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             return trees;
         }
 
-        public async Task<IEnumerable<FamilyTreeListItemModel>> FindTreesFromKeyword(string keyword)
-        {
-            var query = FindTreesUsingKeyword(keyword);
-
-            if(query == null)
-            {
-                return new List<FamilyTreeListItemModel>();
-            }
-
-            query = query.Include(e => e.Owner).Include(e => e.Editors)
-                .Where(tr => tr.PublicMode == true);
-
-            List<FamilyTreeListItemModel> trees = new List<FamilyTreeListItemModel>();
-            foreach (var tree in (await query.ToListAsync()))
-            {
-                trees.Add(_mapper.Map<FamilyTreeListItemModel>(tree));
-            }
-
-            return trees;
-        }
-
         public async Task<FamilyTreeModel> ImportFamilyTree(FamilyTreeImportModel model, ClaimsPrincipal claimsPrincipal)
         {
             var user = await _userManager.GetUserAsync(claimsPrincipal);
@@ -513,51 +492,6 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             return new FindTreesPaginationResponseModel()
             {
                 Result = models,
-                TotalPages = totalPage,
-                CurrentPage = model.Page,
-                ItemsPerPage = model.ItemsPerPage
-            };
-        }
-
-        public async Task<FindTreesPaginationResponseModel> FindTreesFromKeyword(string keyword, PaginationModel model)
-        {
-            var query = FindTreesUsingKeyword(keyword);
-
-            if (query == null)
-            {
-                return new FindTreesPaginationResponseModel()
-                {
-                    Result = new List<FamilyTreeListItemModel>(),
-                    TotalPages = 1,
-                    CurrentPage = 1,
-                    ItemsPerPage = model.ItemsPerPage
-                };
-            }
-
-            query = query.Where(tr => tr.DateCreated == null || tr.DateCreated.Value.CompareTo(model.CreatedBefore) <= 0)
-                .Where(tr => tr.PublicMode == true);
-
-            var totalPage = (ulong)MathF.Ceiling((ulong)query.Count() / model.ItemsPerPage);
-            totalPage = totalPage <= 0 ? 1 : totalPage;
-
-            if (model.Page > totalPage)
-            {
-                throw new PaginationException(GeneralExceptionMessages.PageOutOfBounds, model.Page, model.ItemsPerPage, totalPage);
-            }
-
-            query = query.Skip((int)((model.Page - 1) * model.ItemsPerPage)).Take((int)model.ItemsPerPage);
-
-            query = query.Include(e => e.Owner).Include(e => e.Editors);
-
-            List<FamilyTreeListItemModel> trees = new List<FamilyTreeListItemModel>();
-            foreach (var tree in (await query.ToListAsync()))
-            {
-                trees.Add(_mapper.Map<FamilyTreeListItemModel>(tree));
-            }
-
-            return new FindTreesPaginationResponseModel()
-            {
-                Result = trees,
                 TotalPages = totalPage,
                 CurrentPage = model.Page,
                 ItemsPerPage = model.ItemsPerPage
