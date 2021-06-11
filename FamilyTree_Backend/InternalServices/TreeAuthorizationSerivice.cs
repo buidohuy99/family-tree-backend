@@ -56,6 +56,46 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             return result;
         }
 
+        public Task<AuthorizationResult> AuthorizeWithEventAsync(ClaimsPrincipal user, long eventId, IAuthorizationRequirement requirements)
+        {
+            var eventItem = _unitOfWork.Repository<FamilyEvent>().GetDbset().Find(eventId);
+            if (eventItem == null)
+            {
+                throw new PersonNotFoundException(CalendarExceptionMessages.FamilyEventNotFound, eventId);
+            }
+
+            var entry = _unitOfWork.Entry(eventItem);
+            entry.Reference(p => p.FamilyTree).Load();
+
+            FamilyTree tree = eventItem.FamilyTree;
+            var treeEntry = _unitOfWork.Entry(tree);
+            treeEntry.Collection(tr => tr.Editors).Load();
+            treeEntry.Collection(tr => tr.People).Load();
+
+            var result = _authorizationService.AuthorizeAsync(user, tree, requirements);
+            return result;
+        }
+
+        public Task<AuthorizationResult> AuthorizeWithMemoryAsync(ClaimsPrincipal user, long memoryId, IAuthorizationRequirement requirements)
+        {
+            var memoryItem = _unitOfWork.Repository<FamilyMemory>().GetDbset().Find(memoryId);
+            if (memoryItem == null)
+            {
+                throw new PersonNotFoundException(MemoryExceptionMessages.FamilyMemoryNotFound, memoryId);
+            }
+
+            var entry = _unitOfWork.Entry(memoryItem);
+            entry.Reference(p => p.FamilyTree).Load();
+
+            FamilyTree tree = memoryItem.FamilyTree;
+            var treeEntry = _unitOfWork.Entry(tree);
+            treeEntry.Collection(tr => tr.Editors).Load();
+            treeEntry.Collection(tr => tr.People).Load();
+
+            var result = _authorizationService.AuthorizeAsync(user, tree, requirements);
+            return result;
+        }
+
         #region Private methods
         private void LoadTreeToPerson(Person person)
         {

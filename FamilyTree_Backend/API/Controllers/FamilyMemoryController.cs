@@ -5,6 +5,7 @@ using FamilyTreeBackend.Core.Application.Models.FamilyMemory;
 using FamilyTreeBackend.Core.Application.Models.FamilyTree;
 using FamilyTreeBackend.Core.Domain.Constants;
 using FamilyTreeBackend.Core.Domain.Entities;
+using FamilyTreeBackend.Presentation.API.Handlers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -21,11 +22,14 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
     public class FamilyMemoryController : BaseController
     {
         private readonly IMemoryService _memoryService;
+        private readonly ITreeAuthorizationService _authorizationService;
         public FamilyMemoryController(
             UserManager<ApplicationUser> userManager,
-            IMemoryService memoryService) : base(userManager)
+            IMemoryService memoryService,
+            ITreeAuthorizationService authorizationService) : base(userManager)
         {
             _memoryService = memoryService;
+            _authorizationService = authorizationService;
         }
 
         [HttpGet("memories/tree/{treeId}")]
@@ -33,6 +37,18 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         [SwaggerResponse(200, Type = typeof(HttpResponse<IEnumerable<FamilyMemoryModel>>))]
         public async Task<IActionResult> GetMemoryByTree(long treeId)
         {
+            var authorizationResult = await _authorizationService.AuthorizeAsync(
+                User,
+                treeId,
+                MemoryOperations.Read
+            );
+            if (!authorizationResult.Succeeded)
+            {
+                return Unauthorized(new HttpResponse<AuthorizationFailure>(
+                    authorizationResult.Failure,
+                    GenericResponseStrings.Tree_NoPermissionRead));
+            }
+
             var result = await _memoryService.FindAllMemoriesOfTree(treeId);
             return Ok(new HttpResponse<IEnumerable<FamilyMemoryModel>>(result, GenericResponseStrings.MemoryControoler_FindMemoriesSuccesful));
         }
@@ -40,8 +56,20 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         [HttpPost("memory")]
         [SwaggerOperation(Summary = "Add new family memory")]
         [SwaggerResponse(200, Type = typeof(HttpResponse<FamilyMemoryModel>))]
-        public async Task<IActionResult> AddMemory(FamilyMemoryInputModel input)
+        public async Task<IActionResult> AddMemory([FromBody] FamilyMemoryInputModel input)
         {
+            var authorizationResult = await _authorizationService.AuthorizeAsync(
+                User,
+                input.FamilyTreeId,
+                MemoryOperations.Create
+            );
+            if (!authorizationResult.Succeeded)
+            {
+                return Unauthorized(new HttpResponse<AuthorizationFailure>(
+                    authorizationResult.Failure,
+                    GenericResponseStrings.Tree_NoPermissionEdit));
+            }
+
             var result = await _memoryService.AddMemory(User, input);
             var response = new HttpResponse<FamilyMemoryModel>(
                 result, 
@@ -54,6 +82,18 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         [SwaggerResponse(200, Type = typeof(string))]
         public async Task<IActionResult> AddMemory(long memoryId)
         {
+            var authorizationResult = await _authorizationService.AuthorizeWithMemoryAsync(
+                User,
+                memoryId,
+                MemoryOperations.Delete
+            );
+            if (!authorizationResult.Succeeded)
+            {
+                return Unauthorized(new HttpResponse<AuthorizationFailure>(
+                    authorizationResult.Failure,
+                    GenericResponseStrings.Tree_NoPermissionEdit));
+            }
+
             await _memoryService.DeleteMemory(memoryId);
             return Ok(GenericResponseStrings.MemoryControoler_DeleteMemorySuccesful);
         }

@@ -262,6 +262,11 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
                     .WithMany()
                     .HasForeignKey(entity => entity.CreatedByUserID)
                     .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasOne(e => e.FamilyTree)
+                    .WithMany(e => e.Memories)
+                    .HasForeignKey(e => e.FamilyTreeId)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<Notification>((entity) =>
@@ -280,7 +285,10 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
                     .ValueGeneratedOnAddOrUpdate();
             });
 
-            modelBuilder.Entity<UserConnection>().HasNoKey().ToView(null);
+            modelBuilder.Entity<UserConnection>(e => {
+                e.HasNoKey().ToView(null);
+                e.ToTable("UserConnections");
+            });
         }
 
         public void SeedData()
