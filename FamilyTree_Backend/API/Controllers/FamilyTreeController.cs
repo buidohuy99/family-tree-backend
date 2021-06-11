@@ -165,7 +165,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
                 result, GenericResponseStrings.TreeController_FindAllTreeSuccessful));
         }
 
-        [HttpGet("trees-from-keyword/list")]
+        [HttpGet("trees-from-keyword")]
         [SwaggerOperation(Summary = "Find all trees of user from keyword")]
         [SwaggerResponse(200, Type = typeof(HttpResponse<IEnumerable<FamilyTreeListItemModel>>),
             Description = "Find all trees accessible to user with Name/Description fitting a query string")]
@@ -177,7 +177,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
                 result, GenericResponseStrings.TreeController_FindAllTreeSuccessful));
         }
 
-        [HttpGet("trees-from-keyword/list/using-pagination")]
+        [HttpGet("trees-from-keyword/using-pagination")]
         [SwaggerOperation(Summary = "Find all trees of user from keyword (only get by page)")]
         [SwaggerResponse(200, Type = typeof(HttpResponse<FindTreesPaginationResponseModel>),
             Description = "Find all trees accessible to user with Name/Description fitting a query string (only get by page)")]

@@ -5,6 +5,8 @@ using FamilyTreeBackend.Core.Application.Models.FamilyMemory;
 using FamilyTreeBackend.Core.Application.Models.FamilyTree;
 using FamilyTreeBackend.Core.Domain.Constants;
 using FamilyTreeBackend.Core.Domain.Entities;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -15,6 +17,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
 {
     [Area("memory-management")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class FamilyMemoryController : BaseController
     {
         private readonly IMemoryService _memoryService;
@@ -39,7 +42,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         [SwaggerResponse(200, Type = typeof(HttpResponse<FamilyMemoryModel>))]
         public async Task<IActionResult> AddMemory(FamilyMemoryInputModel input)
         {
-            var result = await _memoryService.AddMemory(input);
+            var result = await _memoryService.AddMemory(User, input);
             var response = new HttpResponse<FamilyMemoryModel>(
                 result, 
                 GenericResponseStrings.MemoryControoler_AddMemorySuccesful);
