@@ -12,5 +12,9 @@ namespace FamilyTreeBackend.Core.Domain.Entities
         public string Description { get; set; }
         public DateTime MemoryDate { get; set; }
         public ICollection<string> ImageUrls { get; set; }
+
+        public string CreatedByUserID { get; set; }
+        public ApplicationUser CreatedBy { get; set; }
+        public FamilyTree FamilyTree { get; set; }
     }
 }

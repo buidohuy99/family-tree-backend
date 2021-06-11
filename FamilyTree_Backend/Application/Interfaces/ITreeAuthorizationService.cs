@@ -12,5 +12,7 @@ namespace FamilyTreeBackend.Core.Application.Interfaces
     {
         public Task<AuthorizationResult> AuthorizeAsync(ClaimsPrincipal user, long treeId, IAuthorizationRequirement requirements);
         public Task<AuthorizationResult> AuthorizeWithPersonAsync(ClaimsPrincipal user, long personId, IAuthorizationRequirement requirements);
+        public Task<AuthorizationResult> AuthorizeWithEventAsync(ClaimsPrincipal user, long eventId, IAuthorizationRequirement requirements);
+        public Task<AuthorizationResult> AuthorizeWithMemoryAsync(ClaimsPrincipal user, long memoryId, IAuthorizationRequirement requirements);
     }
 }

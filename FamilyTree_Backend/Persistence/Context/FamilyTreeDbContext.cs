@@ -143,17 +143,6 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
                     .OnDelete(DeleteBehavior.Cascade);
             });
 
-            //modelBuilder.Entity<Marriage>((entity) =>
-            //{
-            //    entity.ToTable("Marriage");
-            //    entity.HasBaseType<Relationship>()
-            //        .HasOne(e => e.ParentRelationship)
-            //        .WithOne()
-            //        .HasForeignKey<Marriage>(e => e.Id)
-            //        .HasConstraintName("FK_ParentRelationship_OfMarriage")
-            //        .OnDelete(DeleteBehavior.Cascade);
-            //});
-
             modelBuilder.Entity<FamilyTree>((entity) => {
                 entity.ToTable("FamilyTree");
 
@@ -268,6 +257,16 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
                 entity.Property(e => e.LastModified)
                     .HasDefaultValueSql("GETUTCDATE()")
                     .ValueGeneratedOnAddOrUpdate();
+
+                entity.HasOne(e => e.CreatedBy)
+                    .WithMany()
+                    .HasForeignKey(entity => entity.CreatedByUserID)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasOne(e => e.FamilyTree)
+                    .WithMany(e => e.Memories)
+                    .HasForeignKey(e => e.FamilyTreeId)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<Notification>((entity) =>
@@ -286,7 +285,10 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
                     .ValueGeneratedOnAddOrUpdate();
             });
 
-            modelBuilder.Entity<UserConnection>().HasNoKey().ToView(null);
+            modelBuilder.Entity<UserConnection>(e => {
+                e.HasNoKey().ToView(null);
+                e.ToTable("UserConnections");
+            });
         }
 
         public void SeedData()
