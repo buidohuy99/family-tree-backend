@@ -102,6 +102,19 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             return result;
         }
 
+        public async Task<IdentityResult> ChangeUserEmail(ClaimsPrincipal claimsPrincipal, string newEmail)
+        {
+            var user = await _userManager.GetUserAsync(claimsPrincipal);
+            if (user == null)
+            {
+                throw new UserNotFoundException(UserExceptionMessages.UserNotFound, email: newEmail);
+            }
+
+            var result = await _userManager.SetEmailAsync(user, newEmail);
+            return result;
+
+        }
+
         public IEnumerable<UserDTO> FindUser(UserFilterModel model)
         {
             var users = _userManager.Users.Where(e => e.Status == false);

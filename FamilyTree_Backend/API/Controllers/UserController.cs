@@ -78,6 +78,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpPost("confirm-email-token")]
         [SwaggerOperation(Summary = "Generate and send a token required for confriming email to provided email")]
         [SwaggerResponse(200, Description = "Email has been successfully sent, no return response body")]
@@ -91,21 +92,38 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         [AllowAnonymous]
         [HttpPost("confirm-email")]
         [SwaggerOperation(Summary = "confirm email for the user with provided email, require email confirmation token")]
-        [SwaggerResponse(200, Description = "Email confirmed successfully")]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<string>), Description = "Email confirmed successfully")]
         public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailModel model)
         {
             IdentityResult result = await _userService.ConfirmEmailWithToken(model);
 
             if (result.Succeeded)
             {
-                return Ok();
+                return Ok(new HttpResponse<string>(model.Email, GenericResponseStrings.UserController_ConfirmEmailSuccessul));
             }
             else
             {
                 throw new ConfirmEmailFailException(UserExceptionMessages.ConfirmEmailFail, email: model.Email, errors: result.Errors);
             }
         }
-                
+
+        [HttpPost("change-email")]
+        [SwaggerOperation(Summary = "change user's email with provided new one")]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<string>), Description = "Return newly changed email")]
+        public async Task<IActionResult> ChangeEmail([FromBody] ChangeEmailInputModel model)
+        {
+            IdentityResult result = await _userService.ChangeUserEmail(User, model.NewEmail);
+
+            if (result.Succeeded)
+            {
+                return Ok(new HttpResponse<string>(model.NewEmail, GenericResponseStrings.UserController_ChangeEmailSuccessul));
+            }
+            else
+            {
+                throw new ChangeEmailFailException(UserExceptionMessages.ChangeEmailFail, email: model.NewEmail, errors: result.Errors);
+            }
+        }
+
         [HttpPost("users")]
         [SwaggerOperation(Summary = "Filter users based on params, set params to null to not use that filter")]
         [SwaggerResponse(200, Type = typeof(HttpResponse<IEnumerable<UserDTO>>), Description = "Returns list of users")]
