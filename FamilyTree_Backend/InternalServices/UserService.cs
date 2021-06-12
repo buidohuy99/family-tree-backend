@@ -87,8 +87,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             {
                 users = users.Where(e => e.Email.Equals(model.Email));
             }
-
-            if (model.UserName == null && model.Email == null)
+            else
             {
                 if(model.UsernameOrEmailContains != null)
                 {
@@ -139,8 +138,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             {
                 users = users.Where(e => e.Email.Equals(model.Email));
             }
-
-            if (model.UserName == null && model.Email == null)
+            else
             {
                 if (model.UsernameOrEmailContains != null)
                 {
