@@ -44,7 +44,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
                 );
             if (!authorizationResult.Succeeded)
             {
-                return Unauthorized(new HttpResponse<AuthorizationFailure>(
+                return StatusCode(403, new HttpResponse<AuthorizationFailure>(
                     authorizationResult.Failure,
                     GenericResponseStrings.Tree_NoPermissionRead));
             }
@@ -67,7 +67,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             );
             if (!authorizationResult.Succeeded)
             {
-                return Unauthorized(new HttpResponse<AuthorizationFailure>(
+                return StatusCode(403, new HttpResponse<AuthorizationFailure>(
                     authorizationResult.Failure,
                     GenericResponseStrings.Tree_NoPermissionEdit));
             }
@@ -90,7 +90,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             );
             if (!authorizationResult.Succeeded)
             {
-                return Unauthorized(new HttpResponse<AuthorizationFailure>(
+                return StatusCode(403, new HttpResponse<AuthorizationFailure>(
                     authorizationResult.Failure,
                     GenericResponseStrings.Tree_NoPermissionEdit));
             }
@@ -112,7 +112,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             );
             if (!authorizationResult.Succeeded)
             {
-                return Unauthorized(new HttpResponse<AuthorizationFailure>(
+                return StatusCode(403, new HttpResponse<AuthorizationFailure>(
                     authorizationResult.Failure,
                     GenericResponseStrings.Tree_NoPermissionEdit));
             }
@@ -136,7 +136,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             );
             if (!authorizationResult.Succeeded)
             {
-                return Unauthorized(new HttpResponse<AuthorizationFailure>(
+                return StatusCode(403, new HttpResponse<AuthorizationFailure>(
                     authorizationResult.Failure,
                     GenericResponseStrings.Tree_NoPermissionEdit));
             }
@@ -160,7 +160,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             );
             if (!authorizationResult.Succeeded)
             {
-                return Unauthorized(new HttpResponse<AuthorizationFailure>(
+                return StatusCode(403, new HttpResponse<AuthorizationFailure>(
                     authorizationResult.Failure,
                     GenericResponseStrings.Tree_NoPermissionEdit));
             }

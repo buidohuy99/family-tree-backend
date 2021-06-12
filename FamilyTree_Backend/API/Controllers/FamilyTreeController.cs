@@ -56,7 +56,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
 
             if (!authorizeResult.Succeeded)
             {
-                return Unauthorized(new HttpResponse<AuthorizationFailure>(
+                return StatusCode(403, new HttpResponse<AuthorizationFailure>(
                     authorizeResult.Failure,
                     GenericResponseStrings.Tree_NoPermissionRead));
             }
@@ -74,7 +74,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
 
             if (!authorizeResult.Succeeded)
             {
-                return Unauthorized(new HttpResponse<AuthorizationFailure>(
+                return StatusCode(403, new HttpResponse<AuthorizationFailure>(
                     authorizeResult.Failure,
                     GenericResponseStrings.Tree_NoPermissionEdit));
             }
@@ -94,7 +94,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
 
             if (!authorizeResult.Succeeded)
             {
-                return Unauthorized(new HttpResponse<AuthorizationFailure>(
+                return StatusCode(403, new HttpResponse<AuthorizationFailure>(
                     authorizeResult.Failure,
                     GenericResponseStrings.Tree_NoPermissionDelete));
             }
@@ -199,7 +199,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
 
             if (!authorizeResult.Succeeded)
             {
-                return Unauthorized(new HttpResponse<AuthorizationFailure>(
+                return StatusCode(403, new HttpResponse<AuthorizationFailure>(
                     authorizeResult.Failure,
                     GenericResponseStrings.Tree_NoPermissionEdit));
             }
@@ -217,7 +217,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
 
             if (!authorizeResult.Succeeded)
             {
-                return Unauthorized(new HttpResponse<AuthorizationFailure>(
+                return StatusCode(403, new HttpResponse<AuthorizationFailure>(
                     authorizeResult.Failure,
                     GenericResponseStrings.Tree_NoPermissionEdit));
             }
@@ -260,15 +260,22 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             return File(new System.Text.UTF8Encoding().GetBytes(result.payload), "application/json", $"FamilyTreeExport_{result.treeName}_{DateTime.Now:yyyyMMddHHmmss}.json");
         }
 
-        [AllowAnonymous]
         [HttpPost("tree/{treeId}/backup")]
         [SwaggerOperation(Summary = "Get json backup of the tree (can be used for import)")]
         [SwaggerResponse(200, Type = typeof(FileResult),
             Description = "Get json backup")]
         [ProducesResponseType(typeof(FileResult), (int)HttpStatusCode.OK)]
         [Produces("application/json")]
-        public async Task<FileResult> GetJsonBackup(long treeId)
+        public async Task<IActionResult> GetJsonBackup(long treeId)
         {
+            var authorizeResult = await _authorizationService.AuthorizeAsync(User, treeId, TreeOperations.Backup);
+
+            if (!authorizeResult.Succeeded)
+            {
+                return StatusCode(403, new HttpResponse<AuthorizationFailure>(
+                    authorizeResult.Failure,
+                    GenericResponseStrings.Tree_NoPermissionRead));
+            }
             var result = await _familyTreeService.ExportFamilyTreeJson(treeId, true);
             string token = JWE.Encrypt(result.payload, new[] { new JweRecipient(JweAlgorithm.PBES2_HS256_A128KW, _jweConfigs.FileIOFamilyTreeKey, null) }, JweEncryption.A256GCM);
             return File(new System.Text.UTF8Encoding().GetBytes(token), "application/json", $"FamilyTreeBackup_{result.treeName}_{DateTime.Now:yyyyMMddHHmmss}.json");
