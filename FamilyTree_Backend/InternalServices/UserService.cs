@@ -410,7 +410,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                 );
         }
 
-        private const string ResetEmailUrl = "/reset-passowrd?token={0}&email={1}";
+        private const string ResetEmailUrl = "/reset-password?token={0}&email={1}";
         private const string ConfirmEmailUrl = "/confirm-email?token={0}&email={1}";
         private const string Sql_GetUserConnection = @"
 with
