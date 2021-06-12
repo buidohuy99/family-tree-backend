@@ -11,5 +11,6 @@ namespace FamilyTreeBackend.Core.Application.Interfaces
         public Task SendEmailAsync(string email, string subject, string body);
 
         public Task SendResetPasswordEmail(string email, string resetPasswordUrl);
+        public Task SendEmailConfirmationEmail(string email, string confirmUrl);
     }
 }
