@@ -27,5 +27,6 @@ namespace FamilyTreeBackend.Core.Application.Interfaces
         public Task<IEnumerable<UserConnectionDTO>> FindUserConnection(ClaimsPrincipal user, string searchingUserId);
         public Task<string> GenerateConfirmEmailUrl(string email);
         public Task<IdentityResult> ConfirmEmailWithToken(ConfirmEmailModel model);
+        Task<IdentityResult> ChangeUserEmail(ClaimsPrincipal user, string newEmail);
     }
 }
