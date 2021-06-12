@@ -41,5 +41,14 @@ namespace FamilyTreeBackend.Core.Domain.Entities
                 return textWriter.ToString();
             }
         }
+
+        public static RequestResponseDataModel GetDataFromXMLString(string xml)
+        {
+            using (TextReader reader = new StringReader(xml))
+            {
+                var result = xmlSerializer.Deserialize(reader) as RequestResponseDataModel;
+                return result;
+            }
+        }
     }
 }

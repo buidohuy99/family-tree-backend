@@ -22,6 +22,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             #region Register scoped services
             services.AddScoped<IWebAccessUserService, WebAccessUserService>();
             services.AddScoped<IRequestResponseLogReaderService, RequestResponseLogReaderService>();
+            services.AddScoped<IRequestResponseLogReaderService, RequestResponseLogReaderService>();
             #endregion
 
             #region Register singleton

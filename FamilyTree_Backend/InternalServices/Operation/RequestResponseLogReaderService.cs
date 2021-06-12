@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using FamilyTreeBackend.Core.Application.Interfaces;
 using FamilyTreeBackend.Core.Application.Operation.Models;
+using FamilyTreeBackend.Core.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -20,7 +21,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices.Operation
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-        public async Task<IEnumerable<RequestResponseListModel>> GetRequestResponseLogs(DateTime? from, DateTime? to, int page, int pageSize = 50)
+        public async Task<RequestResponsePageModel> GetRequestResponseLogs(DateTime? from, DateTime? to, uint page, uint pageSize = 50)
         {
             if (from == null)
             {
@@ -31,18 +32,31 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices.Operation
                 to = DateTime.Now;
             }
 
+            var query = _unitOfWork.GetRequestResponseLogs()
+                .Where(l => l.DateCreated >= from && l.DateCreated <= to);
+
+            var pageCount = (uint)query.Count();
+
+            if (page > pageCount && page > 1)
+            {
+                page = pageCount;
+            }
+
             var logs = await _unitOfWork.GetRequestResponseLogs()
                 .Where(l => l.DateCreated >= from && l.DateCreated <= to)
-                .AsNoTracking().Skip(page * pageSize).Take(pageSize)
+                .AsNoTracking().Skip((int)((page - 1) * pageSize)).Take((int)pageSize)
                 .OrderByDescending(l => l.DateCreated)
                 .ToListAsync();
 
             var result = new List<RequestResponseListModel>();
             foreach(var log in logs)
             {
-                result.Add(_mapper.Map<RequestResponseListModel>(log));
+                result.Add(_mapper.Map<RequestResponseListModel>(RequestResponseDataModel.GetDataFromXMLString(log.Data)));
             }
-            return result;
+
+            var resultPage = new RequestResponsePageModel(result, pageCount, page, pageSize);
+            
+            return resultPage;
         }
     }
 }
