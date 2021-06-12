@@ -23,28 +23,43 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices.Operation
         }
         public async Task<RequestResponsePageModel> GetRequestResponseLogs(DateTime? from, DateTime? to, uint page, uint pageSize = 50)
         {
-            if (from == null)
+            if (from == null || from.Value == DateTime.MinValue)
             {
                 from = DateTime.Today;
             }
-            if (to == null)
+            if (to == null || to.Value == DateTime.MinValue)
             {
                 to = DateTime.Now;
             }
 
+            if (from > to)
+            {
+                from = to;
+            }
+
+            if (page <= 0)
+            {
+                page = 1;
+            }
+            
             var query = _unitOfWork.GetRequestResponseLogs()
-                .Where(l => l.DateCreated >= from && l.DateCreated <= to);
+                .Where(l => l.DateCreated.Value.CompareTo(from.Value.ToUniversalTime()) >= 0
+                    && l.DateCreated.Value.CompareTo(to.Value.ToUniversalTime()) <= 0);
 
-            var pageCount = (uint)query.Count();
+            var pageCount = (uint)MathF.Ceiling((float)(query.Count()) / (float)(pageSize));
 
-            if (page > pageCount && page > 1)
+            if (pageCount == 0)
+            {
+                page = 1;
+            }
+
+            if (page > pageCount && pageCount > 0)
             {
                 page = pageCount;
             }
 
-            var logs = await _unitOfWork.GetRequestResponseLogs()
-                .Where(l => l.DateCreated >= from && l.DateCreated <= to)
-                .AsNoTracking().Skip((int)((page - 1) * pageSize)).Take((int)pageSize)
+            var logs = await query.AsNoTracking()
+                .Skip((int)((page - 1) * pageSize)).Take((int)pageSize)
                 .OrderByDescending(l => l.DateCreated)
                 .ToListAsync();
 
@@ -54,7 +69,15 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices.Operation
                 result.Add(_mapper.Map<RequestResponseListModel>(RequestResponseDataModel.GetDataFromXMLString(log.Data)));
             }
 
-            var resultPage = new RequestResponsePageModel(result, pageCount, page, pageSize);
+            var resultPage = new RequestResponsePageModel()
+            {
+                From = from.Value,
+                To = to.Value,
+                TotalPages = pageCount,
+                CurrentPage = page,
+                ItemsPerPage = pageSize,
+                List = result,
+            };
             
             return resultPage;
         }

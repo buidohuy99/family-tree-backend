@@ -178,7 +178,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
             users = users.Where(tr => tr.CreatedDate.CompareTo(paginationModel.CreatedBefore) <= 0);
 
-            var totalPage = (ulong)MathF.Ceiling((ulong)users.Count() / paginationModel.ItemsPerPage);
+            var totalPage = (ulong)MathF.Ceiling((ulong)users.Count() / (float)paginationModel.ItemsPerPage);
             totalPage = totalPage <= 0 ? 1 : totalPage;
 
             if (paginationModel.Page > totalPage)

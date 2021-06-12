@@ -10,13 +10,17 @@ namespace Operation.Controllers
     public class LogsController : Controller
     {
         private readonly IRequestResponseLogReaderService _logReaderService;
+
+        private const int PageSize = 50;
         public LogsController(IRequestResponseLogReaderService logReaderService)
         {
             _logReaderService = logReaderService;
         }
-        public async Task<IActionResult> Index()
+
+        [HttpGet]
+        public async Task<IActionResult> Index(DateTime from, DateTime to, int currentPage)
         {
-            var result = await _logReaderService.GetRequestResponseLogs(null, null, 1, 50);
+            var result = await _logReaderService.GetRequestResponseLogs(from, to, (uint)currentPage, PageSize);
             return View(result);
         }
     }

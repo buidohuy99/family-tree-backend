@@ -72,7 +72,7 @@ namespace FamilyTreeBackend.Presentation.API.Middlewares
             await responseBody.CopyToAsync(originalBodyStream);
             logContainer.StatusCode = context.Response.StatusCode;
             logContainer.ResponseBody = text;
-            logContainer.DateCreated = DateTime.Now.ToString("yyyy/MM/dd hh:mm:ss");
+            logContainer.DateCreated = DateTime.Now.ToString("yyyy/MM/dd hh:mm:ss tt");
         }
 
 
