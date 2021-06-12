@@ -27,6 +27,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
     {
         private readonly IEmailService _emailService;
         private readonly IUserService _userService;
+        
 
         public UserController(
             IEmailService emailService, 
@@ -51,8 +52,8 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         [AllowAnonymous]
         [HttpPost("reset-password-token")]
         [SwaggerOperation(Summary = "Generate and send a token required for resetting password to provided email")]
-        [SwaggerResponse(200, Description = "Email has been successfully sent, no return response body")]
-        public async Task<IActionResult> SendResetPassword([FromBody] ResetPasswordEmailInputModel input)
+        [SwaggerResponse(200, Description = "Email has been successfully sent")]
+        public async Task<IActionResult> SendResetPasswordToken([FromBody] ResetPasswordEmailInputModel input)
         {
             var resetPasswordUrl = await _userService.GenerateResetPasswordUrl(input.Email);
             await _emailService.SendResetPasswordEmail(input.Email, resetPasswordUrl);
@@ -77,6 +78,34 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             }
         }
 
+        [HttpPost("confirm-email-token")]
+        [SwaggerOperation(Summary = "Generate and send a token required for confriming email to provided email")]
+        [SwaggerResponse(200, Description = "Email has been successfully sent, no return response body")]
+        public async Task<IActionResult> SendConfirmEmailToken([FromBody] ResetPasswordEmailInputModel input)
+        {
+            var confirmUrl = await _userService.GenerateConfirmEmailUrl(input.Email);
+            await _emailService.SendEmailConfirmationEmail(input.Email, confirmUrl);
+            return Ok();
+        }
+
+        [AllowAnonymous]
+        [HttpPost("confirm-email")]
+        [SwaggerOperation(Summary = "confirm email for the user with provided email, require email confirmation token")]
+        [SwaggerResponse(200, Description = "Email confirmed successfully")]
+        public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailModel model)
+        {
+            IdentityResult result = await _userService.ConfirmEmailWithToken(model);
+
+            if (result.Succeeded)
+            {
+                return Ok();
+            }
+            else
+            {
+                throw new ConfirmEmailFailException(UserExceptionMessages.ConfirmEmailFail, email: model.Email, errors: result.Errors);
+            }
+        }
+                
         [HttpPost("users")]
         [SwaggerOperation(Summary = "Filter users based on params, set params to null to not use that filter")]
         [SwaggerResponse(200, Type = typeof(HttpResponse<IEnumerable<UserDTO>>), Description = "Returns list of users")]

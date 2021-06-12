@@ -25,5 +25,7 @@ namespace FamilyTreeBackend.Core.Application.Interfaces
         public Task<NotificationDTO> RemoveNotification(long notficationId);
         Task TestTriggerNotification();
         public Task<IEnumerable<UserConnectionDTO>> FindUserConnection(ClaimsPrincipal user, string searchingUserId);
+        public Task<string> GenerateConfirmEmailUrl(string email);
+        public Task<IdentityResult> ConfirmEmailWithToken(ConfirmEmailModel model);
     }
 }

@@ -126,6 +126,7 @@ namespace FamilyTreeBackend.Core.Domain.Constants
     {
         public const string UserNotFound = "Cannot find user with provided Id";
         public const string ResetPasswordFail = "Reset password failed";
+        public const string ConfirmEmailFail = "Confirm email failed";
         public const string UpdateUserFail = "Cannot update specified user because server encountered an error while saving";
         public const string NotificationNotFound = "Cannot find notification with provided id";
     }
