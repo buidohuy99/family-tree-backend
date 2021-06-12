@@ -49,13 +49,14 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("retrieve-reset-password-url")]
-        [SwaggerOperation(Summary = "Generate and return a token required for resetting password")]
-        [SwaggerResponse(200, Type = typeof(HttpResponse<string>), Description = "Returns token")]
-        public async Task<IActionResult> SendResetPassword([FromBody] string email)
+        [HttpPost("reset-password-token")]
+        [SwaggerOperation(Summary = "Generate and send a token required for resetting password to provided email")]
+        [SwaggerResponse(200, Description = "Email has been successfully sent, no return response body")]
+        public async Task<IActionResult> SendResetPassword([FromBody] ResetPasswordEmailInputModel input)
         {
-            var resetPasswordUrl = await _userService.GenerateResetPasswordUrl(email);
-            return Ok(new HttpResponse<string>(resetPasswordUrl, GenericResponseStrings.GenerateResetPasswordUrlSuccessful));
+            var resetPasswordUrl = await _userService.GenerateResetPasswordUrl(input.Email);
+            await _emailService.SendResetPasswordEmail(input.Email, resetPasswordUrl);
+            return Ok();
         }
 
         [AllowAnonymous]

@@ -56,7 +56,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             var clientSite = _configuration.GetValue<string>("ClientSite");
 
             var passwordResetUrl = new StringBuilder(clientSite)
-                .Append("/resetPassword/")
+                .Append("/reset-password/")
                 .Append(token).ToString();
 
             return passwordResetUrl;
