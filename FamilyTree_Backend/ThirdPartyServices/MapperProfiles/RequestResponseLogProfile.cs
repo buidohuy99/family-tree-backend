@@ -18,6 +18,9 @@ namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices.MapperProf
                 .ForMember(dest => dest.StatusCode, opt =>
                     opt.MapFrom(src => $"{src.StatusCode}-{ReasonPhrases.GetReasonPhrase(src.StatusCode)}"));
 
+            CreateMap<RequestResponseDataModel, RequestResponseLogDetailsModel>()
+                .ForMember(dest => dest.StatusCode, opt =>
+                    opt.MapFrom(src => $"{src.StatusCode}-{ReasonPhrases.GetReasonPhrase(src.StatusCode)}"));
         }
     }
 }

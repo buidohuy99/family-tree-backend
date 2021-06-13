@@ -66,7 +66,9 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices.Operation
             var result = new List<RequestResponseListModel>();
             foreach(var log in logs)
             {
-                result.Add(_mapper.Map<RequestResponseListModel>(RequestResponseDataModel.GetDataFromXMLString(log.Data)));
+                var item = _mapper.Map<RequestResponseListModel>(RequestResponseDataModel.GetDataFromXMLString(log.Data));
+                item.Id = log.Id;
+                result.Add(item);
             }
 
             var resultPage = new RequestResponsePageModel()
@@ -80,6 +82,14 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices.Operation
             };
             
             return resultPage;
+        }
+
+        public async Task<RequestResponseLogDetailsModel> GetRequestResponseLogById(string id)
+        {
+            var log = await _unitOfWork.GetRequestResponseLogs().FindAsync(id);
+            var model = _mapper.Map<RequestResponseLogDetailsModel>(RequestResponseDataModel.GetDataFromXMLString(log.Data));
+            model.Id = log.Id;
+            return model;
         }
     }
 }

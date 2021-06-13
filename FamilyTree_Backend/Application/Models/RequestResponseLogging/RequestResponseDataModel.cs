@@ -24,8 +24,6 @@ namespace FamilyTreeBackend.Core.Domain.Entities
         [DataMember]
         public string RequestPath { get; set; }
         [DataMember]
-        public string RequestHeader { get; set; }
-        [DataMember]
         public string RequestBody { get; set; }
         [DataMember]
         public int StatusCode { get; set; }

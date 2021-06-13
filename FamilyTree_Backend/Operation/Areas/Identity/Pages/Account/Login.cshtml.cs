@@ -42,7 +42,8 @@ namespace Operation.Areas.Identity.Pages.Account
         public class InputModel
         {
             [Required]
-            public string Username { get; set; }
+            [EmailAddress]
+            public string Email { get; set; }
 
             [Required]
             [DataType(DataType.Password)]
@@ -77,21 +78,26 @@ namespace Operation.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
-                var user = await _userManager.FindByNameAsync(Input.Username);
-                var roles = await _userManager.GetRolesAsync(user);
-                if (!roles.Any(str => str.Equals(ApplicationUserRoles.Admin)))
-                {
-                    ModelState.AddModelError(string.Empty, "User is not authorized to access this site");
-                    return Page();
-                }
+                
 
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var result = await _signInManager.PasswordSignInAsync(Input.Username, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+                var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation("User logged in.");
-                    return LocalRedirect(returnUrl);
+                    var user = await _userManager.FindByNameAsync(Input.Email);
+                    var roles = await _userManager.GetRolesAsync(user);
+                    if (!roles.Any(str => str.Equals(ApplicationUserRoles.Admin)))
+                    {
+                        ModelState.AddModelError(string.Empty, "User is not authorized to access this site");
+                        return Page();
+                    }
+                    else
+                    {
+                        _logger.LogInformation("User logged in.");
+                        return LocalRedirect(returnUrl);
+                    }
+                    
                 }
                 if (result.RequiresTwoFactor)
                 {

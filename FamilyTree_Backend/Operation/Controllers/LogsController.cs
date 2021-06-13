@@ -23,5 +23,12 @@ namespace Operation.Controllers
             var result = await _logReaderService.GetRequestResponseLogs(from, to, (uint)currentPage, PageSize);
             return View(result);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Details(string id)
+        {
+            var result = await _logReaderService.GetRequestResponseLogById(id);
+            return View(result);
+        }
     }
 }
