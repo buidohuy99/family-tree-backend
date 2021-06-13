@@ -78,7 +78,7 @@ namespace Operation.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
-                var user = await _userManager.FindByNameAsync(Input.Email);
+                var user = await _userManager.FindByEmailAsync(Input.Email);
                 var roles = user == null ? null : await _userManager.GetRolesAsync(user);
                 if (roles != null)
                 {
