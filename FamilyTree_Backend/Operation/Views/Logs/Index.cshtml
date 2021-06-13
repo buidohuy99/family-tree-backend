@@ -9,11 +9,12 @@
 
 <p>
     <form asp-controller="Logs" asp-action="Index" method="get">
-        <p>
-            From: <input asp-for="From"/>
-            To: <input asp-for="To" />
-            <input type="submit" value="Filter" />
-        </p>
+<p>
+    From: <input asp-for="From" />
+    User Id: <input asp-for="To" />
+    To: <input asp-for="SearchUserId" />
+    <input type="submit" value="Filter" />
+</p>
     </form>
 </p>
 <table class="table">
@@ -69,7 +70,7 @@
 <div>
     <ul class="pagination">
         <li class="page-item">
-            <a asp-route-From="@Model.From.ToString("s")" asp-route-To="@Model.To.ToString("s")" asp-route-currentPage="1" class="page-link"><<</a>
+            <a asp-route-From="@Model.From.ToString("s")" asp-route-To="@Model.To.ToString("s")" asp-route-currentPage="1" asp-route-SearchUserId="@Model.SearchUserId" class="page-link"><<</a>
         </li>
         @{
             const int visiblePage = 7;
@@ -96,13 +97,13 @@
             for (var i = first; i <= last; i++)
             {
                 <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
-                    <a asp-route-From="@Model.From.ToString("s")" asp-route-To="@Model.To.ToString("s")" asp-route-currentPage="@i" class="page-link">@i</a>
+                    <a asp-route-From="@Model.From.ToString("s")" asp-route-To="@Model.To.ToString("s")" asp-route-currentPage="@i" asp-route-SearchUserId="@Model.SearchUserId" class="page-link">@i</a>
                 </li>
             }
         }
         
         <li class="page-item">
-            <a asp-route-From="@Model.From.ToString("s")" asp-route-To="@Model.To.ToString("s")" asp-route-currentPage="@Model.TotalPages" class="page-link">>></a>
+            <a asp-route-From="@Model.From.ToString("s")" asp-route-To="@Model.To.ToString("s")" asp-route-currentPage="@Model.TotalPages" asp-route-SearchUserId="@Model.SearchUserId" class="page-link">>></a>
         </li>
     </ul>
 </div>

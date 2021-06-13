@@ -6,7 +6,7 @@ namespace FamilyTreeBackend.Core.Application.Interfaces
 {
     public interface IRequestResponseLogReaderService
     {
-        public Task<RequestResponsePageModel> GetRequestResponseLogs(DateTime? from, DateTime? to, uint page, uint pageSize = 50);
+        public Task<RequestResponsePageModel> GetRequestResponseLogs(DateTime? from, DateTime? to, string userId, uint page, uint pageSize = 50);
         public Task<RequestResponseLogDetailsModel> GetRequestResponseLogById(string id);
     }
 }

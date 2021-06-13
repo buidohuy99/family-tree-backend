@@ -21,7 +21,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices.Operation
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-        public async Task<RequestResponsePageModel> GetRequestResponseLogs(DateTime? from, DateTime? to, uint page, uint pageSize = 50)
+        public async Task<RequestResponsePageModel> GetRequestResponseLogs(DateTime? from, DateTime? to, string userId, uint page, uint pageSize = 50)
         {
             if (from == null || from.Value == DateTime.MinValue)
             {
@@ -56,6 +56,13 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices.Operation
             if (page > pageCount && pageCount > 0)
             {
                 page = pageCount;
+            }
+
+            if (!string.IsNullOrEmpty(userId))
+            {
+                string formatSearch = @"<UserId>{0}</UserId>";
+                string searchString = string.Format(formatSearch, userId);
+                query = query.Where(l => l.Data.Contains(searchString));
             }
 
             var logs = await query.AsNoTracking()

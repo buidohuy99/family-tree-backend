@@ -18,9 +18,9 @@ namespace Operation.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(DateTime from, DateTime to, int currentPage)
+        public async Task<IActionResult> Index(DateTime from, DateTime to, int currentPage, string searchUserId)
         {
-            var result = await _logReaderService.GetRequestResponseLogs(from, to, (uint)currentPage, PageSize);
+            var result = await _logReaderService.GetRequestResponseLogs(from, to, searchUserId, (uint)currentPage, PageSize);
             return View(result);
         }
 
