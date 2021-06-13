@@ -12,6 +12,7 @@ namespace FamilyTreeBackend.Core.Application.DTOs
             Id = user.Id;
             UserName = user.UserName;
             Email = user.Email;
+            EmailConfirmed = user.EmailConfirmed;
             LoginProvider = user.LoginProvider;
             FirstName = user.FirstName;
             MidName = user.MidName;
@@ -20,7 +21,6 @@ namespace FamilyTreeBackend.Core.Application.DTOs
             Address = user.Address;
             Gender = user.Gender;
             DateOfBirth = user.DateOfBirth;
-            Status = user.Status;
             CreatedDate = user.CreatedDate;
             UpdatedDate = user.UpdatedDate;
             Phone = user.PhoneNumber;
@@ -29,6 +29,7 @@ namespace FamilyTreeBackend.Core.Application.DTOs
         public string Id { get; set; }
         public string UserName { get; set; }
         public string Email { get; set; }
+        public bool EmailConfirmed { get; set; }
         public string LoginProvider { get; set; }
         public string FirstName { get; set; }
         public string MidName { get; set; }
@@ -38,7 +39,6 @@ namespace FamilyTreeBackend.Core.Application.DTOs
         public string Phone { get; set; }
         public Gender? Gender { get; set; }
         public DateTime? DateOfBirth { get; set; }
-        public bool Status { get; set; }
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedDate { get; set; }
     }

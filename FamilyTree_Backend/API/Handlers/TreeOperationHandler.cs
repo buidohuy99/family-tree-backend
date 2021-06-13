@@ -50,7 +50,8 @@ namespace FamilyTreeBackend.Presentation.API.Handlers
                 {
                     if (user?.FindFirst(ClaimTypes.NameIdentifier)?.Value.Equals(person.UserId) == true)
                     {
-                        if (requirement.Name == TreeOperations.Read.Name)
+                        if (requirement.Name == TreeOperations.Read.Name || requirement.Name == EventOperations.Read.Name
+                            || requirement.Name == MemoryOperations.Read.Name)
                         {
                             context.Succeed(requirement);
                             return Task.CompletedTask;

@@ -56,7 +56,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
 
             if (!authorizeResult.Succeeded)
             {
-                return Unauthorized(new HttpResponse<AuthorizationFailure>(
+                return StatusCode(403, new HttpResponse<AuthorizationFailure>(
                     authorizeResult.Failure,
                     GenericResponseStrings.Tree_NoPermissionRead));
             }
@@ -74,7 +74,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
 
             if (!authorizeResult.Succeeded)
             {
-                return Unauthorized(new HttpResponse<AuthorizationFailure>(
+                return StatusCode(403, new HttpResponse<AuthorizationFailure>(
                     authorizeResult.Failure,
                     GenericResponseStrings.Tree_NoPermissionEdit));
             }
@@ -94,7 +94,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
 
             if (!authorizeResult.Succeeded)
             {
-                return Unauthorized(new HttpResponse<AuthorizationFailure>(
+                return StatusCode(403, new HttpResponse<AuthorizationFailure>(
                     authorizeResult.Failure,
                     GenericResponseStrings.Tree_NoPermissionDelete));
             }
@@ -141,32 +141,6 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
                 result, GenericResponseStrings.TreeController_FindAllTreeSuccessful));
         }
 
-        [AllowAnonymous]
-        [HttpGet("trees-from-keyword")]
-        [SwaggerOperation(Summary = "Find all trees in the system from a keyword")]
-        [SwaggerResponse(200, Type = typeof(HttpResponse<IEnumerable<FamilyTreeListItemModel>>),
-            Description = "Find all trees with Name/Description fitting a query string")]
-        public async Task<IActionResult> FindAllTreesFromKeyword([FromQuery] string q)
-        {
-            var result = await _familyTreeService.FindTreesFromKeyword(q != null ? q : string.Empty);
-
-            return Ok(new HttpResponse<IEnumerable<FamilyTreeListItemModel>>(
-                result, GenericResponseStrings.TreeController_FindAllTreeSuccessful));
-        }
-
-        [AllowAnonymous]
-        [HttpGet("trees-from-keyword/using-pagination")]
-        [SwaggerOperation(Summary = "Find all trees in the system from a keyword (only take a page)")]
-        [SwaggerResponse(200, Type = typeof(HttpResponse<FindTreesPaginationResponseModel>),
-            Description = "Find all trees with Name/Description fitting a query string (only take a page)")]
-        public async Task<IActionResult> FindAllTreesFromKeyword([FromQuery] string q, [FromQuery] PaginationModel model)
-        {
-            var result = await _familyTreeService.FindTreesFromKeyword(q != null ? q : string.Empty, model);
-
-            return Ok(new HttpResponse<FindTreesPaginationResponseModel>(
-                result, GenericResponseStrings.TreeController_FindAllTreeSuccessful));
-        }
-
         [HttpGet("trees/list")]
         [SwaggerOperation(Summary = "Find all trees of user")]
         [SwaggerResponse(200, Type = typeof(HttpResponse<IEnumerable<FamilyTreeListItemModel>>),
@@ -191,7 +165,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
                 result, GenericResponseStrings.TreeController_FindAllTreeSuccessful));
         }
 
-        [HttpGet("trees-from-keyword/list")]
+        [HttpGet("trees-from-keyword")]
         [SwaggerOperation(Summary = "Find all trees of user from keyword")]
         [SwaggerResponse(200, Type = typeof(HttpResponse<IEnumerable<FamilyTreeListItemModel>>),
             Description = "Find all trees accessible to user with Name/Description fitting a query string")]
@@ -203,7 +177,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
                 result, GenericResponseStrings.TreeController_FindAllTreeSuccessful));
         }
 
-        [HttpGet("trees-from-keyword/list/using-pagination")]
+        [HttpGet("trees-from-keyword/using-pagination")]
         [SwaggerOperation(Summary = "Find all trees of user from keyword (only get by page)")]
         [SwaggerResponse(200, Type = typeof(HttpResponse<FindTreesPaginationResponseModel>),
             Description = "Find all trees accessible to user with Name/Description fitting a query string (only get by page)")]
@@ -225,7 +199,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
 
             if (!authorizeResult.Succeeded)
             {
-                return Unauthorized(new HttpResponse<AuthorizationFailure>(
+                return StatusCode(403, new HttpResponse<AuthorizationFailure>(
                     authorizeResult.Failure,
                     GenericResponseStrings.Tree_NoPermissionEdit));
             }
@@ -243,7 +217,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
 
             if (!authorizeResult.Succeeded)
             {
-                return Unauthorized(new HttpResponse<AuthorizationFailure>(
+                return StatusCode(403, new HttpResponse<AuthorizationFailure>(
                     authorizeResult.Failure,
                     GenericResponseStrings.Tree_NoPermissionEdit));
             }
@@ -286,15 +260,22 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             return File(new System.Text.UTF8Encoding().GetBytes(result.payload), "application/json", $"FamilyTreeExport_{result.treeName}_{DateTime.Now:yyyyMMddHHmmss}.json");
         }
 
-        [AllowAnonymous]
         [HttpPost("tree/{treeId}/backup")]
         [SwaggerOperation(Summary = "Get json backup of the tree (can be used for import)")]
         [SwaggerResponse(200, Type = typeof(FileResult),
             Description = "Get json backup")]
         [ProducesResponseType(typeof(FileResult), (int)HttpStatusCode.OK)]
         [Produces("application/json")]
-        public async Task<FileResult> GetJsonBackup(long treeId)
+        public async Task<IActionResult> GetJsonBackup(long treeId)
         {
+            var authorizeResult = await _authorizationService.AuthorizeAsync(User, treeId, TreeOperations.Backup);
+
+            if (!authorizeResult.Succeeded)
+            {
+                return StatusCode(403, new HttpResponse<AuthorizationFailure>(
+                    authorizeResult.Failure,
+                    GenericResponseStrings.Tree_NoPermissionRead));
+            }
             var result = await _familyTreeService.ExportFamilyTreeJson(treeId, true);
             string token = JWE.Encrypt(result.payload, new[] { new JweRecipient(JweAlgorithm.PBES2_HS256_A128KW, _jweConfigs.FileIOFamilyTreeKey, null) }, JweEncryption.A256GCM);
             return File(new System.Text.UTF8Encoding().GetBytes(token), "application/json", $"FamilyTreeBackup_{result.treeName}_{DateTime.Now:yyyyMMddHHmmss}.json");

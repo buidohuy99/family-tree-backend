@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FamilyTreeBackend.Core.Application.DTOs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,5 +15,6 @@ namespace FamilyTreeBackend.Core.Application.Models.FamilyMemory
         public DateTime MemoryDate { get; set; }
         public ICollection<string> ImageUrls { get; set; }
         public DateTime DateCreated { get; set; }
+        public UserDTO Creator { get; set; }
     }
 }

@@ -45,7 +45,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                     await client.DisconnectAsync(true);
                 }
             } 
-            catch(Exception e)
+            catch(Exception)
             {
                 throw new SendEmailFailException(SendEmailExceptionMessages.SendEmailFailed, email);
             }
@@ -54,6 +54,67 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             //await Task.CompletedTask;
         }
 
-        
+        public async Task SendResetPasswordEmail(string email, string resetPasswordUrl)
+        {
+            try
+            {
+                var message = new MimeMessage();
+                message.From.Add(new MailboxAddress(_smtpSettings.SenderName, _smtpSettings.SenderEmail));
+                message.To.Add(new MailboxAddress("", email));
+                message.Subject = "Orgigin Keeper: Reset your password";
+                message.Body = new TextPart("html")
+                {
+                    Text = $"here is your bloody link: ${resetPasswordUrl}",
+                };
+
+                using (var client = new SmtpClient())
+                {
+                    client.ServerCertificateValidationCallback = (s, c, h, e) => true;
+
+                    await client.ConnectAsync(_smtpSettings.Server, _smtpSettings.Port, true);
+
+                    await client.AuthenticateAsync(_smtpSettings.Username, _smtpSettings.Password);
+                    await client.SendAsync(message);
+                    await client.DisconnectAsync(true);
+                }
+            }
+            catch (Exception)
+            {
+                throw new SendEmailFailException(SendEmailExceptionMessages.SendEmailFailed, email);
+            }
+        }
+
+        public async Task SendEmailConfirmationEmail(string email, string confirmUrl)
+        {
+            try
+            {
+                var message = new MimeMessage();
+                message.From.Add(new MailboxAddress(_smtpSettings.SenderName, _smtpSettings.SenderEmail));
+                message.To.Add(new MailboxAddress("", email));
+                message.Subject = "Orgigin Keeper: Email Confirmation";
+                message.Body = new TextPart("html")
+                {
+                    Text = $"here is your bloody link: ${confirmUrl}",
+                };
+
+                using (var client = new SmtpClient())
+                {
+                    client.ServerCertificateValidationCallback = (s, c, h, e) => true;
+
+                    await client.ConnectAsync(_smtpSettings.Server, _smtpSettings.Port, true);
+
+                    await client.AuthenticateAsync(_smtpSettings.Username, _smtpSettings.Password);
+                    await client.SendAsync(message);
+                    await client.DisconnectAsync(true);
+                }
+            }
+            catch (Exception)
+            {
+                throw new SendEmailFailException(SendEmailExceptionMessages.SendEmailFailed, email);
+            }
+        }
+
+
+
     }
 }

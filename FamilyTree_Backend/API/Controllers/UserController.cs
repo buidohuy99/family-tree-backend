@@ -27,6 +27,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
     {
         private readonly IEmailService _emailService;
         private readonly IUserService _userService;
+        
 
         public UserController(
             IEmailService emailService, 
@@ -49,13 +50,14 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("retrieve-reset-password-url")]
-        [SwaggerOperation(Summary = "Generate and return a token required for resetting password")]
-        [SwaggerResponse(200, Type = typeof(HttpResponse<string>), Description = "Returns token")]
-        public async Task<IActionResult> SendResetPassword([FromBody] string email)
+        [HttpPost("reset-password-token")]
+        [SwaggerOperation(Summary = "Generate and send a token required for resetting password to provided email")]
+        [SwaggerResponse(200, Description = "Email has been successfully sent")]
+        public async Task<IActionResult> SendResetPasswordToken([FromBody] ResetPasswordEmailInputModel input)
         {
-            var resetPasswordUrl = await _userService.GenerateResetPasswordUrl(email);
-            return Ok(new HttpResponse<string>(resetPasswordUrl, GenericResponseStrings.GenerateResetPasswordUrlSuccessful));
+            var resetPasswordUrl = await _userService.GenerateResetPasswordUrl(input.Email);
+            await _emailService.SendResetPasswordEmail(input.Email, resetPasswordUrl);
+            return Ok();
         }
 
         [AllowAnonymous]
@@ -73,6 +75,52 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             else
             {
                 throw new ResetPasswordFailExcpetion(UserExceptionMessages.ResetPasswordFail, email: model.Email, errors: result.Errors);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpPost("confirm-email-token")]
+        [SwaggerOperation(Summary = "Generate and send a token required for confriming email to provided email")]
+        [SwaggerResponse(200, Description = "Email has been successfully sent, no return response body")]
+        public async Task<IActionResult> SendConfirmEmailToken([FromBody] ResetPasswordEmailInputModel input)
+        {
+            var confirmUrl = await _userService.GenerateConfirmEmailUrl(input.Email);
+            await _emailService.SendEmailConfirmationEmail(input.Email, confirmUrl);
+            return Ok();
+        }
+
+        [AllowAnonymous]
+        [HttpPost("confirm-email")]
+        [SwaggerOperation(Summary = "confirm email for the user with provided email, require email confirmation token")]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<string>), Description = "Email confirmed successfully")]
+        public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailModel model)
+        {
+            IdentityResult result = await _userService.ConfirmEmailWithToken(model);
+
+            if (result.Succeeded)
+            {
+                return Ok(new HttpResponse<string>(model.Email, GenericResponseStrings.UserController_ConfirmEmailSuccessul));
+            }
+            else
+            {
+                throw new ConfirmEmailFailException(UserExceptionMessages.ConfirmEmailFail, email: model.Email, errors: result.Errors);
+            }
+        }
+
+        [HttpPost("change-email")]
+        [SwaggerOperation(Summary = "change user's email with provided new one")]
+        [SwaggerResponse(200, Type = typeof(HttpResponse<string>), Description = "Return newly changed email")]
+        public async Task<IActionResult> ChangeEmail([FromBody] ChangeEmailInputModel model)
+        {
+            IdentityResult result = await _userService.ChangeUserEmail(User, model.NewEmail);
+
+            if (result.Succeeded)
+            {
+                return Ok(new HttpResponse<string>(model.NewEmail, GenericResponseStrings.UserController_ChangeEmailSuccessul));
+            }
+            else
+            {
+                throw new ChangeEmailFailException(UserExceptionMessages.ChangeEmailFail, email: model.NewEmail, errors: result.Errors);
             }
         }
 

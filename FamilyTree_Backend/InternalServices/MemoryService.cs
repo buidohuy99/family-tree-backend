@@ -1,14 +1,17 @@
 ﻿using AutoMapper;
+using FamilyTreeBackend.Core.Application.DTOs;
 using FamilyTreeBackend.Core.Application.Helpers.Exceptions;
 using FamilyTreeBackend.Core.Application.Helpers.Exceptions.MemoryExceptions;
 using FamilyTreeBackend.Core.Application.Interfaces;
 using FamilyTreeBackend.Core.Application.Models.FamilyMemory;
 using FamilyTreeBackend.Core.Domain.Constants;
 using FamilyTreeBackend.Core.Domain.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -18,14 +21,22 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
     {
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
-        public MemoryService(IMapper mapper, IUnitOfWork unitOfWork)
+        private readonly UserManager<ApplicationUser> _userManager;
+        public MemoryService(IMapper mapper, IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
+            _userManager = userManager;
         }
-        public async Task<FamilyMemoryModel> AddMemory(FamilyMemoryInputModel model)
+        public async Task<FamilyMemoryModel> AddMemory(ClaimsPrincipal creator, FamilyMemoryInputModel model)
         {
+            var user = await _userManager.GetUserAsync(creator);
+            if (user == null)
+            {
+                throw new UserNotFoundException(UserExceptionMessages.UserNotFound);
+            }
             var newMemory = _mapper.Map<FamilyMemory>(model);
+            newMemory.CreatedBy = user;
             await _unitOfWork.Repository<FamilyMemory>().AddAsync(newMemory);
             await _unitOfWork.SaveChangesAsync();
 
@@ -58,13 +69,16 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             }
 
             var memories = await _unitOfWork.Repository<FamilyMemory>().GetDbset()
+                .Include(m => m.CreatedBy)
                 .Where(m => m.FamilyTreeId == treeId)
                 .OrderByDescending(m => m.MemoryDate).ToListAsync();
 
             List<FamilyMemoryModel> result = new List<FamilyMemoryModel>();
             foreach(var memory in memories)
             {
-                result.Add(_mapper.Map<FamilyMemoryModel>(memory));
+                var item = _mapper.Map<FamilyMemoryModel>(memory);
+                item.Creator = memory.CreatedByUserID != null ? new UserDTO(memory.CreatedBy) : null;
+                result.Add(item);
             }
             return result;
         }

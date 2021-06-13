@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FamilyTreeBackend.Presentation.API.Handlers
 {
-    public static class TreeOperations
+    public class EventOperations
     {
         public static OperationAuthorizationRequirement Create =
         new OperationAuthorizationRequirement { Name = nameof(Create) };
@@ -17,16 +17,13 @@ namespace FamilyTreeBackend.Presentation.API.Handlers
         public static OperationAuthorizationRequirement Update =
             new OperationAuthorizationRequirement { Name = nameof(Update) };
 
+        public static OperationAuthorizationRequirement Reschedule =
+            new OperationAuthorizationRequirement { Name = nameof(Reschedule) };
+
+        public static OperationAuthorizationRequirement Cancel =
+            new OperationAuthorizationRequirement { Name = nameof(Cancel) };
+
         public static OperationAuthorizationRequirement Delete =
             new OperationAuthorizationRequirement { Name = nameof(Delete) };
-
-        public static OperationAuthorizationRequirement Backup =
-            new OperationAuthorizationRequirement { Name = nameof(Backup) };
-
-        public static OperationAuthorizationRequirement AddEditor =
-            new OperationAuthorizationRequirement { Name = nameof(AddEditor) };
-
-        public static OperationAuthorizationRequirement RemoveEditor =
-            new OperationAuthorizationRequirement { Name = nameof(RemoveEditor) };
     }
 }

@@ -9,6 +9,7 @@ using FamilyTreeBackend.Core.Domain.Constants;
 using FamilyTreeBackend.Core.Domain.Entities;
 using FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices.Quartz.QuartzJobs;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -17,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Policy;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -55,9 +57,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
             var clientSite = _configuration.GetValue<string>("ClientSite");
 
-            var passwordResetUrl = new StringBuilder(clientSite)
-                .Append("/resetPassword/")
-                .Append(token).ToString();
+            var passwordResetUrl = clientSite + string.Format(ResetEmailUrl, token, email);
 
             return passwordResetUrl;
         }
@@ -75,9 +75,49 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             return result;
         }
 
+        public async Task<string> GenerateConfirmEmailUrl(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                throw new UserNotFoundException(UserExceptionMessages.UserNotFound);
+            }
+
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            var clientSite = _configuration.GetValue<string>("ClientSite");
+            var confirmEmailUrl = clientSite + string.Format(ConfirmEmailUrl, token, user.Email);
+            return confirmEmailUrl;
+        }
+
+        public async Task<IdentityResult> ConfirmEmailWithToken(ConfirmEmailModel model)
+        {
+            var user = await _userManager.FindByEmailAsync(model.Email);
+
+            if (user == null)
+            {
+                throw new UserNotFoundException(UserExceptionMessages.UserNotFound, email: model.Email);
+            }
+
+            var result = await _userManager.ConfirmEmailAsync(user, model.Token);
+            return result;
+        }
+
+        public async Task<IdentityResult> ChangeUserEmail(ClaimsPrincipal claimsPrincipal, string newEmail)
+        {
+            var user = await _userManager.GetUserAsync(claimsPrincipal);
+            if (user == null)
+            {
+                throw new UserNotFoundException(UserExceptionMessages.UserNotFound, email: newEmail);
+            }
+
+            var result = await _userManager.SetEmailAsync(user, newEmail);
+            return result;
+
+        }
+
         public IEnumerable<UserDTO> FindUser(UserFilterModel model)
         {
-            var users = _userManager.Users;
+            var users = _userManager.Users.Where(e => e.Status == false);
 
             if (model.UserName != null)
             {
@@ -87,10 +127,9 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             {
                 users = users.Where(e => e.Email.Equals(model.Email));
             }
-
-            if (model.UserName == null && model.Email == null)
+            else
             {
-                if(model.UsernameOrEmailContains != null)
+                if (model.UsernameOrEmailContains != null)
                 {
                     users = users.Where(e => e.UserName.Contains(model.UsernameOrEmailContains) || e.Email.Contains(model.UsernameOrEmailContains));
                 }
@@ -129,7 +168,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
         public FindUsersPaginationResponseModel FindUser(UserFilterModel model, PaginationModel paginationModel)
         {
-            var users = _userManager.Users;
+            var users = _userManager.Users.Where(e => e.Status == false);
 
             if (model.UserName != null)
             {
@@ -139,8 +178,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             {
                 users = users.Where(e => e.Email.Equals(model.Email));
             }
-
-            if (model.UserName == null && model.Email == null)
+            else
             {
                 if (model.UsernameOrEmailContains != null)
                 {
@@ -188,7 +226,8 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
             users = users.Skip((int)((paginationModel.Page - 1) * paginationModel.ItemsPerPage)).Take((int)paginationModel.ItemsPerPage);
 
-            return new FindUsersPaginationResponseModel(){
+            return new FindUsersPaginationResponseModel()
+            {
                 Result = users.Select(e => new UserDTO(e)),
                 TotalPages = totalPage,
                 CurrentPage = paginationModel.Page,
@@ -343,7 +382,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             Dictionary<string, UserConnection> connections = await _unitOfWork.GetUserConnections()
                 .FromSqlRaw(Sql_GetUserConnection, sourceUser, destinationUser).ToDictionaryAsync(uc => uc.SourceUserId);
 
-            
+
             foreach (var pair in connections)
             {
                 var connection = pair.Value;
@@ -384,6 +423,8 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                 );
         }
 
+        private const string ResetEmailUrl = "/reset-password?token={0}&email={1}";
+        private const string ConfirmEmailUrl = "/confirm-email?token={0}&email={1}";
         private const string Sql_GetUserConnection = @"
 with
 _connectedUserLevel1 as (
@@ -438,41 +479,41 @@ union
 select *
 from _reachedDestinationConnections";
 
-//        private const string Sql_GetUserConnection = @"
-//with
-//_treesConnectedToUser1 as (
-//select p.FamilyTreeId
-//from Person p
-//where p.UserId = @User1
-//),
+        //        private const string Sql_GetUserConnection = @"
+        //with
+        //_treesConnectedToUser1 as (
+        //select p.FamilyTreeId
+        //from Person p
+        //where p.UserId = @User1
+        //),
 
-//_treesConnectedToUser2 as (
-//select p.FamilyTreeId
-//from Person p
-//where p.UserId = @User2
-//),
+        //_treesConnectedToUser2 as (
+        //select p.FamilyTreeId
+        //from Person p
+        //where p.UserId = @User2
+        //),
 
-//_connectedPeople1 as (
-//select p.UserId
-//, p.FamilyTreeId
-//from Person p
-//where
-//p.UserId is not null 
-//and p.FamilyTreeId in (select * from _treesConnectedToUser1)
-//),
+        //_connectedPeople1 as (
+        //select p.UserId
+        //, p.FamilyTreeId
+        //from Person p
+        //where
+        //p.UserId is not null 
+        //and p.FamilyTreeId in (select * from _treesConnectedToUser1)
+        //),
 
-//_connectedPeople2 as (
-//select p.UserId
-//, p.FamilyTreeId
-//from Person p
-//where 
-//p.UserId is not null
-//and p.FamilyTreeId in (select * from _treesConnectedToUser2)
-//)
+        //_connectedPeople2 as (
+        //select p.UserId
+        //, p.FamilyTreeId
+        //from Person p
+        //where 
+        //p.UserId is not null
+        //and p.FamilyTreeId in (select * from _treesConnectedToUser2)
+        //)
 
-//select p1.FamilyTreeId as FamilyTreeId
-//, p1.UserId as SourceUserId
-//, p2.UserId as DestinationUserId
-//from _connectedPeople1 p1 inner join _connectedPeople2 p2 on p1.FamilyTreeId = p2.FamilyTreeId";
+        //select p1.FamilyTreeId as FamilyTreeId
+        //, p1.UserId as SourceUserId
+        //, p2.UserId as DestinationUserId
+        //from _connectedPeople1 p1 inner join _connectedPeople2 p2 on p1.FamilyTreeId = p2.FamilyTreeId";
     }
 }

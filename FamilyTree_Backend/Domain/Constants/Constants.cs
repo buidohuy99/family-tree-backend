@@ -55,6 +55,8 @@ namespace FamilyTreeBackend.Core.Domain.Constants
         public const string UserController_ReadNotificationSuccessul = "Notification has been mark for read successfully";
         public const string UserController_RemoveNotificationSuccessul = "Notification has been removed successfully";
         public const string UserController_FindConnectionsSuccessul = "Connections between users have been found successfully";
+        public const string UserController_ChangeEmailSuccessul = "Email has been changed successfully";
+        public const string UserController_ConfirmEmailSuccessul = "Email has been confirmed successfully";
 
         public const string RequestProcessingError = "Error occured while processing your request";
         public const string InternalServerError = "Server encountered an exception";
@@ -126,6 +128,8 @@ namespace FamilyTreeBackend.Core.Domain.Constants
     {
         public const string UserNotFound = "Cannot find user with provided Id";
         public const string ResetPasswordFail = "Reset password failed";
+        public const string ConfirmEmailFail = "Confirm email failed";
+        public const string ChangeEmailFail = "Change email failed";
         public const string UpdateUserFail = "Cannot update specified user because server encountered an error while saving";
         public const string NotificationNotFound = "Cannot find notification with provided id";
     }
