@@ -16,6 +16,10 @@ namespace FamilyTreeBackend.Core.Domain.Entities
         [DataMember]
         public string RequestSchema { get; set; }
         [DataMember]
+        public string UserAgent { get; set; }
+        [DataMember]
+        public string UserId { get; set; }
+        [DataMember]
         public string RequestHost { get; set; }
         [DataMember]
         public string RequestPath { get; set; }

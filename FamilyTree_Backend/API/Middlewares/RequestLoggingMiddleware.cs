@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Claims;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -53,6 +54,9 @@ namespace FamilyTreeBackend.Presentation.API.Middlewares
             context.Request.Body.Position = 0;
 
             logContainer.RequestBody = requestBody;
+            logContainer.UserAgent = context.Request.Headers["User-Agent"].ToString();
+            //var claim = context.User.FindFirst(ClaimTypes.NameIdentifier);
+            //logContainer.UserId = claim != null ? claim.Value : "";
             logContainer.RequestHost = context.Request.Host.Value;
             logContainer.RequestPath = context.Request.Path;
             logContainer.RequestSchema = context.Request.Scheme;
