@@ -9,6 +9,7 @@ namespace FamilyTreeBackend.Core.Application.Interfaces
 {
     public interface IRequestResponseLoggingService
     {
+        public RequestResponseDataModel Model { get; set; } 
         public Task SaveLogData(RequestResponseDataModel model);
     }
 }

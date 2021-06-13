@@ -76,7 +76,8 @@ namespace FamilyTreeBackend.Presentation.API
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, FamilyTreeDbContext dbContext, IServiceProvider serviceProvider)
         {
-            app.UseRequestLoggingMiddleware();
+            
+            app.UseResponseLoggingMiddleware();
             app.UseExceptionHandler("/error");
 
             dbContext.Database.Migrate();
@@ -111,6 +112,8 @@ namespace FamilyTreeBackend.Presentation.API
             #region Extract user from token middleware
             //app.UseUserExtractionMiddleware();
             #endregion
+
+            app.UseRequestLoggingMiddleware();
 
             app.UseEndpoints(endpoints =>
             {

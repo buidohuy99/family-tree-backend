@@ -15,9 +15,11 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
     public class RequestResponseLoggingService : IRequestResponseLoggingService
     {
         private readonly IUnitOfWork _unitOfWork;
+        public RequestResponseDataModel Model { get; set; }
         public RequestResponseLoggingService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
+            Model = new RequestResponseDataModel();
         }
         public async Task SaveLogData(RequestResponseDataModel model)
         {
