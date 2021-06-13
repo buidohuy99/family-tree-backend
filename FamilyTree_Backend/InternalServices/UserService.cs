@@ -7,6 +7,7 @@ using FamilyTreeBackend.Core.Application.Models;
 using FamilyTreeBackend.Core.Application.Models.User;
 using FamilyTreeBackend.Core.Domain.Constants;
 using FamilyTreeBackend.Core.Domain.Entities;
+using FamilyTreeBackend.Infrastructure.Service.InternalServices.EmailTemplates;
 using FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices.Quartz.QuartzJobs;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Routing;
@@ -44,7 +45,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             _mapper = mapper;
         }
 
-        public async Task<string> GenerateResetPasswordUrl(string email)
+        public async Task<string> GenerateResetPassowrdEmail(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
 
@@ -54,12 +55,15 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             }
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-
             var clientSite = _configuration.GetValue<string>("ClientSite");
-
             var passwordResetUrl = clientSite + string.Format(ResetEmailUrl, token, email);
-
-            return passwordResetUrl;
+            
+            string emailContent = EmailTemplatesManager.GetEmailCotent(EmailTemplatesManager.ResetPassword, passwordResetUrl);
+            if (string.IsNullOrEmpty(emailContent))
+            {
+                return $"Reset password link: {passwordResetUrl}";
+            }
+            return emailContent;
         }
 
         public async Task<IdentityResult> ResetPasswordWithToken(ResetPasswordModel model)
@@ -75,7 +79,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             return result;
         }
 
-        public async Task<string> GenerateConfirmEmailUrl(string email)
+        public async Task<string> GenerateEmailConfirmationEmail(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
@@ -86,7 +90,13 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             var clientSite = _configuration.GetValue<string>("ClientSite");
             var confirmEmailUrl = clientSite + string.Format(ConfirmEmailUrl, token, user.Email);
-            return confirmEmailUrl;
+            
+            string emailContent = EmailTemplatesManager.GetEmailCotent(EmailTemplatesManager.ConfirmEmail, confirmEmailUrl);
+            if (string.IsNullOrEmpty(emailContent))
+            {
+                return $"Email confirmation link: {confirmEmailUrl}";
+            }
+            return emailContent;
         }
 
         public async Task<IdentityResult> ConfirmEmailWithToken(ConfirmEmailModel model)
