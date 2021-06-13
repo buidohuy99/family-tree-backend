@@ -80,7 +80,12 @@ namespace Operation.Areas.Identity.Pages.Account
             {
                 var user = await _userManager.FindByNameAsync(Input.Email);
                 var roles = user == null ? null : await _userManager.GetRolesAsync(user);
-                if (roles == null || !roles.Any(str => str.Equals(ApplicationUserRoles.Admin)))
+                if (roles != null)
+                {
+                    ModelState.AddModelError(string.Empty, "User with this email does not not exists");
+                    return Page();
+                }
+                if (!roles.Any(str => str.Equals(ApplicationUserRoles.Admin)))
                 {
                     ModelState.AddModelError(string.Empty, "User is not authorized to access this site");
                     return Page();
