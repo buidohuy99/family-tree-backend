@@ -7,6 +7,7 @@ using FamilyTreeBackend.Core.Application.Models;
 using FamilyTreeBackend.Core.Application.Models.User;
 using FamilyTreeBackend.Core.Domain.Constants;
 using FamilyTreeBackend.Core.Domain.Entities;
+using FamilyTreeBackend.Infrastructure.Service.InternalServices.EmailTemplates;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -43,7 +44,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         [SwaggerOperation(Summary = "This is used to test sending email")]
         public async Task<IActionResult> TestSendEmail([FromBody] string email)
         {
-            string body = "<div>Hello world</div>";
+            string body = EmailTemplatesManager.GetEmailCotent(EmailTemplatesManager.ResetPassword, "hello");
             await _emailService.SendEmailAsync(email, "Test email sending", body);
 
             return Ok();
@@ -55,7 +56,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         [SwaggerResponse(200, Description = "Email has been successfully sent")]
         public async Task<IActionResult> SendResetPasswordToken([FromBody] ResetPasswordEmailInputModel input)
         {
-            var resetPasswordUrl = await _userService.GenerateResetPasswordUrl(input.Email);
+            var resetPasswordUrl = await _userService.GenerateResetPassowrdEmail(input.Email);
             await _emailService.SendResetPasswordEmail(input.Email, resetPasswordUrl);
             return Ok();
         }
@@ -84,7 +85,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         [SwaggerResponse(200, Description = "Email has been successfully sent, no return response body")]
         public async Task<IActionResult> SendConfirmEmailToken([FromBody] ResetPasswordEmailInputModel input)
         {
-            var confirmUrl = await _userService.GenerateConfirmEmailUrl(input.Email);
+            var confirmUrl = await _userService.GenerateEmailConfirmationEmail(input.Email);
             await _emailService.SendEmailConfirmationEmail(input.Email, confirmUrl);
             return Ok();
         }

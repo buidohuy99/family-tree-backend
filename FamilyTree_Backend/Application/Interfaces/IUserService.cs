@@ -14,7 +14,7 @@ namespace FamilyTreeBackend.Core.Application.Interfaces
 {
     public interface IUserService
     {
-        public Task<string> GenerateResetPasswordUrl(string email);
+        public Task<string> GenerateResetPassowrdEmail(string email);
         public Task<IdentityResult> ResetPasswordWithToken(ResetPasswordModel model);
         public IEnumerable<UserDTO> FindUser(UserFilterModel model);
         public FindUsersPaginationResponseModel FindUser(UserFilterModel model, PaginationModel paginationModel);
@@ -25,7 +25,7 @@ namespace FamilyTreeBackend.Core.Application.Interfaces
         public Task<NotificationDTO> RemoveNotification(long notficationId);
         Task TestTriggerNotification();
         public Task<IEnumerable<UserConnectionDTO>> FindUserConnection(ClaimsPrincipal user, string searchingUserId);
-        public Task<string> GenerateConfirmEmailUrl(string email);
+        public Task<string> GenerateEmailConfirmationEmail(string email);
         public Task<IdentityResult> ConfirmEmailWithToken(ConfirmEmailModel model);
         Task<IdentityResult> ChangeUserEmail(ClaimsPrincipal user, string newEmail);
     }
