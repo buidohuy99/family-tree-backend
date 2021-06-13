@@ -1,0 +1,109 @@
+﻿@model FamilyTreeBackend.Core.Application.Operation.Models.RequestResponsePageModel
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Index</h1>
+
+<p>
+    <form asp-controller="Logs" asp-action="Index" method="get">
+<p>
+    From: <input asp-for="From" />
+    User Id: <input asp-for="To" />
+    To: <input asp-for="SearchUserId" />
+    <input type="submit" value="Filter" />
+</p>
+    </form>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.List[0].DateCreated)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.List[0].UserAgent)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.List[0].UserId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.List[0].RequestPath)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.List[0].StatusCode)
+            </th>
+            @*<th></th>*@
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.List)
+        {
+        <tr>
+            <td>
+                @Html.ActionLink(item.DateCreated, "Details", new {  id=item.Id })
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UserAgent)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UserId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RequestPath)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.StatusCode)
+            </td>
+            @*<td>
+                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
+                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
+                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+            </td>*@
+        </tr>
+        }
+    </tbody>
+</table>
+
+<div>
+    <ul class="pagination">
+        <li class="page-item">
+            <a asp-route-From="@Model.From.ToString("s")" asp-route-To="@Model.To.ToString("s")" asp-route-currentPage="1" asp-route-SearchUserId="@Model.SearchUserId" class="page-link"><<</a>
+        </li>
+        @{
+            const int visiblePage = 7;
+            int first = (int)Model.CurrentPage - visiblePage / 2;
+            int last = (int)Model.CurrentPage + visiblePage / 2;
+
+            if (first <= 0)
+            {
+                first = 1;
+                last = first + visiblePage - 1;
+            }
+            else if (last > Model.TotalPages)
+            {
+                last = (int)Model.TotalPages;
+                first = last - visiblePage + 1;
+            }
+
+            if ((int)Model.TotalPages <= visiblePage)
+            {
+                last = (int)Model.TotalPages;
+                first = 1;
+            }
+
+            for (var i = first; i <= last; i++)
+            {
+                <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                    <a asp-route-From="@Model.From.ToString("s")" asp-route-To="@Model.To.ToString("s")" asp-route-currentPage="@i" asp-route-SearchUserId="@Model.SearchUserId" class="page-link">@i</a>
+                </li>
+            }
+        }
+        
+        <li class="page-item">
+            <a asp-route-From="@Model.From.ToString("s")" asp-route-To="@Model.To.ToString("s")" asp-route-currentPage="@Model.TotalPages" asp-route-SearchUserId="@Model.SearchUserId" class="page-link">>></a>
+        </li>
+    </ul>
+</div>
