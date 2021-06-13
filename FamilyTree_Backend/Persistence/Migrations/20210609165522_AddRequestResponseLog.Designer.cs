@@ -4,14 +4,16 @@ using FamilyTreeBackend.Infrastructure.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(FamilyTreeDbContext))]
-    partial class FamilyTreeDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210609165522_AddRequestResponseLog")]
+    partial class AddRequestResponseLog
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -280,9 +282,6 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                         .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("CreatedByUserID")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<DateTime?>("DateCreated")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
@@ -306,8 +305,6 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CreatedByUserID");
 
                     b.HasIndex("FamilyTreeId");
 
@@ -526,8 +523,6 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
 
                     b.Property<string>("SourceUserId")
                         .HasColumnType("nvarchar(max)");
-
-                    b.ToTable("UserConnections");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -730,18 +725,11 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("FamilyTreeBackend.Core.Domain.Entities.FamilyMemory", b =>
                 {
-                    b.HasOne("FamilyTreeBackend.Core.Domain.Entities.ApplicationUser", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedByUserID")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.HasOne("FamilyTreeBackend.Core.Domain.Entities.FamilyTree", null)
                         .WithMany("Memories")
                         .HasForeignKey("FamilyTreeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("CreatedBy");
                 });
 
             modelBuilder.Entity("FamilyTreeBackend.Core.Domain.Entities.FamilyTree", b =>

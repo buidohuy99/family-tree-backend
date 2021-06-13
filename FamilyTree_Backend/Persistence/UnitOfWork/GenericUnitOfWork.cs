@@ -64,6 +64,11 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.UnitOfWork
             return _dbContext.UserConnections;
         }
 
+        public DbSet<RequestResponseLog> GetRequestResponseLogs()
+        {
+            return _dbContext.RequestResponseLogs;
+        }
+
     }
 
 }

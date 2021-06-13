@@ -1,6 +1,6 @@
-﻿using FamilyTreeBackend.Core.Domain.Entities;
+﻿using FamilyTreeBackend.Core.Application.Helpers;
+using FamilyTreeBackend.Core.Domain.Entities;
 using FamilyTreeBackend.Core.Domain.Enums;
-using FamilyTreeBackend.Infrastructure.Persistence.Role;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -30,12 +30,14 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
         public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
         public virtual DbSet<Notification> Notifications { get; set; }
         public virtual DbSet<UserConnection> UserConnections { get; set; }
+        public virtual DbSet<RequestResponseLog> RequestResponseLogs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<ApplicationUser>((entity) => {
+            modelBuilder.Entity<ApplicationUser>((entity) =>
+            {
                 entity.Property(e => e.CreatedDate)
                     .HasDefaultValueSql("GETUTCDATE()")
                     .ValueGeneratedOnAdd();
@@ -45,7 +47,8 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
                    .ValueGeneratedOnAddOrUpdate();
             });
 
-            modelBuilder.Entity<RefreshToken>((entity) => {
+            modelBuilder.Entity<RefreshToken>((entity) =>
+            {
                 entity.ToTable("RefreshToken");
 
                 entity.HasKey(e => e.Token);
@@ -59,7 +62,8 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
                     .OnDelete(DeleteBehavior.SetNull);
             });
 
-            modelBuilder.Entity<Family>((entity) => {
+            modelBuilder.Entity<Family>((entity) =>
+            {
                 entity.ToTable("Family");
 
                 entity.HasKey(e => e.Id);
@@ -90,7 +94,8 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
                     .OnDelete(DeleteBehavior.Cascade);
             });
 
-            modelBuilder.Entity<Person>((entity) => {
+            modelBuilder.Entity<Person>((entity) =>
+            {
                 entity.ToTable("Person");
 
                 entity.HasKey(e => e.Id);
@@ -122,7 +127,8 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
                     .OnDelete(DeleteBehavior.Cascade);
             });
 
-            modelBuilder.Entity<Relationship>((entity) => {
+            modelBuilder.Entity<Relationship>((entity) =>
+            {
                 entity.ToTable("Relationship");
 
                 entity.HasKey(e => e.Id);
@@ -214,7 +220,8 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
                     .ValueGeneratedOnAddOrUpdate();
             });
 
-            modelBuilder.Entity<FamilyEventExceptionCase>((entity) => {
+            modelBuilder.Entity<FamilyEventExceptionCase>((entity) =>
+            {
                 entity.ToTable("FamilyEventExceptionCases");
 
                 entity.HasKey(e => e.Id);
@@ -283,6 +290,17 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
                 entity.Property(e => e.LastModified)
                     .HasDefaultValueSql("GETUTCDATE()")
                     .ValueGeneratedOnAddOrUpdate();
+            });
+
+            modelBuilder.Entity<RequestResponseLog>((entity) => {
+                entity.ToTable("RequestResponseLogs");
+
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+
+                entity.Property(e => e.DateCreated)
+                    .HasDefaultValueSql("GETUTCDATE()")
+                    .ValueGeneratedOnAdd();
             });
 
             modelBuilder.Entity<UserConnection>(e => {

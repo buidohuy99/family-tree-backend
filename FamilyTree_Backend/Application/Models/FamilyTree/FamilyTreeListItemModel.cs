@@ -16,5 +16,6 @@ namespace FamilyTreeBackend.Core.Application.Models.FamilyTree
         public ICollection<UserIconDTO> Editors { get; set; }
         public DateTime DateCreated { get; set; }
         public DateTime LastModified { get; set; }
+        public bool PublicMode { get; set; }
     }
 }

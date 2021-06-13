@@ -2,7 +2,9 @@
 using FamilyTreeBackend.Core.Domain.Entities;
 using FamilyTreeBackend.Infrastructure.Persistence;
 using FamilyTreeBackend.Infrastructure.Persistence.Context;
+using FamilyTreeBackend.Infrastructure.Service.InternalServices.Operation;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Operation.Services;
@@ -20,11 +22,13 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
             #region Register scoped services
             services.AddScoped<IWebAccessUserService, WebAccessUserService>();
+            services.AddScoped<IRequestResponseLogReaderService, RequestResponseLogReaderService>();
+            services.AddScoped<IRequestResponseLogReaderService, RequestResponseLogReaderService>();
             #endregion
 
             #region Register singleton
             services.AddSingleton<IUploadService, UploadService>();
-            services.AddSingleton<IEmailService, EmailService>();
+            services.AddSingleton<IEmailSender, OperationEmailSender>();
             #endregion
         }
     }
