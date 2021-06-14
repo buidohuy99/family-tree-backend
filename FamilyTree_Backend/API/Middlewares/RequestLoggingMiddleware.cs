@@ -56,7 +56,7 @@ namespace FamilyTreeBackend.Presentation.API.Middlewares
                 return;
             }
 
-            if (context.Request.ContentType.Equals("multipart/form-data"))
+            if (context.Request.ContentType != null && context.Request.ContentType.Equals("multipart/form-data"))
             {
                 logContainer.RequestBody = "Content is files";
                 return;
