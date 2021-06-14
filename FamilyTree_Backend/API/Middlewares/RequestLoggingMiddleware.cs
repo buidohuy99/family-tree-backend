@@ -19,6 +19,7 @@ namespace FamilyTreeBackend.Presentation.API.Middlewares
         private readonly RequestDelegate _next;
         private readonly RecyclableMemoryStreamManager _recyclableMemoryStreamManager = new RecyclableMemoryStreamManager();
         private Regex apiPathFilter = new Regex("/api/");
+        private const long CONTENT_LENGTH_LIMIT = 2097152;
         public RequestLoggingMiddleware(RequestDelegate next)
         {
             _next = next;
@@ -42,6 +43,25 @@ namespace FamilyTreeBackend.Presentation.API.Middlewares
 
         private async Task LogRequest(HttpContext context, RequestResponseDataModel logContainer)
         {
+            logContainer.UserAgent = context.Request.Headers["User-Agent"].ToString();
+            var claim = context.User.FindFirst(ClaimTypes.NameIdentifier);
+            logContainer.UserId = claim != null ? claim.Value : "";
+            logContainer.RequestHost = context.Request.Host.Value;
+            logContainer.RequestPath = context.Request.Path;
+            logContainer.RequestSchema = context.Request.Scheme;
+
+            if (context.Request.ContentLength > CONTENT_LENGTH_LIMIT)
+            {
+                logContainer.RequestBody = "Content length exceeded logging limit";
+                return;
+            }
+
+            if (context.Request.ContentType.Equals("multipart/form-data"))
+            {
+                logContainer.RequestBody = "Content is files";
+                return;
+            }
+
             context.Request.EnableBuffering();
             await using var requestStream = _recyclableMemoryStreamManager.GetStream();
             await context.Request.Body.CopyToAsync(requestStream);
@@ -55,33 +75,11 @@ namespace FamilyTreeBackend.Presentation.API.Middlewares
             context.Request.Body.Position = 0;
 
             logContainer.RequestBody = requestBody;
-            logContainer.UserAgent = context.Request.Headers["User-Agent"].ToString();
-            var claim = context.User.FindFirst(ClaimTypes.NameIdentifier);
-            logContainer.UserId = claim != null ? claim.Value : "";
-            logContainer.RequestHost = context.Request.Host.Value;
-            logContainer.RequestPath = context.Request.Path;
-            logContainer.RequestSchema = context.Request.Scheme;
+
+
         }
 
-        private async Task LogResponse(HttpContext context, RequestResponseDataModel logContainer)
-        {
-            var originalBodyStream = context.Response.Body;
-            await using var responseBody = _recyclableMemoryStreamManager.GetStream();
-            context.Response.Body = responseBody;
-
-            await _next(context);
-
-            context.Response.Body.Seek(0, SeekOrigin.Begin);
-            var text = await new StreamReader(context.Response.Body).ReadToEndAsync();
-            context.Response.Body.Seek(0, SeekOrigin.Begin);
-            await responseBody.CopyToAsync(originalBodyStream);
-            logContainer.StatusCode = context.Response.StatusCode;
-            logContainer.ResponseBody = text;
-            logContainer.DateCreated = DateTime.Now.ToString("yyyy/MM/dd hh:mm:ss tt");
-        }
-
-
-
+        
     }
 
     // Extension method used to add the middleware to the HTTP request pipeline.

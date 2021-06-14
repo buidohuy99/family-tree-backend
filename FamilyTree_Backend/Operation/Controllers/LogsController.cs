@@ -11,7 +11,7 @@ namespace Operation.Controllers
     {
         private readonly IRequestResponseLogReaderService _logReaderService;
 
-        private const int PageSize = 50;
+        private const int PageSize = 20;
         public LogsController(IRequestResponseLogReaderService logReaderService)
         {
             _logReaderService = logReaderService;
