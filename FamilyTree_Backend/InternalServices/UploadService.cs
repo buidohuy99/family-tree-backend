@@ -67,20 +67,12 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                 }
             }
 
-            List<Task> tasks = new List<Task>();
             try
             {
                 foreach (var file in input.Files)
                 {
-                    var task = UploadImage(file);
-                    tasks.Add(task);
-                }
-                await Task.WhenAll(tasks);
-
-                foreach (var task in tasks)
-                {
-                    var returnedUrl = ((Task<string>)task).Result;
-                    result.Add(returnedUrl);
+                    var imageUrl = await UploadImage(file);
+                    result.Add(imageUrl);
                 }
                 return result;
             }
@@ -88,7 +80,6 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             {
                 throw;
             }
-            
         }
 
         private async Task<string> UploadImage(IFormFile file)
