@@ -21,7 +21,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices.Operation
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-        public async Task<RequestResponsePageModel> GetRequestResponseLogs(DateTime? from, DateTime? to, string userId, uint page, uint pageSize = 50)
+        public async Task<RequestResponsePageModel> GetRequestResponseLogs(DateTime? from, DateTime? to, string userId, string path, uint page, uint pageSize = 50)
         {
             if (from == null || from.Value == DateTime.MinValue)
             {
@@ -46,6 +46,20 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices.Operation
                 .Where(l => l.DateCreated.Value.CompareTo(from.Value.ToUniversalTime()) >= 0
                     && l.DateCreated.Value.CompareTo(to.Value.ToUniversalTime()) <= 0);
 
+            if (!string.IsNullOrEmpty(userId))
+            {
+                //string formatSearch = @"<UserId>{0}</UserId>";
+                //string searchString = string.Format(formatSearch, userId);
+                query = query.Where(l => l.UserId.Contains(userId));
+            }
+
+            if (!string.IsNullOrEmpty(path))
+            {
+                //string formatSearch = @"<UserId>{0}</UserId>";
+                //string searchString = string.Format(formatSearch, userId);
+                query = query.Where(l => l.UserId.Contains(path));
+            }
+
             var pageCount = (uint)MathF.Ceiling((float)(query.Count()) / (float)(pageSize));
 
             if (pageCount == 0)
@@ -56,13 +70,6 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices.Operation
             if (page > pageCount && pageCount > 0)
             {
                 page = pageCount;
-            }
-
-            if (!string.IsNullOrEmpty(userId))
-            {
-                string formatSearch = @"<UserId>{0}</UserId>";
-                string searchString = string.Format(formatSearch, userId);
-                query = query.Where(l => l.Data.Contains(searchString));
             }
 
             var logs = await query.AsNoTracking()
@@ -85,6 +92,8 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices.Operation
                 TotalPages = pageCount,
                 CurrentPage = page,
                 ItemsPerPage = pageSize,
+                SearchUserId = string.IsNullOrEmpty(userId)? "" : userId,
+                Path = string.IsNullOrEmpty(path) ? "" : path,
                 List = result,
             };
             

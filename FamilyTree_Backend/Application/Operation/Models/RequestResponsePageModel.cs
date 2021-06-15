@@ -11,6 +11,7 @@ namespace FamilyTreeBackend.Core.Application.Operation.Models
         public DateTime From { get; set; }
         public DateTime To { get; set; }
         public string SearchUserId { get; set; }
+        public string Path { get; set; }
         public uint TotalPages { get; set; }
         public uint CurrentPage { get; set; }
         public uint ItemsPerPage { get; set; }

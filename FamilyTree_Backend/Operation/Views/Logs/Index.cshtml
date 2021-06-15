@@ -11,8 +11,9 @@
     <form asp-controller="Logs" asp-action="Index" method="get">
 <p>
     From: <input asp-for="From" />
-    User Id: <input asp-for="To" />
-    To: <input asp-for="SearchUserId" />
+    To: <input asp-for="To" />
+    User Id: <input asp-for="SearchUserId" />
+    Path: <input asp-for="Path" />
     <input type="submit" value="Filter" />
 </p>
     </form>
@@ -30,6 +31,9 @@
                 @Html.DisplayNameFor(model => model.List[0].UserId)
             </th>
             <th>
+                @Html.DisplayNameFor(model => model.List[0].RequestMethod)
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.List[0].RequestPath)
             </th>
             <th>
@@ -43,25 +47,28 @@
         {
         <tr>
             <td>
-                @Html.ActionLink(item.DateCreated, "Details", new {  id=item.Id })
+                @Html.ActionLink(item.DateCreated, "Details", new { id = item.Id })
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.UserAgent)
+                @Html.Raw(item.UserAgent)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.UserId)
+                @Html.Raw(item.UserId)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.RequestPath)
+                @Html.Raw(item.RequestMethod)
+            </td>
+            <td>
+                @Html.Raw(item.RequestPath)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.StatusCode)
             </td>
             @*<td>
-                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
-            </td>*@
+            @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
+            @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
+            @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+        </td>*@
         </tr>
         }
     </tbody>
@@ -70,7 +77,12 @@
 <div>
     <ul class="pagination">
         <li class="page-item">
-            <a asp-route-From="@Model.From.ToString("s")" asp-route-To="@Model.To.ToString("s")" asp-route-currentPage="1" asp-route-SearchUserId="@Model.SearchUserId" class="page-link"><<</a>
+            <a 
+               asp-route-From="@Model.From.ToString("s")" 
+               asp-route-To="@Model.To.ToString("s")" 
+               asp-route-SearchUserId="@Model.SearchUserId" 
+               asp-route-Path="@Model.Path" 
+               asp-route-currentPage="1" class="page-link"><<</a>
         </li>
         @{
             const int visiblePage = 7;
@@ -97,13 +109,23 @@
             for (var i = first; i <= last; i++)
             {
                 <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
-                    <a asp-route-From="@Model.From.ToString("s")" asp-route-To="@Model.To.ToString("s")" asp-route-currentPage="@i" asp-route-SearchUserId="@Model.SearchUserId" class="page-link">@i</a>
+                    <a 
+                       asp-route-From="@Model.From.ToString("s")" 
+                       asp-route-To="@Model.To.ToString("s")" 
+                       asp-route-SearchUserId="@Model.SearchUserId" 
+                       asp-route-Path="@Model.Path" 
+                       asp-route-currentPage="@i"class="page-link">@i</a>
                 </li>
             }
         }
         
         <li class="page-item">
-            <a asp-route-From="@Model.From.ToString("s")" asp-route-To="@Model.To.ToString("s")" asp-route-currentPage="@Model.TotalPages" asp-route-SearchUserId="@Model.SearchUserId" class="page-link">>></a>
+            <a 
+               asp-route-From="@Model.From.ToString("s")" 
+               asp-route-To="@Model.To.ToString("s")" 
+               asp-route-SearchUserId="@Model.SearchUserId" 
+               asp-route-Path="@Model.Path" 
+               asp-route-currentPage="@Model.TotalPages" class="page-link">>></a>
         </li>
     </ul>
 </div>

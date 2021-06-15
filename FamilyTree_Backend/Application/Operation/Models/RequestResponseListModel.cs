@@ -17,6 +17,8 @@ namespace FamilyTreeBackend.Core.Application.Operation.Models
         public string UserAgent { get; set; }
         [DisplayName("User Id")]
         public string UserId { get; set; }
+        [DisplayName("Method")]
+        public string RequestMethod { get; set; }
         [DisplayName("Request Path")]
         public string RequestPath { get; set; }
         [DisplayName("Status Code")]
