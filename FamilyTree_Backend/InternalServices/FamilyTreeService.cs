@@ -328,6 +328,10 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                     var spouse = import.People.FirstOrDefault(e => e.Id == relationship.SpouseId);
                     if (spouse != null && !addedPeople.ContainsKey(spouse.Id))
                     {
+                        if (spouse.ChildOfCoupleId != null && !addedCouples.ContainsKey(spouse.ChildOfCoupleId.Value))
+                        {
+                            continue;
+                        }
                         var newPerson = new Person()
                         {
                             FirstName = spouse.FirstName,
