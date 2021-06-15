@@ -46,6 +46,7 @@ namespace FamilyTreeBackend.Presentation.API.Middlewares
             logContainer.UserAgent = context.Request.Headers["User-Agent"].ToString();
             var claim = context.User.FindFirst(ClaimTypes.NameIdentifier);
             logContainer.UserId = claim != null ? claim.Value : "";
+            logContainer.RequestMethod = context.Request.Method;
             logContainer.RequestHost = context.Request.Host.Value;
             logContainer.RequestPath = context.Request.Path;
             logContainer.RequestSchema = context.Request.Scheme;

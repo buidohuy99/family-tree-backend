@@ -19,6 +19,8 @@ namespace FamilyTreeBackend.Core.Application.Operation.Models
         public string UserId { get; set; }
         [DisplayName("Request Host")]
         public string RequestHost { get; set; }
+        [DisplayName("Request Method")]
+        public string RequestMethod { get; set; }
         [DisplayName("Request Path")]
         public string RequestPath { get; set; }
         [DisplayName("Request Body")]

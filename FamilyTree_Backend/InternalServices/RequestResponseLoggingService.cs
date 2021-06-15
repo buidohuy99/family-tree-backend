@@ -26,6 +26,8 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             var xmlStr = RequestResponseDataModel.GetXMLStringFromData(model);
             var log = new RequestResponseLog();
             log.Data = xmlStr;
+            log.UserId = model.UserId;
+            log.RequestPath = model.RequestPath;
             await _unitOfWork.GetRequestResponseLogs().AddAsync(log);
             await _unitOfWork.SaveChangesAsync();
         }
