@@ -52,6 +52,7 @@ namespace FamilyTreeBackend.Presentation.API.Controllers.Misc
                 [CalendarExceptionMessages.MissingDateOnInput] = 400,
                 [CalendarExceptionMessages.NonRepeatableEventCantHaveFollowingEvents] = 403,
                 [CalendarExceptionMessages.FollowingEventMustBeAfterEvent] = 400,
+                [CalendarExceptionMessages.RescheduledExceptionMustBeAfterCancelledPoint] = 400,
 
                 [MemoryExceptionMessages.FamilyMemoryNotFound] = 404,
 

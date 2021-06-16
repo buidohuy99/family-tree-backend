@@ -245,6 +245,11 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             checkTimeSpanOfInputValid(familyEvent.Repeat, model.RescheduledStartDate, model.RescheduledEndDate);
 
             if (familyEvent.Repeat != RepeatEvent.NONE) {
+                if (model.RescheduledStartDate.CompareTo(model.EndDate.Value) < 0)
+                {
+                    throw new FamilyEventDateException(CalendarExceptionMessages.RescheduledExceptionMustBeAfterCancelledPoint, model.StartDate, model.EndDate);
+                }
+
                 // Cancel old event
                 var cancelOld = new FamilyEventExceptionCase()
                 {
@@ -260,6 +265,11 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             }
             else
             {
+                if (model.RescheduledStartDate.CompareTo(familyEvent.EndDate) < 0)
+                {
+                    throw new FamilyEventDateException(CalendarExceptionMessages.RescheduledExceptionMustBeAfterCancelledPoint, model.StartDate, model.EndDate);
+                }
+
                 // Cancel all previous reschedules if event is not repeated
                 var getEventExceptions = _unitOfWork.Entry(familyEvent);
                 if (getEventExceptions != null)
@@ -333,7 +343,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                     StartDate = model.StartDate.Value,
                     EndDate = model.EndDate.Value,
                     IsCancelled = true,
-                    IsRescheduled = true,
+                    IsRescheduled = false,
                 };
 
                 await _unitOfWork.Repository<FamilyEventExceptionCase>().AddAsync(cancelOld);

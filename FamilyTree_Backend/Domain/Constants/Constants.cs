@@ -154,6 +154,7 @@ namespace FamilyTreeBackend.Core.Domain.Constants
         public const string StartDateIsAfterEndDate = "Start date must be before end date";
         public const string StartDateAndEndDateIsNotWithinSameRepeatCycle = "Start date and end date of event must be within the same cycle for recurring events";
         public const string FollowingEventMustBeAfterEvent = "Cannot add a following event before the current event";
+        public const string RescheduledExceptionMustBeAfterCancelledPoint = "Cannot add a rescheduled exception before the cancellation point";
     }
 
     public static class MemoryExceptionMessages
