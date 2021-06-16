@@ -140,43 +140,34 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                 checkTimeSpanOfInputValid(model.Repeat == null ? familyEvent.Repeat : model.Repeat.Value, model.StartDate.Value, model.EndDate.Value);
 
                 // Updating schedule
-                if (!model.ApplyToFollowingEvents)
+                if (familyEvent.FollowingEvent != null)
                 {
-                    var exceptionCase = _mapper.Map<FamilyEventExceptionCase>(model);
-                    exceptionCase.BaseFamilyEvent = familyEvent;
-                    await _unitOfWork.Repository<FamilyEventExceptionCase>().AddAsync(exceptionCase);
+                    throw new InvalidOperationOnFamilyEventException(CalendarExceptionMessages.CannotAddMultipleFollowingEventsToEvent, familyEvent.Id);
                 }
-                else
+                if(familyEvent.Repeat == RepeatEvent.NONE && model.Repeat == RepeatEvent.NONE)
                 {
-                    if (familyEvent.FollowingEvent != null)
-                    {
-                        throw new InvalidOperationOnFamilyEventException(CalendarExceptionMessages.CannotAddMultipleFollowingEventsToEvent, familyEvent.Id);
-                    }
-                    if(familyEvent.Repeat == RepeatEvent.NONE && model.Repeat == RepeatEvent.NONE)
-                    {
-                        throw new InvalidOperationOnFamilyEventException(CalendarExceptionMessages.NonRepeatableEventCantHaveFollowingEvents, familyEvent.Id);
-                    }
-                    if(model.StartDate.Value.CompareTo(familyEvent.EndDate) < 0)
-                    {
-                        throw new FamilyEventDateException(CalendarExceptionMessages.FollowingEventMustBeAfterEvent, model.StartDate, model.EndDate);
-                    }
-                    var newEvent = _mapper.Map<FamilyEvent>(model);
-                    newEvent.FamilyTreeId = familyEvent.FamilyTreeId;
-                    newEvent.ParentEvent = familyEvent;
-                    if (model.Repeat == null || model.Repeat == familyEvent.Repeat)
-                    {
-                        newEvent.Repeat = familyEvent.Repeat;
-                    }
-                    if (model.ReminderOffest == null)
-                    {
-                        newEvent.ReminderOffest = familyEvent.ReminderOffest;
-                    }
-                    if (model.Note == null)
-                    {
-                        newEvent.Note = familyEvent.Note;
-                    }
-                    await _unitOfWork.Repository<FamilyEvent>().AddAsync(newEvent);
+                    throw new InvalidOperationOnFamilyEventException(CalendarExceptionMessages.NonRepeatableEventCantHaveFollowingEvents, familyEvent.Id);
                 }
+                if(model.StartDate.Value.CompareTo(familyEvent.EndDate) < 0)
+                {
+                    throw new FamilyEventDateException(CalendarExceptionMessages.FollowingEventMustBeAfterEvent, model.StartDate, model.EndDate);
+                }
+                var newEvent = _mapper.Map<FamilyEvent>(model);
+                newEvent.FamilyTreeId = familyEvent.FamilyTreeId;
+                newEvent.ParentEvent = familyEvent;
+                if (model.Repeat == null || model.Repeat == familyEvent.Repeat)
+                {
+                    newEvent.Repeat = familyEvent.Repeat;
+                }
+                if (model.ReminderOffest == null)
+                {
+                    newEvent.ReminderOffest = familyEvent.ReminderOffest;
+                }
+                if (model.Note == null)
+                {
+                    newEvent.Note = familyEvent.Note;
+                }
+                await _unitOfWork.Repository<FamilyEvent>().AddAsync(newEvent);
             } else if (!(model.StartDate == null && model.EndDate == null)) // missing input 
             {
                 throw new FamilyEventDateException(CalendarExceptionMessages.MissingDateOnInput, model.StartDate, model.EndDate);    

@@ -16,8 +16,5 @@ namespace FamilyTreeBackend.Core.Application.Models.FamilyEvents
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public RepeatEvent? Repeat { get; set; }
-        [Required]
-        [DefaultValue(false)]
-        public bool ApplyToFollowingEvents { get; set; }
     }
 }
