@@ -253,7 +253,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                     StartDate = model.StartDate.Value,
                     EndDate = model.EndDate.Value,
                     IsCancelled = true,
-                    IsRescheduled = true,
+                    IsRescheduled = false,
                 };
 
                 await _unitOfWork.Repository<FamilyEventExceptionCase>().AddAsync(cancelOld);
