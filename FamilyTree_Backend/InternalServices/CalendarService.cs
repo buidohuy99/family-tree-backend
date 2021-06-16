@@ -173,32 +173,18 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                 throw new FamilyEventDateException(CalendarExceptionMessages.MissingDateOnInput, model.StartDate, model.EndDate);    
             } else // Update without changing the start and end date
             {
-                if (model.Repeat == null || model.Repeat == familyEvent.Repeat)
+                if (model.ReminderOffest != null)
                 {
-                    if (model.ReminderOffest != null)
-                    {
-                        familyEvent.ReminderOffest = model.ReminderOffest.Value;
-                    }
-                    if (model.Note != null)
-                    {
-                        familyEvent.Note = model.Note;
-                    }
+                    familyEvent.ReminderOffest = model.ReminderOffest.Value;
                 }
-                else
+                if (model.Note != null)
+                {
+                    familyEvent.Note = model.Note;
+                }
+                if (model.Repeat != null)
                 {
                     checkTimeSpanOfInputValid(model.Repeat.Value, familyEvent.StartDate, familyEvent.EndDate);
-
-                    var newEvent = new FamilyEvent() { 
-                        ParentEvent = familyEvent,
-                        Note = model.Note ?? familyEvent.Note,
-                        ReminderOffest = model.ReminderOffest.HasValue ? model.ReminderOffest.Value : familyEvent.ReminderOffest,
-                        StartDate = familyEvent.StartDate,
-                        EndDate = familyEvent.EndDate,
-                        Repeat = model.Repeat.Value,
-                        FamilyTreeId = familyEvent.FamilyTreeId
-                    };
-
-                    await _unitOfWork.Repository<FamilyEvent>().AddAsync(newEvent);
+                    familyEvent.Repeat = model.Repeat.Value;
                 }
             }
             
