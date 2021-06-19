@@ -18,6 +18,7 @@ using StopWord;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Security.Claims;
 using System.Security.Policy;
 using System.Text;
@@ -57,11 +58,12 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
             var clientSite = _configuration.GetValue<string>("ClientSite");
             var passwordResetUrl = clientSite + string.Format(ResetEmailUrl, token, email);
-            
-            string emailContent = EmailTemplatesManager.GetEmailCotent(EmailTemplatesManager.ResetPassword, passwordResetUrl);
+            var encodedUrl = WebUtility.UrlEncode(passwordResetUrl);
+
+            string emailContent = EmailTemplatesManager.GetEmailCotent(EmailTemplatesManager.ResetPassword, encodedUrl);
             if (string.IsNullOrEmpty(emailContent))
             {
-                return $"Reset password link: {passwordResetUrl}";
+                return $"Reset password link: {encodedUrl}";
             }
             return emailContent;
         }
@@ -90,11 +92,12 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             var clientSite = _configuration.GetValue<string>("ClientSite");
             var confirmEmailUrl = clientSite + string.Format(ConfirmEmailUrl, token, user.Email);
-            
-            string emailContent = EmailTemplatesManager.GetEmailCotent(EmailTemplatesManager.ConfirmEmail, confirmEmailUrl);
+            var encodedUrl = WebUtility.UrlEncode(confirmEmailUrl);
+
+            string emailContent = EmailTemplatesManager.GetEmailCotent(EmailTemplatesManager.ConfirmEmail, encodedUrl);
             if (string.IsNullOrEmpty(emailContent))
             {
-                return $"Email confirmation link: {confirmEmailUrl}";
+                return $"Email confirmation link: {encodedUrl}";
             }
             return emailContent;
         }

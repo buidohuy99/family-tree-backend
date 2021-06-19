@@ -54,7 +54,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             //await Task.CompletedTask;
         }
 
-        public async Task SendResetPasswordEmail(string email, string resetPasswordUrl)
+        public async Task SendResetPasswordEmail(string email, string emailContent)
         {
             try
             {
@@ -64,7 +64,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                 message.Subject = "Orgigin Keeper: Reset your password";
                 message.Body = new TextPart("html")
                 {
-                    Text = $"here is your bloody link: ${resetPasswordUrl}",
+                    Text = emailContent,
                 };
 
                 using (var client = new SmtpClient())
@@ -84,7 +84,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             }
         }
 
-        public async Task SendEmailConfirmationEmail(string email, string confirmUrl)
+        public async Task SendEmailConfirmationEmail(string email, string emailContent)
         {
             try
             {
@@ -94,7 +94,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                 message.Subject = "Orgigin Keeper: Email Confirmation";
                 message.Body = new TextPart("html")
                 {
-                    Text = $"here is your bloody link: ${confirmUrl}",
+                    Text = emailContent,
                 };
 
                 using (var client = new SmtpClient())

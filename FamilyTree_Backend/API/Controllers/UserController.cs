@@ -56,8 +56,8 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
         [SwaggerResponse(200, Description = "Email has been successfully sent")]
         public async Task<IActionResult> SendResetPasswordToken([FromBody] ResetPasswordEmailInputModel input)
         {
-            var resetPasswordUrl = await _userService.GenerateResetPassowrdEmail(input.Email);
-            await _emailService.SendResetPasswordEmail(input.Email, resetPasswordUrl);
+            var emailContent = await _userService.GenerateResetPassowrdEmail(input.Email);
+            await _emailService.SendResetPasswordEmail(input.Email, emailContent);
             return Ok();
         }
 
