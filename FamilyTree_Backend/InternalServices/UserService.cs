@@ -438,28 +438,28 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
         private const string Sql_GetUserConnection = @"
 with
 _connectedUserLevel1 as (
-select p1.UserId as SourceId
-, p2.UserId as DestinationId
+select p1.UserId as SourceUserId
+, p2.UserId as DestinationUserId
 , p1.FamilyTreeId
 from Person p1 inner join Person p2 on (p1.FamilyTreeId = p2.FamilyTreeId and p2.UserId is not null)
 where p1.UserId = @SourceUser
 ),
 
 _connectedUserLevel2 as (
-select p1.UserId as SourceId
-, p2.UserId as DestinationId
+select p1.UserId as SourceUserId
+, p2.UserId as DestinationUserId
 , p1.FamilyTreeId
 from _connectedUserLevel1 lv1 
-inner join Person p1 on (lv1.SourceId = p1.UserId) 
+inner join Person p1 on (lv1.SourceUserId = p1.UserId and p1.FamilyTreeId not in (select FamilyTreeId from _connectedUserLevel1)) 
 inner join Person p2 on (p1.FamilyTreeId = p2.FamilyTreeId and p2.UserId is not null)
 ),
 
 _connectedUserLevel3 as (
-select p1.UserId as SourceId
-, p2.UserId as DestinationId
+select p1.UserId as SourceUserId
+, p2.UserId as DestinationUserId
 , p1.FamilyTreeId
 from _connectedUserLevel1 lv2 
-inner join Person p1 on (lv2.SourceId = p1.UserId) 
+inner join Person p1 on (lv2.SourceUserId = p1.UserId  and p1.FamilyTreeId not in (select FamilyTreeId from _connectedUserLevel2)) 
 inner join Person p2 on (p1.FamilyTreeId = p2.FamilyTreeId and p2.UserId is not null)
 ),
 
@@ -477,14 +477,14 @@ from _connectedUserLevel3
 _reachedDestinationConnections as (
 select *
 from _map
-where _map.DestinationId = @DestinationUser
+where _map.DestinationUserId = @DestinationUser
 )
 
 
 select _map.*
 from _map inner join _reachedDestinationConnections 
-on (_map.SourceId = _reachedDestinationConnections.SourceId 
-OR _map.DestinationId = _reachedDestinationConnections.SourceId)
+on (_map.SourceUserId = _reachedDestinationConnections.SourceUserId 
+OR _map.DestinationUserId = _reachedDestinationConnections.SourceUserId)
 union
 select *
 from _reachedDestinationConnections";
