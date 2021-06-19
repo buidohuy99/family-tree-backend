@@ -33,7 +33,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices.EmailTemplat
 
                     string body = @"{0}";
                     body = string.Format(body, SourceReader.ReadToEnd());
-                    return string.Format(body, "hello");
+                    return string.Format(body, args);
                 }
             }
             catch(Exception e)
