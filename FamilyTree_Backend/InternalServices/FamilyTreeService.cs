@@ -88,7 +88,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             {
                 throw new TreeNotFoundException(TreeExceptionMessages.TreeNotFound, treeId);
             }
-            
+
             _unitOfWork.Repository<FamilyTree>().Delete(tree);
 
             await _unitOfWork.SaveChangesAsync();
@@ -120,7 +120,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                 .ToListAsync();
 
             List<FamilyTreeListItemModel> models = new List<FamilyTreeListItemModel>();
-            foreach(var tree in trees)
+            foreach (var tree in trees)
             {
                 models.Add(_mapper.Map<FamilyTreeListItemModel>(tree));
             }
@@ -142,7 +142,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
 
             var addedUser = new List<string>();
 
-            foreach(var username in userNames)
+            foreach (var username in userNames)
             {
                 var user = await _userManager.FindByNameAsync(username);
 
@@ -226,7 +226,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             };
             contributors.Owner = new UserDTO(tree.Owner);
 
-            foreach(var editor in tree.Editors)
+            foreach (var editor in tree.Editors)
             {
                 contributors.Editors.Add(new UserDTO(editor));
             }
@@ -251,7 +251,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             }
 
             query = query.Include(e => e.Owner).Include(e => e.Editors)
-                .Where(e => e.PublicMode == true || e.OwnerId == applicationUser.Id || e.Editors.Any(editor => editor.Id == applicationUser.Id));
+                .Where(e => e.PublicMode == true || e.OwnerId == applicationUser.Id || e.Editors.Any(editor => editor.Id == applicationUser.Id) || e.People.Any(p => p.UserId.Equals(applicationUser.Id)));
 
             List<FamilyTreeListItemModel> trees = new List<FamilyTreeListItemModel>();
             foreach (var tree in (await query.ToListAsync()))
@@ -474,7 +474,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                 .Include(tr => tr.Owner)
                 .Include(tr => tr.Editors)
                 .Where(tr => tr.DateCreated == null || tr.DateCreated.Value.CompareTo(model.CreatedBefore) <= 0)
-                .Where(tr => tr.OwnerId.Equals(applicationUser.Id) || tr.Editors.Any(e => e.Id.Equals(applicationUser.Id)));
+                .Where(tr => tr.OwnerId.Equals(applicationUser.Id) || tr.Editors.Any(e => e.Id.Equals(applicationUser.Id)) || tr.People.Any(p => p.UserId.Equals(applicationUser.Id)));
 
             var totalPage = (ulong)MathF.Ceiling((ulong)trees.Count() / (float)model.ItemsPerPage);
             totalPage = totalPage <= 0 ? 1 : totalPage;
@@ -524,7 +524,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             }
 
             query = query.Where(tr => tr.DateCreated == null || tr.DateCreated.Value.CompareTo(model.CreatedBefore) <= 0)
-                .Where(tr => tr.PublicMode == true || tr.OwnerId.Equals(applicationUser.Id) || tr.Editors.Any(e => e.Id.Equals(applicationUser.Id)));
+                .Where(tr => tr.PublicMode == true || tr.OwnerId.Equals(applicationUser.Id) || tr.Editors.Any(e => e.Id.Equals(applicationUser.Id)) || tr.People.Any(p => p.UserId.Equals(applicationUser.Id)));
 
             var totalPage = (ulong)MathF.Ceiling((ulong)query.Count() / (float)model.ItemsPerPage);
             totalPage = totalPage <= 0 ? 1 : totalPage;

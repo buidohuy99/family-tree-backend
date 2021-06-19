@@ -608,9 +608,20 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                 throw new PersonNotFoundException(PersonExceptionMessages.PersonNotFound, personId);
             }
 
-            if(updatedPersonModel.UserId != null && _userManager.FindByIdAsync(updatedPersonModel.UserId) == null)
+            if(updatedPersonModel.UserId != null)
             {
-                throw new UserNotFoundException(UserExceptionMessages.UserNotFound, updatedPersonModel.UserId);
+                if (!_userManager.Users.Any( u => u.Id == updatedPersonModel.UserId))
+                {
+                    throw new UserNotFoundException(UserExceptionMessages.UserNotFound, updatedPersonModel.UserId);
+                }
+
+                var existingNodeRelatedToUser = await _unitOfWork.Repository<Person>().GetDbset()
+                    .AnyAsync(e => e.FamilyTreeId == person.FamilyTreeId && e.UserId == updatedPersonModel.UserId && e.Id != person.Id);
+                if (existingNodeRelatedToUser)
+                {
+
+                    throw new UserExistsInTreeException(PersonExceptionMessages.UserAlreadyExistedInTree, updatedPersonModel.UserId, person.FamilyTreeId);
+                }
             }
 
             _mapper.Map(updatedPersonModel, person);

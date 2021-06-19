@@ -237,13 +237,13 @@ namespace FamilyTreeBackend.Presentation.API.Controllers
             return Ok();
         }
 
-        [HttpGet("find-user-connection")]
-        [SwaggerOperation(Summary = "Test trigger notification")]
+        [HttpPost("find-user-connection")]
+        [SwaggerOperation(Summary = "Find User Connection")]
         [SwaggerResponse(200, Type = typeof(HttpResponse<IEnumerable<UserConnectionDTO>>),
             Description = "The list of connections, with each node in the list lead to another node (if any), eventually to the destination user, max 3 nodes deep")]
-        public async Task<IActionResult> FindUserConnection([FromBody] string searchingUserId)
+        public async Task<IActionResult> FindUserConnection([FromBody] FindUserConnectionInputModel input)
         {
-            var result = await _userService.FindUserConnection(User, searchingUserId);
+            var result = await _userService.FindUserConnection(User, input.searchUserId);
             return Ok(new HttpResponse<IEnumerable<UserConnectionDTO>>(result, GenericResponseStrings.UserController_FindConnectionsSuccessul));
         }
     }
