@@ -25,6 +25,15 @@ namespace FamilyTreeBackend.Presentation.API.Handlers
 
             var tree = resource.FamilyTree;
 
+            if (tree.PublicMode == true && (requirement.Name == TreeOperations.Read.Name
+                    || requirement.Name == PersonOperations.Read.Name
+                    || requirement.Name == EventOperations.Read.Name
+                    || requirement.Name == MemoryOperations.Read.Name))
+            {
+                context.Succeed(requirement);
+                return Task.CompletedTask;
+            }
+
             if (user?.FindFirst(ClaimTypes.NameIdentifier)?.Value.Equals(tree.OwnerId) == true)
             {
                 context.Succeed(requirement);

@@ -18,6 +18,15 @@ namespace FamilyTreeBackend.Presentation.API.Handlers
             
             try
             {
+                if(resource.PublicMode == true && (requirement.Name == TreeOperations.Read.Name 
+                    || requirement.Name == PersonOperations.Read.Name
+                    || requirement.Name == EventOperations.Read.Name
+                    || requirement.Name == MemoryOperations.Read.Name))
+                {
+                    context.Succeed(requirement);
+                    return Task.CompletedTask;
+                }
+
                 //check if user is owner
                 if (user?.FindFirst(ClaimTypes.NameIdentifier)?.Value.Equals(resource.OwnerId) == true)
                 {
