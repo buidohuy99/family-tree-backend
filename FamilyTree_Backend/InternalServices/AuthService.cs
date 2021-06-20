@@ -50,7 +50,14 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                 {
                     throw new LoginUserFailException(AuthExceptionMessages.InvalidPassword);
                 }
-                
+
+                // purgeeeee old stuff or stuff that no longer has an owner
+                foreach (var foundToken in _unitOfWork.GetRefreshTokens().Where(t => t.UserId == null || (t.UserId.Equals(user.Id) && DateTime.UtcNow.CompareTo(t.ExpiredDate) > 0)))
+                {
+                    _unitOfWork.GetRefreshTokens().Attach(foundToken);
+                    _unitOfWork.GetRefreshTokens().Remove(foundToken);
+                }
+
                 if (user.Status == false)
                 {
                     throw new LoginUserFailException(AuthExceptionMessages.DisabledUser);
