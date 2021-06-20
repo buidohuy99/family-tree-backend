@@ -117,6 +117,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
             IEnumerable<FamilyTree> trees = await _unitOfWork.Repository<FamilyTree>().GetDbset()
                 .Include(tr => tr.Owner)
                 .Include(tr => tr.Editors)
+                .Where(tr => tr.PublicMode == true)
                 .ToListAsync();
 
             List<FamilyTreeListItemModel> models = new List<FamilyTreeListItemModel>();
