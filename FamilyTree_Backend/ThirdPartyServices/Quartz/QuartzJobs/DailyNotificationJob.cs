@@ -79,7 +79,7 @@ FROM FamilyEvent e LEFT JOIN FamilyEventExceptionCases ex ON e.Id = ex.FamilyEve
 WHERE
 ----if not cancelled or rescheduled to another day
 (
-NOT (coalesce(CAST(ex.IsCancelled AS BIT), 0)== 1 
+NOT (coalesce(CAST(ex.IsCancelled AS BIT), 0) = 1 
 	AND coalesce(CAST(ex.StartDate AS DATE), '0001-01-01') = CAST(DATEADD(day, e.ReminderOffest, @Today) AS DATE))
 AND (
 --non repeat
