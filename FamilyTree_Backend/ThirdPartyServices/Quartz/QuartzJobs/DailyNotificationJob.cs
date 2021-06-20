@@ -47,11 +47,11 @@ namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices.Quartz.Qua
                 .Where(tr => tr.Id == familyEvent.FamilyTreeId)
                 .SingleOrDefaultAsync();
 
-            _= AddNotificationToUser($"Reminder for event: {familyEvent.Note} on {familyEvent.StartDate:yyyy/MM/dd HH:mm}", tree.Owner);
+            await AddNotificationToUser($"Reminder for event: {familyEvent.Note} on {familyEvent.StartDate:yyyy/MM/dd HH:mm}", tree.Owner);
 
             foreach (var editors in tree.Editors)
             {
-                _= AddNotificationToUser($"Reminder for event: {familyEvent.Note}", editors);
+                await AddNotificationToUser($"Reminder for event: {familyEvent.Note}", editors);
             }
         }
 
