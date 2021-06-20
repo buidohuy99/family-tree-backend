@@ -57,6 +57,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                     _unitOfWork.GetRefreshTokens().Attach(foundToken);
                     _unitOfWork.GetRefreshTokens().Remove(foundToken);
                 }
+                await _unitOfWork.SaveChangesAsync();
 
                 if (user.Status == false)
                 {
