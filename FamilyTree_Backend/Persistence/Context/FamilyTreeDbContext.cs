@@ -388,6 +388,14 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
         {
             var logger = Log.Logger;
 
+            if (!roleManager.Roles.Any())
+            {
+                logger.Information("Seeding user roles...");
+                await roleManager.CreateAsync(new IdentityRole(ApplicationUserRoles.Admin));
+                await roleManager.CreateAsync(new IdentityRole(ApplicationUserRoles.User));
+                logger.Information("Seeding complete for user roles...");
+            }
+
             if (!userManager.Users.Any())
             {
                 logger.Information("Seeding test user...");
@@ -405,16 +413,9 @@ namespace FamilyTreeBackend.Infrastructure.Persistence.Context
                 };
 
                 await userManager.CreateAsync(defaultUser, "test@123");
+                await userManager.AddToRoleAsync(defaultUser, ApplicationUserRoles.Admin);
 
                 logger.Information("Seeding complete for test user...");
-            }
-
-            if (!roleManager.Roles.Any())
-            {
-                logger.Information("Seeding user roles...");
-                await roleManager.CreateAsync(new IdentityRole(ApplicationUserRoles.Admin));
-                await roleManager.CreateAsync(new IdentityRole(ApplicationUserRoles.User));
-                logger.Information("Seeding complete for user roles...");
             }
         }
     }

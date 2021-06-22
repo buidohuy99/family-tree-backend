@@ -42,7 +42,7 @@ namespace Operation.Areas.Identity.Pages.Account
         public class InputModel
         {
             [Required]
-            [EmailAddress]
+            [Display(Name = "Username or Email")]
             public string Email { get; set; }
 
             [Required]
@@ -79,10 +79,14 @@ namespace Operation.Areas.Identity.Pages.Account
             if (ModelState.IsValid)
             {
                 var user = await _userManager.FindByEmailAsync(Input.Email);
+                if (user == null)
+                {
+                    user = await _userManager.FindByNameAsync(Input.Email);
+                }
                 var roles = user == null ? null : await _userManager.GetRolesAsync(user);
                 if (roles == null)
                 {
-                    ModelState.AddModelError(string.Empty, "User with this email does not exists");
+                    ModelState.AddModelError(string.Empty, "User does not exists");
                     return Page();
                 }
                 if (!roles.Any(str => str.Equals(ApplicationUserRoles.Admin)))
