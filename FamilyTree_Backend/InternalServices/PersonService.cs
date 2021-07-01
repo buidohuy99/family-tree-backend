@@ -48,7 +48,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                 }
 
                 // check if user connected to this new parent node is an existing tree node or not (we dont want the user to exist as a tree node)
-                if (input.ParentInfo.UserId != null)
+                if (!string.IsNullOrEmpty(input.ParentInfo.UserId))
                 {
                     var connectedUser = await _userManager.FindByIdAsync(input.ParentInfo.UserId);
                     if (connectedUser == null)
@@ -195,7 +195,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                 }
 
                 // check if user connected to this new parent node is an existing tree node or not (we dont want the user to exist as a tree node)
-                if (input.SpouseInfo.UserId != null)
+                if (!string.IsNullOrEmpty(input.SpouseInfo.UserId))
                 {
                     var connectedUser = await _userManager.FindByIdAsync(input.SpouseInfo.UserId);
                     if (connectedUser == null)
@@ -314,7 +314,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                 }
                 
                 // check if user connected to this new parent node is an existing tree node or not (we dont want the user to exist as a tree node)
-                if (input.ChildInfo.UserId != null)
+                if (!string.IsNullOrEmpty(input.ChildInfo.UserId))
                 {
                     var connectedUser = await _userManager.FindByIdAsync(input.ChildInfo.UserId);
                     if (connectedUser == null)
@@ -394,8 +394,8 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                         await entryFamily.Reference(e => e.Relationship).LoadAsync();
                     }
                 }
-                await transaction.CommitAsync();
-                    // entry the new parent
+               
+                // entry the new parent
                 if (parent2 != null)
                 {
                     var entryParent = _unitOfWork.Entry(parent2);
@@ -414,6 +414,8 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                         }
                     }
                 }
+
+                await transaction.CommitAsync();
 
                 // Populate response
                 response.NewChildInfo = new PersonDTO(newChild);
@@ -608,7 +610,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                 throw new PersonNotFoundException(PersonExceptionMessages.PersonNotFound, personId);
             }
 
-            if(updatedPersonModel.UserId != null)
+            if(!string.IsNullOrEmpty(updatedPersonModel.UserId))
             {
                 if (!_userManager.Users.Any( u => u.Id == updatedPersonModel.UserId))
                 {
