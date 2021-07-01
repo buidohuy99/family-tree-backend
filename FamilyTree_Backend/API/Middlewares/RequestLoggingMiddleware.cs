@@ -19,6 +19,7 @@ namespace FamilyTreeBackend.Presentation.API.Middlewares
         private readonly RequestDelegate _next;
         private readonly RecyclableMemoryStreamManager _recyclableMemoryStreamManager = new RecyclableMemoryStreamManager();
         private Regex apiPathFilter = new Regex("/api/");
+        private Regex fileUploadFilter = new Regex("/file-upload/");
         private const long CONTENT_LENGTH_LIMIT = 2097152;
         public RequestLoggingMiddleware(RequestDelegate next)
         {
@@ -57,7 +58,8 @@ namespace FamilyTreeBackend.Presentation.API.Middlewares
                 return;
             }
 
-            if (context.Request.ContentType != null && context.Request.ContentType.Equals("multipart/form-data"))
+            if ((context.Request.ContentType != null && context.Request.ContentType.Equals("multipart/form-data"))
+                || fileUploadFilter.IsMatch(context.Request.Path.Value))
             {
                 logContainer.RequestBody = "Content is files";
                 return;
