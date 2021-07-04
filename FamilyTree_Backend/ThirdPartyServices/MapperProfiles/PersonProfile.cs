@@ -9,7 +9,6 @@ namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices.MapperProf
 {
     public class PersonProfile : Profile
     {
-        private readonly UserManager<ApplicationUser> _userManager;
         public PersonProfile()
         {
             CreateMap<Person, PersonModel>()
@@ -25,7 +24,9 @@ namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices.MapperProf
 
             CreateMap<Person, PersonDetailsModel>()
                 .ForMember(dest => dest.Father, opt => opt.MapFrom(src => src.ChildOfFamily.Parent1))
-                .ForMember(dest => dest.Mother, opt => opt.MapFrom(src => src.ChildOfFamily.Parent2));
+                .ForMember(dest => dest.Mother, opt => opt.MapFrom(src => src.ChildOfFamily.Parent2))
+                .ForMember(dest => dest.ConnectedUser, opt => opt.MapFrom(src => src.ConnectedUser));
+
             CreateMap<Relationship, RelationshipDTO>();
             CreateMap<Relationship, FileIOSpouseDTO.FileIOSpouseRelationshipDTO>().ReverseMap();
             CreateMap<Person, PersonSummaryDTO>();
