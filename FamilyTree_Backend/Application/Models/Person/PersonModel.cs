@@ -1,4 +1,5 @@
-﻿using FamilyTreeBackend.Core.Domain.Entities;
+﻿using FamilyTreeBackend.Core.Application.DTOs;
+using FamilyTreeBackend.Core.Domain.Entities;
 using FamilyTreeBackend.Core.Domain.Enums;
 using System;
 using System.Collections.Generic;
@@ -21,6 +22,7 @@ namespace FamilyTreeBackend.Core.Application.Models
         public IEnumerable<PersonModel> Spouses;
         public string Note { get; set; }
         public string UserId { get; set; }
+        public UserIconDTO ConnectedUser { get; set; }
         public string ImageUrl { get; set; }
     }
 }

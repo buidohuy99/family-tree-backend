@@ -3,16 +3,19 @@ using FamilyTreeBackend.Core.Application.DTOs;
 using FamilyTreeBackend.Core.Application.Models;
 using FamilyTreeBackend.Core.Application.Models.Person;
 using FamilyTreeBackend.Core.Domain.Entities;
+using Microsoft.AspNetCore.Identity;
 
 namespace FamilyTreeBackend.Infrastructure.Service.ThirdPartyServices.MapperProfiles
 {
     public class PersonProfile : Profile
     {
+        private readonly UserManager<ApplicationUser> _userManager;
         public PersonProfile()
         {
             CreateMap<Person, PersonModel>()
                 .ForMember(dest => dest.Parent1Id, opt => opt.MapFrom(src => src.ChildOfFamily.Parent1Id))
-                .ForMember(dest => dest.Parent2Id, opt => opt.MapFrom(src => src.ChildOfFamily.Parent2Id));
+                .ForMember(dest => dest.Parent2Id, opt => opt.MapFrom(src => src.ChildOfFamily.Parent2Id))
+                .ForMember(dest => dest.ConnectedUser, opt => opt.MapFrom(src => src.ConnectedUser));
             CreateMap<Person, FileIOPersonDTO>()
                .ForMember(dest => dest.Parent1Id, opt => opt.MapFrom(src => src.ChildOfFamily.Parent1Id))
                .ForMember(dest => dest.Parent2Id, opt => opt.MapFrom(src => src.ChildOfFamily.Parent2Id))

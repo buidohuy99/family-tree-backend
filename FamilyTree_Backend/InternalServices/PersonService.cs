@@ -446,6 +446,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
         {
             Person person =  await _unitOfWork.Repository<Person>().GetDbset()
                 .Include(p => p.ChildOfFamily)
+                .Include(p => p.ConnectedUser)
                 .Where(p => p.Id == id)
                 .FirstOrDefaultAsync();
 
@@ -636,6 +637,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
         public async Task<PersonDetailsModel> GetPersonDetail(long personId)
         {
             var person = await _unitOfWork.Repository<Person>().GetDbset()
+                .Include(p => p.ConnectedUser)
                 .Include(p => p.ChildOfFamily)
                 .ThenInclude(f => f.Parent1)
                 .Include(p => p.ChildOfFamily)
