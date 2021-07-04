@@ -611,9 +611,11 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                 throw new PersonNotFoundException(PersonExceptionMessages.PersonNotFound, personId);
             }
 
-            if(!string.IsNullOrEmpty(updatedPersonModel.UserId))
+            ApplicationUser taggedUser = null;
+            if (!string.IsNullOrEmpty(updatedPersonModel.UserId))
             {
-                if (!_userManager.Users.Any( u => u.Id == updatedPersonModel.UserId))
+                taggedUser = await _userManager.FindByIdAsync(updatedPersonModel.UserId);
+                if (taggedUser == null)
                 {
                     throw new UserNotFoundException(UserExceptionMessages.UserNotFound, updatedPersonModel.UserId);
                 }
@@ -622,12 +624,12 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
                     .AnyAsync(e => e.FamilyTreeId == person.FamilyTreeId && e.UserId == updatedPersonModel.UserId && e.Id != person.Id);
                 if (existingNodeRelatedToUser)
                 {
-
                     throw new UserExistsInTreeException(PersonExceptionMessages.UserAlreadyExistedInTree, updatedPersonModel.UserId, person.FamilyTreeId);
                 }
             }
 
             _mapper.Map(updatedPersonModel, person);
+            person.ConnectedUser = taggedUser;
 
             await _unitOfWork.SaveChangesAsync();
 
