@@ -52,7 +52,7 @@ namespace FamilyTreeBackend.Infrastructure.Service.InternalServices
         public async Task<FamilyTreeModel> FindFamilyTree(long treeId)
         {
             FamilyTree tree = await _unitOfWork.Repository<FamilyTree>().GetDbset()
-                .Include(ft => ft.People)
+                .Include(ft => ft.People).ThenInclude(p => p.ConnectedUser)
                 .Include(ft => ft.Families)
                 .FirstOrDefaultAsync(ft => ft.Id == treeId);
 

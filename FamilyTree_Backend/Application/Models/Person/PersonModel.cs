@@ -24,5 +24,8 @@ namespace FamilyTreeBackend.Core.Application.Models
         public string UserId { get; set; }
         public UserIconDTO ConnectedUser { get; set; }
         public string ImageUrl { get; set; }
+        public string PhoneNumber { get; set; }
+        public string HomeAddress { get; set; }
+        public string Occupation { get; set; }
     }
 }
